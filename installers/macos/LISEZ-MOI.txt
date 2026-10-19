@@ -1,0 +1,27 @@
+FileForge pour macOS
+====================
+
+Boîte à outils pour tes fichiers : PDF (fusionner, diviser, compresser, rogner,
+signer, caviarder, OCR, convertir en Word/Excel/PowerPoint…), images, vidéos,
+audio, documents. Tout se fait dans une roue qui s'ouvre sous ta souris.
+Tout reste sur ton Mac : aucun fichier n'est envoyé sur Internet.
+
+INSTALLATION (une fois, ~5 minutes, connexion Internet nécessaire)
+1. Fais un clic droit (ou Ctrl + clic) sur « install.command » → Ouvrir.
+   macOS demande une confirmation car le fichier vient d'Internet : clique « Ouvrir ».
+   (Si le bouton n'apparaît pas : Réglages Système → Confidentialité et sécurité →
+   « Ouvrir quand même », tout en bas.)
+2. Laisse le Terminal travailler jusqu'au message « FileForge est installé ! ».
+   Aucun mot de passe administrateur n'est demandé.
+
+UTILISATION
+- Dans le Finder, sélectionne des fichiers puis ⌃⌥F (Ctrl + Option + F).
+- Ou clic droit → Actions rapides → FileForge…
+- Ou glisse des fichiers sur FileForge.app (dossier Applications de ton compte).
+
+Dans la roue : survole une catégorie, tape au clavier pour chercher une action,
+Entrée pour lancer, Échap pour revenir. Les originaux ne sont jamais modifiés.
+
+DÉSINSTALLER
+Double-clique sur ~/Library/Application Support/FileForge/uninstall.command
+(ou relance « uninstall.command » depuis ce dossier).

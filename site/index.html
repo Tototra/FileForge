@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FileForge</title>
+<meta name="description" content="Convertir, compresser, rogner, signer : FileForge s'ouvre en roue d'un clic droit sur tes fichiers. Gratuit, open source, et rien ne quitte ton ordinateur. Pour macOS, Windows et Linux.">
+<meta name="theme-color" content="#E6E9EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15161D" media="(prefers-color-scheme: dark)">
+<meta property="og:title" content="FileForge">
+<meta property="og:description" content="Clic droit, une roue, c'est fait. La boîte à outils de fichiers qui reste sur ton ordinateur.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="/assets/icon-256.png">
+<link rel="icon" type="image/png" href="/assets/favicon.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/atkinson-hyperlegible-next.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<a class="skip" href="#contenu">Aller au contenu</a>
+
+<header class="top">
+  <a class="brand" href="/" aria-label="FileForge, accueil">
+    <img src="/assets/favicon.png" alt="" width="28" height="28">
+    <span>FileForge</span>
+  </a>
+  <nav aria-label="Principale">
+    <a href="#fonctions">Fonctions</a>
+    <a href="#confidentialite">Confidentialité</a>
+    <a href="#telecharger">Télécharger</a>
+    <a class="gh" href="https://github.com/Tototra/FileForge" aria-label="Code source sur GitHub" data-icon="github"></a>
+  </nav>
+</header>
+
+<main id="contenu">
+  <section class="hero" aria-labelledby="titre">
+    <div class="hero-text">
+      <h1 id="titre"><span>Clic droit.</span> <span>Une roue.</span> <span>C'est fait.</span></h1>
+      <p class="lead">FileForge transforme tes fichiers sans quitter ton gestionnaire de fichiers&nbsp;: un PDF en Word, une vidéo trop lourde pour un mail, une photo à rogner, un contrat à signer. Gratuit, open source, et tout se passe sur ton ordinateur.</p>
+      <div class="cta">
+        <a class="btn" id="hero-dl" href="#telecharger">Télécharger FileForge</a>
+        <a class="quiet" id="hero-other" href="#telecharger">Voir tous les systèmes</a>
+      </div>
+      <p class="fine" id="hero-meta">macOS, Windows et Linux</p>
+    </div>
+
+    <figure class="demo" aria-label="Démonstration de la roue FileForge">
+      <div class="wheel-frame" id="wheel-frame">
+        <div class="wheel-stage" id="stage"></div>
+      </div>
+      <figcaption>
+        <span class="try" id="try-label">Essaie avec</span>
+        <div class="files" role="radiogroup" aria-labelledby="try-label" id="file-picker"></div>
+        <p class="hint" id="hint">Survole une catégorie, puis choisis une action.</p>
+      </figcaption>
+    </figure>
+  </section>
+
+  <section class="features" id="fonctions" aria-labelledby="t-fonctions">
+    <h2 id="t-fonctions">Près de soixante actions, rangées en sept catégories</h2>
+    <p class="section-lead">La roue ne montre que ce qui a du sens pour les fichiers sélectionnés. Les couleurs sont celles de la roue.</p>
+    <div class="cat-grid">
+      <article class="cat" style="--c:#7c5cff">
+        <h3>Convertir</h3>
+        <ul>
+          <li>PDF en Word, Excel, PowerPoint, images ou Markdown</li>
+          <li>Word, PowerPoint et Excel en PDF</li>
+          <li>Photos en JPG, PNG, WebP, HEIC, AVIF</li>
+          <li>Vidéos en MP4 ou en GIF animé</li>
+          <li>Audio en MP3, M4A, WAV, FLAC, OGG</li>
+          <li>Excel, CSV et JSON entre eux</li>
+        </ul>
+      </article>
+      <article class="cat" style="--c:#ec4899">
+        <h3>Éditer</h3>
+        <ul>
+          <li>Rogner en dessinant la zone à garder</li>
+          <li>Signer avec ta signature dessinée</li>
+          <li>Filigrane et numéros de page</li>
+          <li>Redimensionner, pivoter, passer en noir et blanc</li>
+          <li>Couper une vidéo ou un morceau, retirer le son</li>
+          <li>Normaliser le volume</li>
+        </ul>
+      </article>
+      <article class="cat" style="--c:#3b82f6">
+        <h3>Pages</h3>
+        <ul>
+          <li>Fusionner des PDF et des images</li>
+          <li>Diviser par page, par lot ou par plages</li>
+          <li>Extraire, supprimer, réorganiser des pages</li>
+          <li>Pivoter certaines pages seulement</li>
+        </ul>
+      </article>
+      <article class="cat" style="--c:#10b981">
+        <h3>Compresser</h3>
+        <ul>
+          <li>PDF, photos, vidéos et audio, en trois niveaux</li>
+          <li>Archive ZIP de plusieurs fichiers ou dossiers</li>
+        </ul>
+      </article>
+      <article class="cat" style="--c:#06b6d4">
+        <h3>Extraire</h3>
+        <ul>
+          <li>Les images contenues dans un PDF</li>
+          <li>La bande son d'une vidéo en MP3</li>
+          <li>Une image fixe d'une vidéo</li>
+          <li>Le contenu d'une archive</li>
+        </ul>
+      </article>
+      <article class="cat" style="--c:#f59e0b">
+        <h3>Sécurité</h3>
+        <ul>
+          <li>Protéger un PDF par mot de passe (AES-256)</li>
+          <li>Retirer un mot de passe que tu connais</li>
+          <li>Caviarder : masquer définitivement un passage</li>
+          <li>Effacer la position GPS et les métadonnées</li>
+        </ul>
+      </article>
+      <article class="cat" style="--c:#8b93a7">
+        <h3>Outils</h3>
+        <ul>
+          <li>OCR en français : rendre un scan cherchable</li>
+          <li>Aplatir les formulaires, réparer un PDF</li>
+          <li>Renommer en lot, fusionner des tableurs</li>
+          <li>Enchaîner : convertir puis compresser, d'un geste</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="privacy" id="confidentialite" aria-labelledby="t-privacy">
+    <h2 id="t-privacy">Tes fichiers restent chez toi</h2>
+    <p class="section-lead">Les convertisseurs en ligne envoient tes documents sur leurs serveurs. Avec FileForge, ton contrat, tes photos et tes relevés ne quittent jamais ton ordinateur.</p>
+    <div class="flows">
+      <div class="flow flow-web">
+        <h3>Un convertisseur en ligne</h3>
+        <ol>
+          <li data-icon="cloud-upload">Envoyer le fichier sur un serveur</li>
+          <li data-icon="hourglass">Attendre le traitement</li>
+          <li data-icon="download">Télécharger le résultat</li>
+          <li class="doubt">Espérer que l'original soit bien effacé</li>
+        </ol>
+      </div>
+      <div class="flow flow-ff">
+        <h3>FileForge</h3>
+        <ol>
+          <li data-icon="mouse-pointer-click">Clic droit sur le fichier</li>
+          <li data-icon="repeat">Choisir l'action dans la roue</li>
+          <li data-icon="circle-check">Le résultat apparaît à côté de l'original</li>
+        </ol>
+      </div>
+    </div>
+    <ul class="facts">
+      <li><strong>Hors ligne.</strong> Une fois installé, FileForge n'a plus besoin d'Internet.</li>
+      <li><strong>Sans risque.</strong> L'original n'est jamais modifié : chaque résultat est un nouveau fichier.</li>
+      <li><strong>Vérifiable.</strong> Le code est ouvert, sur GitHub, pour qui veut regarder dedans.</li>
+    </ul>
+  </section>
+
+  <section class="download" id="telecharger" aria-labelledby="t-dl">
+    <h2 id="t-dl">Télécharger FileForge</h2>
+    <p class="section-lead" id="dl-lead">Choisis ton système. L'installation prend environ cinq minutes et ne demande aucun mot de passe administrateur.</p>
+    <div class="os-list" id="os-list">
+      <article class="os" data-os="macos" aria-labelledby="os-mac">
+        <header>
+          <h3 id="os-mac">macOS</h3>
+          <p class="req">macOS 12 ou plus récent, Apple Silicon ou Intel</p>
+          <p class="yours" hidden>Ton système</p>
+        </header>
+        <a class="btn" href="/downloads/FileForge-macOS.zip" download data-file="macos">Télécharger pour macOS</a>
+        <p class="file" data-meta="macos">FileForge-macOS.zip</p>
+        <ol class="steps">
+          <li>Ouvre le zip téléchargé.</li>
+          <li>Clic droit sur <code>install.command</code>, puis Ouvrir. macOS demande une confirmation la première fois.</li>
+          <li>Dans le Finder, sélectionne des fichiers et appuie sur <kbd>⌃</kbd><kbd>⌥</kbd><kbd>F</kbd>.</li>
+        </ol>
+      </article>
+      <article class="os" data-os="windows" aria-labelledby="os-win">
+        <header>
+          <h3 id="os-win">Windows</h3>
+          <p class="req">Windows 10 ou 11</p>
+          <p class="yours" hidden>Ton système</p>
+        </header>
+        <a class="btn" href="/downloads/FileForge-Windows.zip" download data-file="windows">Télécharger pour Windows</a>
+        <p class="file" data-meta="windows">FileForge-Windows.zip</p>
+        <ol class="steps">
+          <li>Clic droit sur le zip, puis Extraire tout.</li>
+          <li>Double-clique sur <code>Installer FileForge.bat</code>. Si Windows te met en garde : Informations complémentaires, puis Exécuter quand même.</li>
+          <li>Dans l'Explorateur, sélectionne des fichiers et appuie sur <kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>F</kbd>, ou fais un clic droit.</li>
+        </ol>
+      </article>
+      <article class="os" data-os="linux" aria-labelledby="os-linux">
+        <header>
+          <h3 id="os-linux">Linux</h3>
+          <p class="req">Pensé pour Arch et Hyprland, fonctionne avec GNOME, KDE, Thunar ou Nemo</p>
+          <p class="yours" hidden>Ton système</p>
+        </header>
+        <a class="btn" href="/downloads/FileForge-Linux.tar.gz" download data-file="linux">Télécharger pour Linux</a>
+        <p class="file" data-meta="linux">FileForge-Linux.tar.gz</p>
+        <ol class="steps">
+          <li>Extrais l'archive : <code>tar xzf FileForge-Linux.tar.gz</code></li>
+          <li>Lance <code>./install.sh</code> dans le dossier <code>fileforge-linux</code>.</li>
+          <li>Appuie sur <kbd>Super</kbd><kbd>Alt</kbd><kbd>F</kbd>, ou clic droit sur des fichiers.</li>
+        </ol>
+      </article>
+    </div>
+    <p class="fine note">Pendant l'installation, FileForge télécharge son propre Python et ses bibliothèques (quelques centaines de Mo), sans toucher à ce qui est déjà installé. Ensuite, tout fonctionne hors ligne.</p>
+    <details class="checksums">
+      <summary>Vérifier l'intégrité des fichiers (SHA-256)</summary>
+      <dl id="sums"><dt>Chargement…</dt></dl>
+    </details>
+  </section>
+</main>
+
+<footer class="bottom">
+  <p><span id="version">FileForge</span>. Code source et suivi des problèmes sur <a href="https://github.com/Tototra/FileForge">GitHub</a>.</p>
+</footer>
+
+<script src="/assets/wheel-data.js"></script>
+<script src="/assets/site.js"></script>
+</body>
+</html>
