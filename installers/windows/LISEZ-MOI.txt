@@ -1,0 +1,41 @@
+FileForge pour Windows
+======================
+
+Boîte à outils pour tes fichiers : PDF (fusionner, diviser, compresser, rogner,
+signer, OCR, convertir en Word/Excel/PowerPoint…), images, vidéos, audio,
+documents. Tout se fait dans une roue qui s'ouvre sous ta souris.
+
+INSTALLATION (une seule fois, ~5 minutes, connexion Internet nécessaire)
+------------------------------------------------------------------------
+1. Extrais ce dossier zip (clic droit > Extraire tout).
+2. Double-clique sur « Installer FileForge.bat ».
+   Si Windows affiche « Windows a protégé votre ordinateur » :
+   clique sur « Informations complémentaires » puis « Exécuter quand même ».
+3. Laisse la fenêtre travailler jusqu'au message « FileForge est installé ! ».
+   Aucun droit administrateur n'est nécessaire. Rien n'est modifié en dehors
+   de ton compte utilisateur.
+
+UTILISATION
+-----------
+- Clic droit sur un ou plusieurs fichiers > FileForge...
+  (Windows 11 : clic droit > « Afficher d'autres options », ou Maj + clic droit)
+- Clic droit > Envoyer vers > FileForge : pratique pour beaucoup de fichiers.
+- Ctrl + Alt + F dans l'Explorateur : la roue s'ouvre sur les fichiers sélectionnés.
+- Glisse des fichiers sur l'icône FileForge du Bureau.
+
+Dans la roue :
+- Survole une catégorie (Convertir, Éditer, Pages, Compresser…) pour voir ses actions.
+- Tape au clavier pour chercher une action (« word », « signer »…), puis Entrée.
+- Échap : retour / fermer.
+- À la fin : Ouvrir, Afficher dans l'Explorateur, ou Enchaîner une autre action.
+Les fichiers d'origine ne sont jamais modifiés : le résultat est créé à côté.
+
+Pour convertir PowerPoint / Excel en PDF, il faut LibreOffice (gratuit, proposé
+pendant l'installation). Word vers PDF utilise Microsoft Word s'il est installé.
+
+DÉSINSTALLER
+------------
+Paramètres > Applications > FileForge > Désinstaller.
+
+En cas de souci, le journal se trouve dans :
+%LOCALAPPDATA%\FileForge\FileForge.log
