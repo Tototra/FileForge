@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "files": {
+    "macos": {
+      "name": "FileForge-macOS.zip",
+      "bytes": 282654,
+      "sha256": "a5d8c5aed77fa8f10cfd5849e561b30d85564e4dd7d7d50b3dff59164bd226a1"
+    },
+    "windows": {
+      "name": "FileForge-Windows.zip",
+      "bytes": 155262,
+      "sha256": "ffa4856ae8c3c68f49b5a292c233b48e8aac2a89fa43b646a0dd5eda1a2b6ff3"
+    },
+    "linux": {
+      "name": "FileForge-Linux.tar.gz",
+      "bytes": 152495,
+      "sha256": "0fdf21adfba527ccd6be7506bbd06c0082ca9a7cd1b034862affeea872428a2b"
+    }
+  }
+}
