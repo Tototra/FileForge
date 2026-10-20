@@ -102,13 +102,13 @@ import plistlib, subprocess
 raw = subprocess.run(["defaults", "export", "pbs", "-"], capture_output=True).stdout
 d = plistlib.loads(raw) if raw else {}
 d.setdefault("NSServicesStatus", {})["(null) - FileForge… - runWorkflowAsService"] = {
-    "key_equivalent": "^~f", "enabled_context_menu": True, "enabled_services_menu": True,
+    "key_equivalent": "", "enabled_context_menu": True, "enabled_services_menu": True,
     "presentation_modes": {"ContextMenu": True, "ServicesMenu": True, "TouchBar": True}}
 subprocess.run(["defaults", "import", "pbs", "-"], input=plistlib.dumps(d), check=True)
 EOF
 /System/Library/CoreServices/pbs -flush >/dev/null 2>&1 || true
 /System/Library/CoreServices/pbs -update >/dev/null 2>&1 || true
-ok "Clic droit (Actions rapides), raccourci ⌃⌥F et FileForge.app dans ~/Applications"
+ok "Clic droit (Actions rapides) et FileForge.app dans ~/Applications (⌃⌥F : géré par l'agent FileForge)"
 
 # 6. Options
 # Raccourci global ⌃⌥G : panneau de recherche de fichiers (petit agent sans icône, lancé à l'ouverture de session)
