@@ -3,18 +3,18 @@
   "files": {
     "macos": {
       "name": "FileForge-macOS.zip",
-      "bytes": 300027,
-      "sha256": "4fb9d3561136d9764cb218721dce55cdf87cad057cad3813c08a6e6edc198b1a"
+      "bytes": 300134,
+      "sha256": "34a616a1f2c8a6d61f207216e761aed30caa4d5ce413e876376e28e7b6cb20c2"
     },
     "windows": {
       "name": "FileForge-Setup.exe",
-      "bytes": 316600,
-      "sha256": "38b1dd0aa8ebfa7b7ad5fd8404df727fa9489210945c5f5d2a522aac1f7e91fd"
+      "bytes": 316656,
+      "sha256": "10f170fd8c9514ec480b7c308c6d7e8ca6728032aa5523473103f48a07067bdc"
     },
     "linux": {
       "name": "FileForge-Linux.tar.gz",
-      "bytes": 165560,
-      "sha256": "3e637e2da36b4df9503c002d2ef2fcbda4054fa0b660a8e339fa5b976ef9abb3"
+      "bytes": 165784,
+      "sha256": "4f00ca9a0eca896908f580c5969b2ec1f942580d00a502621f8a04669adf6c41"
     }
   }
 }
