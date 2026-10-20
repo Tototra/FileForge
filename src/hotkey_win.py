@@ -16,7 +16,7 @@ LOG = Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / "FileForge" / "Fi
 SHOW_EVENT = "Local\\FileForgeSearchShow"
 TITLE = "FileForge-Recherche"          # titre de la fenêtre du panneau de recherche (wheel.py --search)
 MOD_ALT, MOD_CONTROL, MOD_NOREPEAT = 0x0001, 0x0002, 0x4000
-VK_G = 0x47
+VK_G, VK_F = 0x47, 0x46
 WM_HOTKEY, WM_TIMER, WM_QUIT = 0x0312, 0x0113, 0x0012
 RESPAWN_MS, HEALTH_MS = 400, 30000      # la réserve suivante est préparée dès que le panneau est refermé
 
@@ -63,6 +63,53 @@ def visible_panel(with_hwnd=False):
     if not found:
         return None
     return found[0] if with_hwnd else found[0][0]
+
+
+def explorer_selection(fg=None):
+    """Fichiers sélectionnés dans la fenêtre de l'Explorateur au premier plan.
+    Windows 11 : tous les onglets d'une fenêtre ont le même HWND, on garde celui qui est affiché."""
+    import pythoncom
+    import win32com.client
+    pythoncom.CoInitialize()
+    fg = fg or user32.GetForegroundWindow()
+    title = ctypes.create_unicode_buffer(260)
+    user32.GetWindowTextW(fg, title, 260)
+    cands = []
+    for w in win32com.client.Dispatch("Shell.Application").Windows():
+        try:
+            if int(w.HWND) != fg:
+                continue
+            sel = [it.Path for it in w.Document.SelectedItems() if os.path.exists(it.Path)]
+            cands.append((w, sel))
+        except Exception:
+            continue
+    if not cands:
+        return []
+    if len(cands) == 1:
+        return cands[0][1]
+    # plusieurs onglets : celui dont la vue est visible, sinon celui dont le nom est dans le titre de la fenêtre
+    for w, sel in cands:
+        if tab_visible(w):
+            return sel
+    for w, sel in cands:
+        try:
+            if w.LocationName and w.LocationName in title.value:
+                return sel
+        except Exception:
+            pass
+    return next((sel for _, sel in cands if sel), [])
+
+
+def tab_visible(w):
+    """L'onglet de l'Explorateur correspondant à cet objet Shell est-il celui affiché ?"""
+    try:
+        import pythoncom
+        from win32com.shell import shell
+        sp = w._oleobj_.QueryInterface(pythoncom.IID_IServiceProvider)
+        sb = sp.QueryService(shell.SID_STopLevelBrowser, shell.IID_IShellBrowser)
+        return bool(user32.IsWindowVisible(sb.GetWindow()))
+    except Exception:
+        return False
 
 
 def bring_to_front(timeout=1.5):
@@ -141,7 +188,24 @@ class Agent:
             user32.KillTimer(None, self.respawn_timer)
         self.respawn_timer = user32.SetTimer(None, 0, RESPAWN_MS, None)
 
+    def on_wheel_hotkey(self):
+        """Ctrl+Alt+F : la roue sur les fichiers sélectionnés dans l'Explorateur, lus à l'instant de l'appui."""
+        t = time.time()
+        try:
+            files = explorer_selection()
+        except Exception as e:
+            files = []
+            log(f"sélection de l'Explorateur illisible : {e}")
+        user32.AllowSetForegroundWindow(-1)
+        args = [pythonw(), str(HERE / "wheel.py"), "--direct"] + (files or ["--no-selection"])
+        subprocess.Popen(args, cwd=os.environ.get("TEMP") or str(Path.home()), creationflags=0x08000000)
+        log(f"Ctrl+Alt+F : {len(files)} fichier(s) sélectionné(s), lus en {int((time.time() - t) * 1000)} ms")
+
     def run(self):
+        if user32.RegisterHotKey(None, 2, MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, VK_F):
+            log("Ctrl+Alt+F enregistré")
+        else:
+            log(f"Ctrl+Alt+F indisponible (erreur {ctypes.get_last_error()})")
         ok = user32.RegisterHotKey(None, 1, MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, VK_G)
         log("Ctrl+Alt+G enregistré" if ok else
             f"Ctrl+Alt+G indisponible (déjà pris par une autre application ? erreur {ctypes.get_last_error()})")
@@ -153,7 +217,7 @@ class Agent:
         while user32.GetMessageW(ctypes.byref(msg), None, 0, 0) > 0:
             try:
                 if msg.message == WM_HOTKEY:
-                    self.on_hotkey()
+                    self.on_wheel_hotkey() if msg.wParam == 2 else self.on_hotkey()
                 elif msg.message == WM_TIMER:
                     ready = self.ensure_standby()
                     if msg.wParam == self.respawn_timer and ready:

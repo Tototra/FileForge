@@ -161,7 +161,7 @@ function Step-Shell {
     $l.Save()
   }
   $Start = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs"
-  NewLnk (Join-Path $Start "FileForge.lnk") "CTRL+ALT+F"
+  NewLnk (Join-Path $Start "FileForge.lnk") $null     # Ctrl+Alt+F est géré par l'agent (instantané, onglets Windows 11)
   # Recherche de fichiers : entrée du menu Démarrer (sans raccourci clavier : Ctrl+Alt+G est géré par l'agent)
   NewLnk (Join-Path $Start "FileForge - Rechercher un fichier.lnk") $null " --search"
   NewLnk (Join-Path $env:APPDATA "Microsoft\Windows\SendTo\FileForge.lnk") $null
