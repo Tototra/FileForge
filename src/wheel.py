@@ -539,6 +539,7 @@ def run(window, files):
                         k = ctypes.windll.kernel32
                         k.CreateEventW.restype = ctypes.c_void_p
                         k.SetEvent(ctypes.c_void_p(k.CreateEventW(None, False, False, "Local\\FileForgeSearchReady")))
+                        ff.log("recherche : champ prêt")
                         break
                 except Exception:
                     pass

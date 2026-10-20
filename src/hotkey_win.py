@@ -162,6 +162,8 @@ class Capture:
                             c = self._char(k.vkCode, k.scanCode)
                             if c and c.isprintable():
                                 self.items.append(("char", c))
+                            else:
+                                self.items.append(("vk", k.vkCode))   # caractère non traduit : on rejoue la touche telle quelle
                     return 1                               # avalée : n'arrive pas dans l'application d'avant
         except Exception:
             log(traceback.format_exc())
@@ -189,6 +191,7 @@ class Agent:
         self.respawn_timer = self.capture_timer = None
         self.last = 0.0
         self.capture = Capture()
+        self.t0 = 0.0
 
     def _spawn(self, standby):
         env = dict(os.environ, FF_AGENT_PID=str(os.getpid()))
@@ -218,6 +221,7 @@ class Agent:
         if a is not None and a.poll() is None:
             a.kill()                         # fenêtre déjà fermée, processus qui traîne
         self.active = None
+        self.t0 = time.time()
         user32.AllowSetForegroundWindow(-1)  # le panneau pourra passer au premier plan
         kernel32.ResetEvent(self.ready)
         self.capture.start()
@@ -225,6 +229,7 @@ class Agent:
         if self.standby is not None and self.standby.poll() is None:
             kernel32.SetEvent(self.show)     # le panneau en réserve s'affiche
             self.active, self.standby = self.standby, None
+            log("ouverture (réserve)")
         else:
             self.active = self._spawn(False)
             log("pas de réserve : ouverture directe")
@@ -232,11 +237,12 @@ class Agent:
             user32.KillTimer(None, self.respawn_timer)
         self.respawn_timer = user32.SetTimer(None, 0, RESPAWN_MS, None)
 
-    def end_capture(self):
+    def end_capture(self, why):
         if self.capture_timer:
             user32.KillTimer(None, self.capture_timer)
             self.capture_timer = None
         items = self.capture.stop()
+        log(f"{why} après {int((time.time() - self.t0) * 1000)} ms, {len(items)} touche(s) recopiée(s)")
         if items:
             replay(items)
 
@@ -254,7 +260,7 @@ class Agent:
             r = user32.MsgWaitForMultipleObjects(1, handles, False, 0xFFFFFFFF, 0x04FF)   # QS_ALLINPUT
             if r == 0:                                  # le champ du panneau a le focus
                 if self.capture.active():
-                    self.end_capture()
+                    self.end_capture("champ prêt")
                 continue
             while user32.PeekMessageW(ctypes.byref(msg), None, 0, 0, 1):              # PM_REMOVE
                 if msg.message == WM_QUIT:
@@ -264,7 +270,7 @@ class Agent:
                         self.on_hotkey()
                     elif msg.message == WM_TIMER:
                         if msg.wParam == self.capture_timer:
-                            self.end_capture()      # le panneau tarde : on rend la main quand même
+                            self.end_capture("délai dépassé")      # le panneau tarde : on rend la main quand même
                         else:
                             if msg.wParam == self.respawn_timer:
                                 user32.KillTimer(None, self.respawn_timer)
