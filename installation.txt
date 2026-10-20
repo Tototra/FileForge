@@ -1,0 +1,10 @@
+clic droit     True
+désinstalleur  True
+Bureau         True
+menu Démarrer  True
+tessdata       True
+LibreOffice pas installé dans Windows True
+LibreOffice privé (pas d'Office) True
+Envoyer vers   True
+wheel.py       True
+venv           True

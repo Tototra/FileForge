@@ -1,0 +1,53 @@
+OK   agent démarré, réserve préparée 
+OK   essai 1 : panneau au premier plan 0.0 s
+OK   essai 1 : curseur dans le champ fq
+OK   essai 1 : Échap ferme 
+OK   essai 2 : panneau au premier plan 0.0 s
+OK   essai 2 : curseur dans le champ fq
+OK   essai 2 : Échap ferme 
+OK   essai 3 : panneau au premier plan 0.0 s
+OK   essai 3 : curseur dans le champ fq
+OK   essai 3 : Échap ferme 
+OK   essai 4 : panneau au premier plan 0.0 s
+OK   essai 4 : curseur dans le champ fq
+OK   essai 4 : Échap ferme 
+OK   essai 5 : panneau au premier plan 0.0 s
+OK   essai 5 : curseur dans le champ fq
+OK   essai 5 : Échap ferme 
+OK   essai 6 : panneau au premier plan 0.0 s
+OK   essai 6 : curseur dans le champ fq
+OK   essai 6 : Échap ferme 
+OK   frappe dès l'ouverture : rien de perdu 'facture free'
+OK   frappe dès l'ouverture : fichier trouvé ["Facture Free juin.pdf","Facture EDF été 2026.pdf","Facture Orange mars.pdf"]
+FAIL second Ctrl+Alt+G referme 
+      état : {"mode":"find","v":"","focus":"fq","has":true} | panneaux visibles [1256] | premier plan 394238
+OK   depuis le Bloc-notes : panneau au premier plan 0.23 s
+FAIL depuis le Bloc-notes : la frappe va dans le panneau 
+      état : {"mode":"find","v":"","focus":"fq","has":true} | panneaux visibles [3100] | premier plan 263304
+OK   Bloc-notes, essai 1 : panneau au premier plan et frappe reçue 0.0 s, 'orange'
+OK   Bloc-notes, essai 2 : panneau au premier plan et frappe reçue 0.13 s, 'orange'
+OK   Bloc-notes, essai 3 : panneau au premier plan et frappe reçue 0.0 s, 'orange'
+OK   5 appuis rapides : au plus un panneau ouvert 1 panneau(x)
+OK   clic à côté referme 
+OK   agent toujours actif 
+OK   une seule réserve en attente 1 : [['8080', 'C:\\Users\\runneradmin\\AppData\\Local\\FileForge\\venv\\Scripts\\pythonw.exe C:\\Users\\runneradmin\\AppData\\Local\\FileForge\\wheel.py --standby-wheel'], ['8284', '"C:\\Users\\runneradmin\\AppData\\Local\\FileForge\\python\\cpython-3.12-windows-x86_64-none\\pythonw.exe"  C:\\Users\\runneradmin\\AppData\\Local\\FileForge\\wheel.py --standby-wheel'], ['5408', 'C:\\Users\\runneradmin\\AppData\\Local\\FileForge\\venv\\Scripts\\pythonw.exe C:\\Users\\runneradmin\\AppData\\Local\\FileForge\\wheel.py --search --standby'], ['1964', '"C:\\Users\\runneradmin\\AppData\\Local\\FileForge\\python\\cpython-3.12-windows-x86_64-none\\pythonw.exe"  C:\\Users\\runneradmin\\AppData\\Local\\FileForge\\wheel.py --search --standby']]
+OK   sans réserve : ouverture directe 0.9 s
+OK   journal sans erreur Python 
+[2026-10-20 23:27:13] recherche : clavier prêt 179 ms après l'appui
+[2026-10-20 23:27:18] recherche : clavier prêt 172 ms après l'appui
+[2026-10-20 23:27:22] recherche : clavier prêt 159 ms après l'appui
+[2026-10-20 23:27:27] recherche : clavier prêt 158 ms après l'appui
+[2026-10-20 23:27:31] recherche : clavier prêt 155 ms après l'appui
+[2026-10-20 23:27:36] recherche : clavier prêt 157 ms après l'appui
+[2026-10-20 23:27:40] recherche : clavier prêt 170 ms après l'appui
+[2026-10-20 23:28:00] recherche : clavier prêt 150 ms après l'appui
+[2026-10-20 23:28:12] recherche : clavier prêt 192 ms après l'appui
+[2026-10-20 23:28:19] recherche : clavier prêt 161 ms après l'appui
+[2026-10-20 23:28:32] recherche : clavier prêt 172 ms après l'appui
+[2026-10-20 23:28:45] recherche : clavier prêt 197 ms après l'appui
+[2026-10-20 23:28:59] recherche : clavier prêt 216 ms après l'appui
+clavier prêt après l'appui : médiane 170 ms, max 216 ms (13 ouvertures)
+ouverture : médiane 0.00 s, max 0.00 s (5/6)
+clavier prêt après l'appui : médiane 170 ms, max 216 ms (13 ouvertures)
+
+2 échec(s) : ['second Ctrl+Alt+G referme', 'depuis le Bloc-notes : la frappe va dans le panneau']

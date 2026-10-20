@@ -1,0 +1,80 @@
+C:\Users\runneradmin\AppData\Local\FileForge\venv\Lib\site-packages\fitz\__init__.py:17: FutureWarning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.
+  warnings.warn(
+[INFO] Start to convert C:\Users\RUNNER~1\AppData\Local\Temp\ff_test\doc.pdf
+[INFO] [1/4] Opening document...
+[INFO] [2/4] Analyzing document...
+[INFO] [3/4] Parsing pages...
+[INFO] (1/4) Page 1
+[INFO] (2/4) Page 2
+[INFO] (3/4) Page 3
+[INFO] (4/4) Page 4
+[INFO] [4/4] Creating pages...
+[INFO] (1/4) Page 1
+[INFO] (2/4) Page 2
+[INFO] (3/4) Page 3
+[INFO] (4/4) Page 4
+[INFO] Terminated in 0.25s.
+OK   📄 PDF · Fusionner en un seul PDF  [pdf2] → ['Fusion.pdf'] ['Ordre : alphabétique (renomme les fichiers 01_, 02_… pour imposer un ordre).']
+OK   📄 PDF · Diviser  [pdf] → ['doc_divisé'] []
+OK   📄 PDF · Extraire des pages  [pdf] → ['doc_extrait.pdf'] []
+OK   📄 PDF · Supprimer des pages  [pdf] → ['doc_modifié.pdf'] []
+OK   📄 PDF · Réorganiser / inverser les pages  [pdf] → ['doc_réorganisé.pdf'] []
+OK   📄 PDF · Pivoter des pages  [pdf] → ['doc_pivoté.pdf'] []
+OK   📄 PDF · Compresser  [pdf] → ['doc_compressé.pdf'] ['doc.pdf : 82.5 Ko → 5.7 Ko (−93 %)']
+OK   📄 PDF · Rogner  [pdf] → ['doc_rogné.pdf'] []
+OK   📄 PDF · Convertir en images (JPG / PNG)  [pdf] → ['doc_images'] []
+OK   📄 PDF · Convertir en Word (.docx)  [pdf] → ['doc.docx'] []
+OK   📄 PDF · Convertir en PowerPoint (.pptx)  [pdf] → ['doc.pptx'] ['Chaque page devient une diapositive (image).']
+OK   📄 PDF · Convertir en Excel (tableaux)  [pdf] → ['doc.xlsx'] ['doc.pdf : aucun tableau détecté, texte exporté ligne par ligne.']
+
+=== Document parser messages ===
+Warning: RapidOCR is missing. Install for much improved OCR results.
+Using Tesseract for OCR processing.
+OCR on page.number=0/1.
+OCR on page.number=1/2.
+OCR on page.number=2/3.
+OCR on page.number=3/4.
+OK   📄 PDF · Convertir en texte / Markdown  [pdf] → ['doc.md'] []
+OK   📄 PDF · Extraire les images  [pdf] → ['doc_images_extraites'] ['doc.pdf : 1 image(s) extraite(s).']
+OK   🔒 PDF · Protéger par mot de passe  [pdf] → ['doc_protégé.pdf'] ['Chiffrement AES-256.']
+OK   🔓 PDF · Retirer le mot de passe / les restrictions  [pdf] → ['doc_déverrouillé.pdf'] ["doc.pdf n'était pas protégé."]
+OK   💧 PDF · Ajouter un filigrane  [pdf] → ['doc_filigrane.pdf'] []
+OK   🔢 PDF · Numéroter les pages  [pdf] → ['doc_numéroté.pdf'] []
+OK   ✍️ PDF · Signer (dessiner ou insérer une signature)  [pdf] → ['doc_signé.pdf'] []
+OK   ⬛ PDF · Caviarder (masquer définitivement)  [pdf] → ['doc_caviardé.pdf'] ['doc.pdf : 1 zone(s) masquée(s) — le contenu dessous est réellement supprimé.']
+OK   🔍 PDF · OCR — rendre un scan cherchable  [pdf] → ['doc_ocr.pdf'] ['Langue(s) OCR : fra+eng. Le texte est maintenant sélectionnable et cherchable.']
+OK   📄 PDF · Aplatir (formulaires et annotations)  [pdf] → ['doc_aplati.pdf'] []
+OK   📄 PDF · Noir et blanc (niveaux de gris)  [pdf] → ['doc_gris.pdf'] ["Les pages sont converties en images (texte non sélectionnable — utilise l'OCR si besoin)."]
+OK   🏷️ PDF · Métadonnées (titre, auteur, nettoyage)  [pdf] → ['doc_meta.pdf'] []
+OK   🛠️ PDF · Réparer un PDF endommagé  [pdf] → ['doc_réparé.pdf'] []
+OK   🖼️ Image · Convertir le format  [img] → ['photo (2).jpg', 'logo.jpg'] []
+OK   🖼️ Image · Redimensionner  [img] → ['photo_800x600.jpg', 'logo_400x300.png'] []
+OK   🖼️ Image · Compresser  [img] → ['photo_compressé.jpg', 'logo_compressé.png'] ['photo.jpg : 41.1 Ko → 17.5 Ko (−57 %)']
+OK   ✂️ Image · Rogner  [img] → ['photo_rogné.jpg', 'logo_rogné.png'] []
+OK   🔄 Image · Pivoter / retourner  [img] → ['photo_pivoté.jpg', 'logo_pivoté.png'] []
+OK   🕵️ Image · Supprimer les métadonnées (EXIF, GPS)  [img] → ['photo_sans-meta.jpg', 'logo_sans-meta.png'] ['Position GPS, appareil, date et autres données EXIF retirées.']
+OK   📄 Image · Convertir en PDF  [img] → ['Images.pdf'] []
+OK   💧 Image · Ajouter un filigrane / copyright  [img] → ['photo_filigrane.jpg', 'logo_filigrane.png'] []
+OK   🎞️ Images · Créer un GIF animé  [img] → ['Animation.gif'] []
+OK   🎬 Vidéo · Convertir en MP4 (compatible partout)  [vid] → ['clip.mp4'] []
+OK   🎬 Vidéo · Compresser  [vid] → ['clip_compressé.mp4'] ['clip.mov : pas de gain possible (90.6 Ko → 100.0 Ko).']
+OK   🎬 Vidéo · Couper (garder un extrait)  [vid] → ['clip_extrait.mp4'] []
+OK   🎬 Vidéo · Convertir en GIF  [vid] → ['clip_anim.gif'] []
+OK   🎬 Vidéo · Extraire l'audio (MP3)  [vid] → ['clip.mp3'] []
+OK   🎬 Vidéo · Retirer le son  [vid] → ['clip_muet.mov'] []
+OK   🎬 Vidéo · Redimensionner (1080p / 720p / 480p / vertical)  [vid] → ['clip_1080p.mp4'] []
+OK   🎬 Vidéo · Pivoter  [vid] → ['clip_pivoté.mp4'] []
+OK   🎬 Vidéo · Capturer une image  [vid] → ['clip_image_1s.jpg'] []
+OK   🎵 Audio · Convertir le format  [vid] → ['clip (2).mp3'] []
+OK   🎵 Audio · Compresser  [aud] → ['son_compressé.mp3'] ['son.wav : 430.7 Ko → 79.2 Ko (−82 %)']
+OK   🎵 Audio · Couper (garder un extrait)  [aud] → ['son_extrait.wav'] []
+OK   🎵 Audio · Normaliser le volume  [vid] → ['clip_volume-normalisé.mov'] []
+OK   🎵 Audio · Fusionner (mettre bout à bout)  [aud2] → ['Fusion.mp3'] []
+OK   📝 Document · Convertir en PDF  [md] → ['notes.pdf'] []
+OK   📝 Markdown · Convertir en HTML  [md] → ['notes.html'] []
+OK   📊 Tableur · Convertir (Excel ⇄ CSV ⇄ JSON)  [tab] → ['data.xlsx'] []
+OK   📦 Compresser en ZIP  [pdf2] → ['Archive.zip'] ['164.9 Ko → 9.7 Ko']
+OK   Word · Convertir ['doc (2).md']
+OK   Extraire l'archive ['Archive']
+
+54 OK / 0 échecs

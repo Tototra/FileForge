@@ -1,0 +1,50 @@
+[2026-10-20 23:21:45] agent : Ctrl+Alt+G enregistré
+[2026-10-20 23:21:45] agent : Ctrl+Alt+F enregistré
+[2026-10-20 23:24:34] test journal → 📄 é « »
+[2026-10-20 23:24:50] 📄 PDF · Extraire des pages ← ['C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\Mes documents FileForge\\Rapport annuel été.pdf']
+[2026-10-20 23:24:54]   → ['C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\Mes documents FileForge\\Rapport annuel été_extrait.pdf']
+[2026-10-20 23:25:33] recherche → wheel C:\Users\runneradmin\Documents\Factures\Facture Orange mars.pdf
+[2026-10-20 23:25:43] agent : Ctrl+Alt+G enregistré
+[2026-10-20 23:25:43] agent : Ctrl+Alt+F enregistré
+[2026-10-20 23:25:53] agent : clic droit : roue en réserve, 1 fichier(s), premier plan 31 ms
+[2026-10-20 23:26:00] agent : clic droit : roue en réserve, 1 fichier(s), premier plan 31 ms
+[2026-10-20 23:26:07] agent : clic droit : roue en réserve, 1 fichier(s), premier plan 31 ms
+[2026-10-20 23:26:13] agent : clic droit : roue en réserve, 1 fichier(s), premier plan 31 ms
+[2026-10-20 23:26:20] agent : clic droit : roue en réserve, 1 fichier(s), premier plan 31 ms
+[2026-10-20 23:26:27] agent : clic droit : roue en réserve, 1 fichier(s), premier plan 32 ms
+[2026-10-20 23:26:36] agent : clic droit : roue en réserve, 2 fichier(s), premier plan 33 ms
+[2026-10-20 23:26:44] agent : clic droit : roue en réserve, 0 fichier(s), premier plan 31 ms
+[2026-10-20 23:26:59] agent : Ctrl+Alt+F : pas de réserve, roue lancée (934 ms)
+[2026-10-20 23:27:05] agent : Ctrl+Alt+G enregistré
+[2026-10-20 23:27:05] agent : Ctrl+Alt+F enregistré
+[2026-10-20 23:27:13] agent : Ctrl+Alt+G : panneau en réserve, premier plan 32 ms
+[2026-10-20 23:27:13] recherche : clavier prêt 179 ms après l'appui
+[2026-10-20 23:27:18] agent : Ctrl+Alt+G : panneau en réserve, premier plan 31 ms
+[2026-10-20 23:27:18] recherche : clavier prêt 172 ms après l'appui
+[2026-10-20 23:27:22] agent : Ctrl+Alt+G : panneau en réserve, premier plan 31 ms
+[2026-10-20 23:27:22] recherche : clavier prêt 159 ms après l'appui
+[2026-10-20 23:27:27] agent : Ctrl+Alt+G : panneau en réserve, premier plan 31 ms
+[2026-10-20 23:27:27] recherche : clavier prêt 158 ms après l'appui
+[2026-10-20 23:27:31] agent : Ctrl+Alt+G : panneau en réserve, premier plan 32 ms
+[2026-10-20 23:27:31] recherche : clavier prêt 155 ms après l'appui
+[2026-10-20 23:27:36] agent : Ctrl+Alt+G : panneau en réserve, premier plan 31 ms
+[2026-10-20 23:27:36] recherche : clavier prêt 157 ms après l'appui
+[2026-10-20 23:27:40] agent : Ctrl+Alt+G : panneau en réserve, premier plan 31 ms
+[2026-10-20 23:27:40] recherche : clavier prêt 170 ms après l'appui
+[2026-10-20 23:27:51] agent : Ctrl+Alt+G : fermeture du panneau
+[2026-10-20 23:28:00] agent : Ctrl+Alt+G : panneau en réserve, premier plan 31 ms
+[2026-10-20 23:28:00] recherche : clavier prêt 150 ms après l'appui
+[2026-10-20 23:28:12] agent : Ctrl+Alt+G : panneau en réserve, premier plan 267 ms
+[2026-10-20 23:28:12] recherche : clavier prêt 192 ms après l'appui
+[2026-10-20 23:28:19] agent : Ctrl+Alt+G : panneau en réserve, premier plan 31 ms
+[2026-10-20 23:28:19] recherche : clavier prêt 161 ms après l'appui
+[2026-10-20 23:28:32] agent : Ctrl+Alt+G : panneau en réserve, premier plan 156 ms
+[2026-10-20 23:28:32] recherche : clavier prêt 172 ms après l'appui
+[2026-10-20 23:28:45] agent : Ctrl+Alt+G : panneau en réserve, premier plan 41 ms
+[2026-10-20 23:28:45] recherche : clavier prêt 197 ms après l'appui
+[2026-10-20 23:28:56] agent : Ctrl+Alt+G : fermeture du panneau
+[2026-10-20 23:28:57] agent : Ctrl+Alt+G : panneau en réserve, premier plan 813 ms
+[2026-10-20 23:28:57] agent : Ctrl+Alt+G : fermeture du panneau
+[2026-10-20 23:28:59] recherche : clavier prêt 216 ms après l'appui
+[2026-10-20 23:29:05] agent : Ctrl+Alt+G : pas de réserve, ouverture directe
+[2026-10-20 23:29:14] agent : Ctrl+Alt+G : pas de réserve, ouverture directe

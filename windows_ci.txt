@@ -1,0 +1,12 @@
+LibreOffice : C:\Users\runneradmin\AppData\Local\FileForge\libreoffice\program\soffice.com
+OK   LibreOffice trouvé  C:\Users\runneradmin\AppData\Local\FileForge\libreoffice\program\soffice.com
+OK   PowerPoint → PDF (nom accentué)  PPT_PPGS_Séance 1_2026-27.pdf : 3 page(s)
+OK   Excel → PDF (nom accentué)  Budget été 2026.pdf : 1 page(s)
+OK   Word → PDF (nom accentué)  Lettre à Zoé.pdf : 1 page(s)
+OK   PowerPoint → ODP  PPT_PPGS_Séance 1_2026-27.odp
+OK   Texte Bloc-notes (cp1252) → PDF  notes Windows.pdf : 1 page(s)
+OK   CSV Excel (cp1252) → XLSX sans accents cassés  export excel.xlsx
+OK   Journal en UTF-8  
+OK   Pages hors limites : on redemande  saisie invalide → redemandée
+
+9 OK / 0 échecs
