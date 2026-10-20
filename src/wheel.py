@@ -12,6 +12,7 @@ IS_WIN = sys.platform == "win32"
 IS_LINUX = sys.platform.startswith("linux")
 IS_MAC = sys.platform == "darwin"
 SEARCH_ONLY = "--search" in sys.argv   # ⌃⌥G : panneau de recherche seul, sans fichier
+STANDBY = IS_WIN and "--standby" in sys.argv   # Windows : panneau préchargé, affiché sur signal de l'agent
 if sys.stdout is None or sys.stderr is None:
     ff.LOG.parent.mkdir(parents=True, exist_ok=True)
     _lf = open(ff.LOG, "a", encoding="utf-8", buffering=1)
@@ -21,6 +22,7 @@ if sys.stdout is None or sys.stderr is None:
 import webview
 
 _alive = threading.Lock()
+SHOWN = threading.Event()   # la fenêtre est visible (le canal de débogage n'agit qu'à ce moment)
 
 # Correctif pywebview (macOS) : evaluate_js partage un sémaphore global entre threads.
 # Deux appels simultanés (mise à jour de la roue + réponse à un clic) se volent le signal
@@ -225,17 +227,51 @@ def choose_file(prompt, types=None):
 TITLE = "FileForge-Roue"
 
 
+def own_hwnd():
+    """Fenêtre de CE processus (un autre panneau, en réserve, porte le même titre)."""
+    import ctypes
+    from ctypes import wintypes
+    u = ctypes.windll.user32
+    pid, found = os.getpid(), []
+    buf = ctypes.create_unicode_buffer(64)
+
+    @ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+    def cb(hwnd, _):
+        p = wintypes.DWORD()
+        u.GetWindowThreadProcessId(hwnd, ctypes.byref(p))
+        if p.value == pid:
+            u.GetWindowTextW(hwnd, buf, 64)
+            if buf.value == TITLE:
+                found.append(hwnd)
+                return False
+        return True
+    u.EnumWindows(cb, 0)
+    return found[0] if found else None
+
+
 def activate():
     if IS_WIN:
         try:
             import ctypes
             u = ctypes.windll.user32
-            hwnd = u.FindWindowW(None, TITLE)
+            hwnd = own_hwnd()
             if hwnd:
-                u.keybd_event(0x12, 0, 0, 0)      # astuce Alt : autorise le passage au premier plan
-                u.keybd_event(0x12, 0, 2, 0)
                 u.ShowWindow(hwnd, 5)
-                u.SetForegroundWindow(hwnd)
+                u.SetForegroundWindow(hwnd)          # autorisé d'office quand l'agent du raccourci nous lance
+                if u.GetForegroundWindow() != hwnd:
+                    # sinon : on se rattache au fil de la fenêtre au premier plan le temps de prendre la main
+                    k = ctypes.windll.kernel32
+                    fg = u.GetForegroundWindow()
+                    a, b = u.GetWindowThreadProcessId(fg, None), k.GetCurrentThreadId()
+                    u.AttachThreadInput(b, a, True)
+                    u.BringWindowToTop(hwnd)
+                    u.SetForegroundWindow(hwnd)
+                    u.AttachThreadInput(b, a, False)
+                if u.GetForegroundWindow() != hwnd:
+                    u.keybd_event(0x12, 0, 0, 0)      # dernier recours : astuce Alt
+                    u.keybd_event(0x12, 0, 2, 0)
+                    u.SetForegroundWindow(hwnd)
+                u.SetFocus(hwnd)
         except Exception as e:
             ff.log(f"activate(win): {e}")
         return
@@ -404,7 +440,7 @@ def win_backdrop(window):
         u.SetThreadDpiAwarenessContext(ctypes.c_void_p(-4))  # coordonnées en pixels physiques
     except Exception:
         pass
-    hwnd = u.FindWindowW(None, TITLE)
+    hwnd = own_hwnd()
     r = wintypes.RECT()
     if not hwnd or not u.GetWindowRect(hwnd, ctypes.byref(r)) or r.right <= r.left:
         raise RuntimeError("fenêtre introuvable")
@@ -421,7 +457,7 @@ def win_round(window):
     import ctypes
     u, g = ctypes.windll.user32, ctypes.windll.gdi32
     window.evaluate_js("document.documentElement.style.background='#16161e';true")
-    hwnd = u.FindWindowW(None, TITLE)
+    hwnd = own_hwnd()
     if hwnd:
         try:
             u.SetThreadDpiAwarenessContext(ctypes.c_void_p(-4))
@@ -433,6 +469,26 @@ def win_round(window):
         w = r.right - r.left
         m = int(w * (380 - 318) / 760)
         u.SetWindowRgn(hwnd, g.CreateEllipticRgn(m, m, w - m, w - m), True)
+
+
+def wait_for_show():
+    """Mode réserve : attend Ctrl+Alt+G (événement de l'agent) ; se termine si l'agent disparaît."""
+    import ctypes
+    k = ctypes.windll.kernel32
+    k.CreateEventW.restype = ctypes.c_void_p
+    k.OpenProcess.restype = ctypes.c_void_p
+    ev = k.CreateEventW(None, False, False, "Local\\FileForgeSearchShow")
+    handles = [ev]
+    try:
+        agent = k.OpenProcess(0x00100000, False, int(os.environ.get("FF_AGENT_PID", "0")))  # SYNCHRONIZE
+        if agent:
+            handles.append(agent)
+    except Exception:
+        pass
+    arr = (ctypes.c_void_p * len(handles))(*handles)
+    r = k.WaitForMultipleObjects(len(handles), arr, False, 0xFFFFFFFF)
+    if r != 0:
+        os._exit(0)          # agent arrêté : la réserve n'a plus lieu d'être
 
 
 def run(window, files):
@@ -453,6 +509,12 @@ def run(window, files):
     if IS_WIN:
         try:
             window.events.loaded.wait(15)
+            if STANDBY:
+                ui.find_warmup()                 # index déjà chargé quand le panneau apparaît
+                wait_for_show()
+                x, y, _ = position()             # écran de la souris au moment de l'appui
+                if x is not None:
+                    window.move(x, y)
             try:
                 win_backdrop(window)
             except Exception as e:
@@ -463,10 +525,23 @@ def run(window, files):
         except Exception as e:
             ff.log(f"show(win): {e}")
     activate()
+    SHOWN.set()
+    if IS_WIN and SEARCH_ONLY:
+        def refocus():
+            import time
+            for _ in range(10):
+                time.sleep(0.15)
+                try:
+                    if window.evaluate_js("(function(){var i=document.getElementById('fq'); if(i){i.focus()} return !!i})()"):
+                        break
+                except Exception:
+                    pass
+        threading.Thread(target=refocus, daemon=True).start()
     if os.environ.get("FF_DEBUG"):
         def dbg():
             import time
             cmd = Path(tempfile.gettempdir()) / "ff_cmd.js"
+            SHOWN.wait()
             while True:
                 if cmd.exists():
                     js = cmd.read_text(); cmd.unlink()

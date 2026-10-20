@@ -96,31 +96,14 @@ jobs:
           & "$env:LOCALAPPDATA\FileForge\venv\Scripts\python.exe" tests\windows_ui.py ci-out *>&1 | Tee-Object -FilePath ci-out\windows_ui.txt
           exit $LASTEXITCODE
 
-      - name: Raccourci Ctrl+Alt+G (appui réel sur les touches)
+      - name: Ctrl+Alt+G, batterie de tests (vraies touches)
         if: always()
-        continue-on-error: true
         run: |
-          $lnk = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\FileForge - Rechercher un fichier.lnk"
-          $sh = New-Object -ComObject WScript.Shell
-          "raccourci : $((Test-Path $lnk)) / touches : $($sh.CreateShortcut($lnk).Hotkey)" | Tee-Object -FilePath ci-out\raccourci.txt
-          Add-Type -AssemblyName System.Windows.Forms, System.Drawing
-          Add-Type 'using System; using System.Runtime.InteropServices; public class K { [DllImport("user32.dll")] public static extern void keybd_event(byte k, byte s, uint f, UIntPtr e); }'
-          $t0 = Get-Date
-          foreach ($k in 0x11, 0x12, 0x47) { [K]::keybd_event($k, 0, 0, [UIntPtr]::Zero) }
-          foreach ($k in 0x47, 0x12, 0x11) { [K]::keybd_event($k, 0, 2, [UIntPtr]::Zero) }
-          $ok = $false
-          for ($i = 0; $i -lt 60; $i++) {
-            $p = Get-CimInstance Win32_Process -Filter "Name='pythonw.exe'" | Where-Object { $_.CommandLine -like "*wheel.py*--search*" }
-            if ($p) { $ok = $true; break }
-            Start-Sleep -Milliseconds 250
-          }
-          Start-Sleep 4
-          $b = [System.Windows.Forms.SystemInformation]::VirtualScreen
-          $bmp = New-Object System.Drawing.Bitmap $b.Width, $b.Height
-          [System.Drawing.Graphics]::FromImage($bmp).CopyFromScreen($b.Left, $b.Top, 0, 0, $bmp.Size)
-          $bmp.Save("ci-out\16-ctrl-alt-g.png")
-          "Ctrl+Alt+G lance la recherche : $ok ($([int]((Get-Date) - $t0).TotalMilliseconds) ms)" | Tee-Object -Append -FilePath ci-out\raccourci.txt
-          Get-CimInstance Win32_Process -Filter "Name='pythonw.exe'" | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
+          $env:PYTHONIOENCODING = "utf-8"
+          "agent au démarrage de session : " + [bool](Get-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name FileForge -ErrorAction SilentlyContinue) | Tee-Object -FilePath ci-out\raccourci.txt
+          "agent lancé par l'installateur : " + [bool](Get-CimInstance Win32_Process -Filter "Name='pythonw.exe'" | Where-Object { $_.CommandLine -like "*hotkey_win.py*" }) | Tee-Object -Append -FilePath ci-out\raccourci.txt
+          & "$env:LOCALAPPDATA\FileForge\venv\Scripts\python.exe" tests\windows_hotkey.py ci-out *>&1 | Tee-Object -FilePath ci-out\windows_hotkey.txt
+          exit $LASTEXITCODE
 
       - name: Désinstallation
         if: always()

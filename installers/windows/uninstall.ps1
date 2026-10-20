@@ -11,6 +11,8 @@ Get-CimInstance Win32_Process -Filter "Name='pythonw.exe' OR Name='python.exe'" 
   ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
 
 $hk = [Microsoft.Win32.Registry]::CurrentUser
+$run = $hk.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\Run", $true)
+if ($run) { $run.DeleteValue("FileForge", $false); $run.Close() }
 foreach ($k in "Software\Classes\*\shell\FileForge", "Software\Classes\Directory\shell\FileForge",
                "Software\Classes\Directory\Background\shell\FileForge",
                "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileForge") {
