@@ -529,10 +529,16 @@ def run(window, files):
     if IS_WIN and SEARCH_ONLY:
         def refocus():
             import time
-            for _ in range(10):
-                time.sleep(0.15)
+            for _ in range(60):
+                time.sleep(0.03)
                 try:
-                    if window.evaluate_js("(function(){var i=document.getElementById('fq'); if(i){i.focus()} return !!i})()"):
+                    if window.evaluate_js("(function(){var i=document.getElementById('fq'); if(i){i.focus()}"
+                                          " return !!i && document.activeElement === i})()"):
+                        # champ prêt : l'agent du raccourci y recopie ce qui a été tapé entre-temps
+                        import ctypes
+                        k = ctypes.windll.kernel32
+                        k.CreateEventW.restype = ctypes.c_void_p
+                        k.SetEvent(ctypes.c_void_p(k.CreateEventW(None, False, False, "Local\\FileForgeSearchReady")))
                         break
                 except Exception:
                     pass

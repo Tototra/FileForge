@@ -184,6 +184,25 @@ shot("4-depuis-bloc-notes")
 key(0x1B); key(0x1B, True); wait_closed()
 note.kill()
 
+# 4 bis. depuis le Bloc-notes, en tapant aussitôt : rien ne doit arriver dans le Bloc-notes
+standby_ready(20)
+note = subprocess.Popen(["notepad.exe"])
+time.sleep(2.5)
+hotkey()
+type_text("orange")
+dt, v = wait_panel()
+time.sleep(1.2)
+val = js("document.getElementById('fq').value")
+expect("frappe immédiate depuis le Bloc-notes : tout arrive dans le panneau", val.strip() == "orange", repr(val))
+key(0x1B); key(0x1B, True); wait_closed()
+time.sleep(0.5)
+u.keybd_event(0x11, 0, 0, 0); u.keybd_event(0x41, 0, 0, 0); u.keybd_event(0x41, 0, 2, 0); u.keybd_event(0x43, 0, 0, 0)
+u.keybd_event(0x43, 0, 2, 0); u.keybd_event(0x11, 0, 2, 0)          # Ctrl+A, Ctrl+C dans le Bloc-notes
+time.sleep(0.5)
+clip = subprocess.run(["powershell", "-NoProfile", "-Command", "Get-Clipboard"], capture_output=True, text=True).stdout.strip()
+expect("le Bloc-notes n'a rien reçu", "orange" not in clip, repr(clip[:40]))
+note.kill()
+
 # 5. appuis répétés très rapides : un seul panneau, rien ne plante
 standby_ready(20)
 for _ in range(5):
@@ -205,7 +224,8 @@ expect("clic à côté referme", wait_closed() is not None)
 # 7. l'agent tient le coup et la réserve se reforme
 time.sleep(4)
 expect("agent toujours actif", agent.poll() is None)
-expect("une seule réserve en attente", len(procs("--standby")) == 1, f"{len(procs('--standby'))}")
+waiting = [pid for pid, _ in procs("--standby") if int(pid) not in visible_panels()]
+expect("une seule réserve en attente", len(waiting) == 1, f"{len(waiting)} : {procs('wheel.py')}")
 
 # 8. si la réserve a disparu (plantage), Ctrl+Alt+G marche quand même
 kill("--standby"); time.sleep(0.5)
@@ -217,6 +237,7 @@ key(0x1B); key(0x1B, True); wait_closed()
 agent.kill(); kill("wheel.py")
 log = (D / "FileForge.log").read_text(encoding="utf-8", errors="replace") if (D / "FileForge.log").exists() else ""
 expect("journal sans erreur Python", "Traceback" not in log)
+(OUT / "FileForge-hotkey.log").write_text(log, encoding="utf-8")
 (OUT / "hotkey-notes.txt").write_text("\n".join(notes), encoding="utf-8")
 print("\n".join(notes))
 print(f"\n{len(fails)} échec(s) : {fails}")
