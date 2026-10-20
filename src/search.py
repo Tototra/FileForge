@@ -29,7 +29,7 @@ elif IS_MAC:
 else:
     CACHE = Path(os.environ.get("XDG_CACHE_HOME") or HOME / ".cache") / "fileforge"
 INDEX = CACHE / "index-fichiers.tsv"
-MAX_AGE = 5 * 60          # au-delà, on relance un scan en arrière-plan à l'ouverture
+MAX_AGE = 15             # index plus vieux : nouveau scan en arrière-plan à l'ouverture (fichiers tout juste créés)
 MAX_ENTRIES = 1_500_000
 
 # dossiers sans intérêt pour une recherche par nom (code, caches, environnements…)
@@ -38,7 +38,7 @@ SKIP_NAMES = {
     ".pytest_cache", ".cache", ".npm", ".yarn", ".pnpm-store", ".cargo", ".rustup", ".gradle", ".m2",
     ".Trash", "$RECYCLE.BIN", "site-packages", "dist-packages", "DerivedData", ".idea", ".vscode",
     "Pods", "build", ".next", ".nuxt", "target", ".terraform", "AppData", "Application Data",
-    "Library", ".local", ".config", "miniconda3", "anaconda3", ".conda", ".docker",
+    "Library", ".local", ".config", "Links", "Searches", "Favorites", "Contacts", "IntelGraphicsProfiles", "miniconda3", "anaconda3", ".conda", ".docker",
 }
 CODE_MARKERS = {".git", "package.json", "pyproject.toml", "Cargo.toml", "go.mod", "pom.xml", "build.gradle",
                 "requirements.txt", ".venv", "venv", "Makefile", "CMakeLists.txt", "composer.json", "Gemfile"}
@@ -72,6 +72,7 @@ FAMILIES["photos"], FAMILIES["images"], FAMILIES["videos"] = FAMILIES["photo"], 
 FAMILIES["pdfs"], FAMILIES["dossiers"], FAMILIES["documents"] = FAMILIES["pdf"], FAMILIES["dossier"], FAMILIES["document"]
 
 
+NOT_RECENT = (".lnk", ".url", ".search-ms", ".ini", ".log", ".lock", ".tsv", ".json", ".plist", ".db", ".sqlite")
 DOC_EXTS = set().union(*(FAMILIES[k] for k in ("document", "image", "video", "audio", "excel", "powerpoint", "archive"))) - {"/"}
 
 
@@ -152,6 +153,19 @@ def index_age():
         return time.time() - INDEX.stat().st_mtime
     except OSError:
         return None
+
+
+def refreshing():
+    """Un scan est-il en cours, ou vient-il de finir sans que l'index en mémoire soit rechargé ?"""
+    try:
+        if time.time() - (CACHE / "scan.lock").stat().st_mtime < 120:
+            return True
+    except OSError:
+        pass
+    try:
+        return INDEXED.stamp is not None and INDEX.stat().st_mtime != INDEXED.stamp
+    except OSError:
+        return False
 
 
 def refresh_in_background():
@@ -273,8 +287,10 @@ def search(q, limit=40):
     now = time.time()
     if not terms and not exts:
         # pas de texte : fichiers récemment modifiés
-        idx = sorted((i for i in range(len(paths)) if not isdir[i] and not code[i]), key=lambda i: -mtimes[i])[:limit]
-        return [describe(paths[i], mtimes[i], isdir[i], []) for i in idx], {"mode": "recents", "total": len(paths)}
+        idx = sorted((i for i in range(len(paths)) if not isdir[i] and not code[i] and not paths[i].lower().endswith(NOT_RECENT)),
+                     key=lambda i: -mtimes[i])[:limit]
+        return [describe(paths[i], mtimes[i], isdir[i], []) for i in idx], {"mode": "recents", "total": len(paths),
+                                                                            "refreshing": refreshing()}
 
     def type_ok(i):
         if not exts:
@@ -327,7 +343,7 @@ def search(q, limit=40):
         top = sorted(hits, key=score, reverse=True)[:limit]
     res = [describe(paths[i], mtimes[i], isdir[i], terms) for i in top]
     return res, {"mode": "flou" if fuzzy else "exact", "total": len(hits), "ms": int((time.time() - t0) * 1000),
-                 "indexed": len(paths)}
+                 "indexed": len(paths), "refreshing": refreshing()}
 
 
 def match(names, dirs, terms, type_ok):

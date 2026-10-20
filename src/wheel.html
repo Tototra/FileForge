@@ -355,8 +355,10 @@ function findQuery(q, now){
     let r;
     try{ r = await window.pywebview.api.find(q) }catch(e){ console.log(e); return }
     if(seq !== F.seq || mode !== 'find') return;   // une frappe plus récente est arrivée
-    if(r.building){ setTimeout(() => { if(F.seq === seq) findQuery(q, true) }, 500) }
-    F.res = r.results || []; F.sel = 0; F.q = q; renderFind(r);
+    // index en cours de construction ou de mise à jour : on relance la même recherche un peu plus tard
+    if(r.building || (r.info && r.info.refreshing)){ setTimeout(() => { if(F.seq === seq && mode === 'find') findQuery(q, true) }, 600) }
+    const keep = q === F.q ? F.sel : 0;   // mise à jour silencieuse : on garde la sélection
+    F.res = r.results || []; F.sel = Math.min(keep, Math.max(0, F.res.length - 1)); F.q = q; renderFind(r);
   }, now ? 0 : 70);
 }
 function when(t){
