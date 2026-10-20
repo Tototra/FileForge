@@ -228,7 +228,7 @@ expect("clic à côté referme", wait_closed() is not None)
 time.sleep(4)
 expect("agent toujours actif", agent.poll() is None)
 # (sous un environnement virtuel, chaque panneau = un lanceur + le vrai Python : on ne compte que ce dernier)
-waiting = [pid for pid, c in procs("--standby") if "\\python\\cpython" in c and int(pid) not in visible_panels()]
+waiting = [pid for pid, c in procs("--search --standby") if "\\python\\cpython" in c and int(pid) not in visible_panels()]
 expect("une seule réserve en attente", len(waiting) == 1, f"{len(waiting)} : {procs('wheel.py')}")
 
 # 8. si la réserve a disparu (plantage), Ctrl+Alt+G marche quand même

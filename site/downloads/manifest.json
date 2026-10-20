@@ -8,8 +8,8 @@
     },
     "windows": {
       "name": "FileForge-Setup.exe",
-      "bytes": 318616,
-      "sha256": "9846a0c13a2ddf030d6b6aa1b78707005d0e3e5d2e64d459bc8e856ab5ee6ad7"
+      "bytes": 318761,
+      "sha256": "3f802013401aede55a4f0f626ae19fa2b004679b83c030c403900eef42d2707b"
     },
     "linux": {
       "name": "FileForge-Linux.tar.gz",

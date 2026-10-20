@@ -25,7 +25,7 @@ MOD_ALT, MOD_CONTROL, MOD_NOREPEAT = 0x0001, 0x0002, 0x4000
 VK_G, VK_F = 0x47, 0x46
 WM_HOTKEY, WM_TIMER, WM_QUIT = 0x0312, 0x0113, 0x0012
 WM_OPEN = 0x8000 + 1                             # WM_APP + 1 : « des fichiers attendent dans la file »
-RESPAWN_MS, HEALTH_MS, COLLECT_MS = 400, 30000, 120
+RESPAWN_MS, HEALTH_MS = 400, 30000
 
 KINDS = {   # fenêtre en réserve : titre, événement qui l'affiche, arguments de wheel.py
     "search": ("FileForge-Recherche", "Local\\FileForgeSearchShow", ["--search", "--standby"]),
@@ -181,6 +181,7 @@ class Agent:
         self.opening_until = 0.0
         self.respawn_timer = self.collect_timer = None
         self.last = 0.0
+        self.last_open, self.last_files = 0.0, set()
 
     # ── réserves
     def ensure_standby(self):
@@ -228,10 +229,22 @@ class Agent:
         self.open_wheel(files, "Ctrl+Alt+F")
 
     def on_open_message(self):
-        # les lanceurs du clic droit arrivent un par fichier : on attend un court instant qu'ils aient tous écrit
-        if self.collect_timer:
-            user32.KillTimer(None, self.collect_timer)
-        self.collect_timer = user32.SetTimer(None, 0, COLLECT_MS, None)
+        """Fichiers confiés par un lanceur (clic droit, Envoyer vers, Bureau, menu Démarrer)."""
+        files = queue_take()
+        now = time.time()
+        if files and now - self.last_open < 3 and set(files) <= self.last_files:
+            return                           # lanceur d'un fichier déjà affiché (clic droit sur plusieurs fichiers)
+        if files:
+            # Windows lance un lanceur par fichier, pas tous en même temps : la sélection de l'Explorateur
+            # donne tout de suite la liste complète, sans attendre les retardataires
+            try:
+                sel = explorer_selection()
+            except Exception:
+                sel = []
+            if sel and set(files) <= set(sel):
+                files = sel
+        self.last_open, self.last_files = now, set(files)
+        self.open_wheel(files, "clic droit")
 
     # ── recherche
     def on_search_hotkey(self):
@@ -285,11 +298,6 @@ class Agent:
                 elif msg.message == WM_OPEN:
                     self.on_open_message()
                 elif msg.message == WM_TIMER:
-                    if msg.wParam == self.collect_timer:
-                        user32.KillTimer(None, self.collect_timer)
-                        self.collect_timer = None
-                        self.open_wheel(queue_take(), "clic droit")
-                        continue
                     ready = self.ensure_standby()
                     if msg.wParam == self.respawn_timer and ready:
                         user32.KillTimer(None, self.respawn_timer)   # sinon le minuteur réessaie un peu plus tard
