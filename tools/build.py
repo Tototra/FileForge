@@ -74,6 +74,10 @@ def build_windows():
     p = OUT / "FileForge-Setup.exe"
     w = INST / "windows"
     if not shutil.which("makensis"):
+        # ex. serveurs de build Cloudflare : on garde l'installateur déjà compilé (et testé) du dépôt
+        if p.exists():
+            print("makensis absent : FileForge-Setup.exe existant conservé")
+            return p
         raise SystemExit("makensis introuvable : sudo apt install nsis  (ou brew install makensis)")
     st = Path(tempfile.mkdtemp())
     (st / "app").mkdir()
