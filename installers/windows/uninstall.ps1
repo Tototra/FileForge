@@ -6,9 +6,12 @@ try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 $Dest = Join-Path $env:LOCALAPPDATA "FileForge"
 if (-not $Quiet) { Write-Host "Désinstallation de FileForge..." -ForegroundColor Cyan }
 
-Get-CimInstance Win32_Process -Filter "Name='pythonw.exe' OR Name='python.exe'" |
-  Where-Object { $_.CommandLine -like "*FileForge*" } |
+# tout ce qui tourne depuis le dossier de FileForge (roue, agent Ctrl+Alt+G, LibreOffice privé…)
+Get-CimInstance Win32_Process |
+  Where-Object { ($_.ExecutablePath -and $_.ExecutablePath -like "$Dest\*") -or
+                 (($_.Name -eq "pythonw.exe" -or $_.Name -eq "python.exe") -and $_.CommandLine -like "*FileForge*") } |
   ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
+Start-Sleep -Milliseconds 500
 
 $hk = [Microsoft.Win32.Registry]::CurrentUser
 $run = $hk.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\Run", $true)
