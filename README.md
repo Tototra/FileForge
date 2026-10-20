@@ -20,6 +20,7 @@ Tout se passe sur ton ordinateur : aucun fichier n'est envoyé sur Internet, et 
 | Extraire | Images d'un PDF, son d'une vidéo, image fixe, contenu d'une archive |
 | Sécurité | Mot de passe AES-256, déverrouillage, caviardage définitif, suppression des métadonnées et du GPS |
 | Outils | OCR français/anglais, aplatir, réparer, renommer en lot, enchaîner plusieurs actions |
+| Rechercher | Ouvre la roue sans fichier et tape un nom : recherche instantanée dans ton dossier personnel, tolérante aux accents et aux fautes de frappe |
 
 ## Installer
 
@@ -42,6 +43,7 @@ src/            le programme (commun aux trois systèmes)
   fileforge.py    moteur : toutes les actions
   wheel.py        la roue (pywebview) et l'intégration à chaque système
   wheel.html      interface de la roue
+  search.py       recherche de fichiers par nom (index local)
   linux_setup.py  intégration Hyprland / Thunar
 installers/     scripts d'installation macOS, Windows, Linux
 assets/         icônes
@@ -56,7 +58,7 @@ tests/          selftest.py : toutes les actions ; windows_ci.py / windows_ui.py
 
 ```bash
 python3 -m venv .venv && . .venv/bin/activate
-pip install pymupdf pymupdf4llm pdf2docx pillow pillow-heif openpyxl pandas xlrd odfpy mammoth markdown python-pptx pywebview imageio-ffmpeg
+pip install pymupdf pymupdf4llm pdf2docx pillow pillow-heif openpyxl pandas xlrd odfpy mammoth markdown python-pptx pywebview imageio-ffmpeg rapidfuzz
 python tests/selftest.py              # toutes les actions, sans interface
 python src/wheel.py un_fichier.pdf    # ouvre la roue
 ```

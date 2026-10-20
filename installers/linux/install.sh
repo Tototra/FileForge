@@ -67,7 +67,7 @@ if [[ ! -x "$DEST/venv/bin/python" ]]; then
 fi
 "$DEST/venv/bin/python" -m pip install -q --upgrade pip
 "$DEST/venv/bin/python" -m pip install -q pymupdf pymupdf4llm pdf2docx pillow openpyxl pandas xlrd odfpy \
-  mammoth markdown python-pptx pywebview
+  mammoth markdown python-pptx pywebview rapidfuzz
 "$DEST/venv/bin/python" -m pip install -q pillow-heif 2>/dev/null || warn "pillow-heif indisponible : les photos HEIC ne seront pas lues"
 "$DEST/venv/bin/python" -c "import webview, pymupdf, tkinter" || { warn "Vérification des bibliothèques échouée."; exit 1; }
 ok "Bibliothèques installées"
