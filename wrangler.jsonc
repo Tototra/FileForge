@@ -1,0 +1,7 @@
+// Site de FileForge sur Cloudflare (Worker de fichiers statiques).
+// Publier : npx wrangler deploy   (après python3 tools/build.py si le code a changé)
+{
+  "name": "filiforme",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./site" }
+}
