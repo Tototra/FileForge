@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """FileForge — interface « roue » qui s'ouvre sous la souris."""
-import os, sys, json, threading, subprocess, tempfile, traceback, importlib.util
+import os, sys, json, threading, subprocess, tempfile, time, traceback, importlib.util
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -521,7 +521,10 @@ def run(window, files):
             window.events.loaded.wait(15)
             if STANDBY:
                 ui.find_warmup()                 # index déjà chargé quand le panneau apparaît
+                # page de recherche déjà affichée (cachée) : à l'appui, il ne reste qu'à montrer la fenêtre
+                window.evaluate_js("FF.show({mode:'find', standalone:true}); true")
                 wait_for_show()
+                ui._woke = time.time()
                 try:
                     # la réserve a été créée « non activable » (pour ne jamais voler le clavier) : on lui rend ce droit
                     import ctypes
@@ -554,6 +557,8 @@ def run(window, files):
                     r = window.evaluate_js("(function(){var i=document.getElementById('fq'); if(!i) return 'attente';"
                                            " i.focus(); return document.hasFocus() && document.activeElement === i ? 'ok' : 'clavier'})()")
                     if r == "ok":
+                        if getattr(ui, "_woke", None):
+                            ff.log(f"recherche : clavier prêt {int((time.time() - ui._woke) * 1000)} ms après l'appui")
                         break
                     if r == "clavier":
                         win_focus_browser()      # visible mais sans le clavier : on le donne au moteur d'affichage

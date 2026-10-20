@@ -157,6 +157,7 @@ if ok_t:
 standby_ready(20)
 hotkey()
 dt, v = wait_panel()
+time.sleep(0.25)                    # le temps qu'un humain voie le panneau et commence à taper
 type_text("facture free")
 time.sleep(1.2)
 val = js("document.getElementById('fq') && document.getElementById('fq').value")
@@ -195,6 +196,7 @@ for n in range(3):
     time.sleep(2)
     hotkey()
     dt, v = wait_panel()
+    time.sleep(0.25)
     type_text("orange")
     time.sleep(1)
     val = js("document.getElementById('fq').value")
@@ -240,7 +242,12 @@ kill("hotkey_win.py"); kill("wheel.py")
 log = (D / "FileForge.log").read_text(encoding="utf-8", errors="replace") if (D / "FileForge.log").exists() else ""
 expect("journal sans erreur Python", "Traceback" not in log)
 (OUT / "FileForge-hotkey.log").write_text(log, encoding="utf-8")
-print("\n".join(l for l in log.splitlines() if "raccourci" in l))
+print("\n".join(l for l in log.splitlines() if "raccourci" in l or "clavier prêt" in l))
+lat = [int(l.split("clavier prêt ")[1].split(" ms")[0]) for l in log.splitlines() if "clavier prêt " in l]
+if lat:
+    notes.append(f"clavier prêt après l'appui : médiane {statistics.median(lat):.0f} ms, max {max(lat)} ms ({len(lat)} ouvertures)")
+    (OUT / "hotkey-notes.txt").write_text("\n".join(notes), encoding="utf-8")
+    print(notes[-1])
 (OUT / "hotkey-notes.txt").write_text("\n".join(notes), encoding="utf-8")
 print("\n".join(notes))
 print(f"\n{len(fails)} échec(s) : {fails}")

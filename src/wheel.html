@@ -532,7 +532,12 @@ window.FF = {
       else if(st.mode === 'done') showDone(st);
       else if(st.mode === 'error') showError(st);
       else if(st.mode === 'drop') showDrop();
-      else if(st.mode === 'find'){ standalone = !!st.standalone; showFind(st.q || '') }
+      else if(st.mode === 'find'){
+        standalone = !!st.standalone;
+        const i = document.getElementById('fq');
+        if(mode === 'find' && i && !st.q) i.focus();     // déjà préparée (panneau en réserve) : on garde la page
+        else showFind(st.q || '');
+      }
     }catch(err){ console.log(err); try{ window.pywebview.api.jslog(String(err && err.stack || err)) }catch(e){} }
     return true;
   }
