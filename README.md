@@ -71,12 +71,14 @@ python3 tools/build.py      # régénère site/downloads/ (archives, FileForge-S
 python3 tools/site_data.py  # si les actions ou catégories ont changé (démo du site)
 ```
 
-## Déployer le site sur Cloudflare Pages
+## Publier le site
 
-Dans Cloudflare : *Workers & Pages → Créer → Pages → Connecter à Git*, choisis ce dépôt, puis :
+Le site est un Worker Cloudflare de fichiers statiques (`wrangler.jsonc`, dossier `site/`) :
 
-- **Commande de build** : `python3 tools/build.py` (ou laisser vide : les paquets sont déjà dans le dépôt)
-- **Répertoire de sortie** : `site`
+```bash
+python3 tools/build.py     # si le code a changé : régénère site/downloads/
+npx wrangler deploy        # publie sur https://filiforme.to-trahant.workers.dev
+```
 
 Le site détecte le système du visiteur et met en avant le bon téléchargement ; les tailles et empreintes
 SHA-256 sont lues dans `site/downloads/manifest.json`.
