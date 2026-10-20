@@ -249,6 +249,16 @@ def own_hwnd():
     return found[0] if found else None
 
 
+def win_focus_browser():
+    """Windows : donne le clavier au moteur d'affichage (WebView2) lui-même, pas à la fenêtre qui le contient."""
+    try:
+        form = ui._win.native
+        from System import Action
+        form.Invoke(Action(lambda: form.webview.Focus()))
+    except Exception as e:
+        ff.log(f"focus(win): {e}")
+
+
 def activate():
     if IS_WIN:
         try:
@@ -271,7 +281,7 @@ def activate():
                     u.keybd_event(0x12, 0, 0, 0)      # dernier recours : astuce Alt
                     u.keybd_event(0x12, 0, 2, 0)
                     u.SetForegroundWindow(hwnd)
-                u.SetFocus(hwnd)
+            win_focus_browser()
         except Exception as e:
             ff.log(f"activate(win): {e}")
         return
@@ -545,8 +555,10 @@ def run(window, files):
                                            " i.focus(); return document.hasFocus() && document.activeElement === i ? 'ok' : 'clavier'})()")
                     if r == "ok":
                         break
-                    if r == "clavier" and n % 10 == 5:
-                        activate()               # visible mais sans le clavier : on redemande le premier plan
+                    if r == "clavier":
+                        win_focus_browser()      # visible mais sans le clavier : on le donne au moteur d'affichage
+                        if n % 10 == 9:
+                            activate()
                 except Exception:
                     pass
         threading.Thread(target=refocus, daemon=True).start()
