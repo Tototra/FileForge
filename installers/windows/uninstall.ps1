@@ -17,6 +17,7 @@ foreach ($k in "Software\Classes\*\shell\FileForge", "Software\Classes\Directory
   $hk.DeleteSubKeyTree($k, $false)
 }
 Remove-Item (Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\FileForge.lnk") -Force
+Remove-Item (Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\FileForge - Rechercher un fichier.lnk") -Force
 Remove-Item (Join-Path $env:APPDATA "Microsoft\Windows\SendTo\FileForge.lnk") -Force
 Remove-Item (Join-Path ([Environment]::GetFolderPath("Desktop")) "FileForge.lnk") -Force
 
