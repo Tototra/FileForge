@@ -111,6 +111,25 @@ EOF
 ok "Clic droit (Actions rapides), raccourci ⌃⌥F et FileForge.app dans ~/Applications"
 
 # 6. Options
+# Raccourci global ⌃⌥G : panneau de recherche de fichiers (petit agent sans icône, lancé à l'ouverture de session)
+AGENT="$HOME/Library/LaunchAgents/fr.fileforge.hotkey.plist"
+mkdir -p "$HOME/Library/LaunchAgents"
+cat > "$AGENT" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>fr.fileforge.hotkey</string>
+  <key>ProgramArguments</key><array><string>$DEST/venv/bin/python</string><string>$DEST/hotkey_mac.py</string></array>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><dict><key>SuccessfulExit</key><false/></dict>
+  <key>ProcessType</key><string>Interactive</string>
+  <key>StandardOutPath</key><string>$HOME/Library/Logs/FileForge.log</string>
+  <key>StandardErrorPath</key><string>$HOME/Library/Logs/FileForge.log</string>
+</dict></plist>
+PLIST
+launchctl bootout "gui/$(id -u)/fr.fileforge.hotkey" 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" "$AGENT" 2>/dev/null && ok "Recherche de fichiers : ⌃⌥G partout"
+
 step 6 "Options"
 if [[ -d "/Applications/LibreOffice.app" ]]; then ok "LibreOffice détecté"
 else
@@ -128,6 +147,7 @@ echo
 echo "  - Dans le Finder : sélectionne des fichiers puis ⌃⌥F (Ctrl + Option + F)"
 echo "  - ou clic droit → Actions rapides → FileForge…"
 echo "  - ou glisse des fichiers sur FileForge.app (dans ton dossier Applications)"
+echo "  - ⌃⌥G n'importe où : chercher un fichier par son nom"
 echo
 echo "  Si le clic droit n'affiche pas FileForge : Réglages Système → Général →"
 echo "  Éléments de connexion et extensions → Finder → coche « FileForge… »."

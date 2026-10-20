@@ -20,7 +20,7 @@ Tout se passe sur ton ordinateur : aucun fichier n'est envoyé sur Internet, et 
 | Extraire | Images d'un PDF, son d'une vidéo, image fixe, contenu d'une archive |
 | Sécurité | Mot de passe AES-256, déverrouillage, caviardage définitif, suppression des métadonnées et du GPS |
 | Outils | OCR français/anglais, aplatir, réparer, renommer en lot, enchaîner plusieurs actions |
-| Rechercher | Ouvre la roue sans fichier et tape un nom : recherche instantanée dans ton dossier personnel, tolérante aux accents et aux fautes de frappe |
+| Rechercher | <kbd>⌃</kbd><kbd>⌥</kbd><kbd>G</kbd> partout sur Mac (ou la roue ouverte sans fichier), puis tape un nom : recherche instantanée dans ton dossier personnel, tolérante aux accents et aux fautes de frappe |
 
 ## Installer
 
@@ -44,6 +44,7 @@ src/            le programme (commun aux trois systèmes)
   wheel.py        la roue (pywebview) et l'intégration à chaque système
   wheel.html      interface de la roue
   search.py       recherche de fichiers par nom (index local)
+  hotkey_mac.py   agent macOS du raccourci global ⌃⌥G
   linux_setup.py  intégration Hyprland / Thunar
 installers/     scripts d'installation macOS, Windows, Linux
 assets/         icônes
