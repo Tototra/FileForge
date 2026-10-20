@@ -115,7 +115,8 @@ jobs:
             # qu'est-ce qui empêche la suppression ?
             "contenu : " + ((Get-ChildItem $D -Force -Recurse -ErrorAction SilentlyContinue | Select-Object -First 15 | ForEach-Object { $_.FullName }) -join ", ") | Tee-Object -FilePath ci-out\restes.txt
             "processus liés : " + ((Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*FileForge*" -or $_.ExecutablePath -like "$D*" } | ForEach-Object { "$($_.Name) [$($_.ProcessId)] parent $($_.ParentProcessId)" }) -join " ; ") | Tee-Object -Append -FilePath ci-out\restes.txt
-            try { Remove-Item $D -Recurse -Force -ErrorAction Stop; "suppression manuelle : réussie" } catch { "suppression manuelle : $($_.Exception.Message)" } | Tee-Object -Append -FilePath ci-out\restes.txt
+            $m = try { Remove-Item $D -Recurse -Force -ErrorAction Stop; "suppression manuelle : réussie" } catch { "suppression manuelle : $($_.Exception.Message)" }
+            $m | Tee-Object -Append -FilePath ci-out\restes.txt
           }
           "durée : $t s" | Tee-Object -FilePath ci-out\desinstallation.txt
           $left = @((Test-Path $D), (Test-Path "HKCU:\Software\Classes\*\shell\FileForge"),
