@@ -1,4 +1,4 @@
-name: Test Windows
+name: Test Windows et Mac
 
 # Installe FileForge-Setup.exe sur un vrai Windows, exécute toutes les actions,
 # pilote la roue et en prend des captures. Les résultats sont publiés sur la branche ci-results.
@@ -152,3 +152,58 @@ jobs:
           git add -A; git commit -qm "Résultats Windows $env:GITHUB_SHA"
           git push -f origin HEAD:ci-results
           Pop-Location
+
+  macos:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installation à partir du zip publié (comme un utilisateur)
+        run: |
+          mkdir -p ci-out "$RUNNER_TEMP/pkg"
+          ditto -x -k site/downloads/FileForge-macOS.zip "$RUNNER_TEMP/pkg"
+          start=$(date +%s)
+          FILEFORGE_TEST=1 bash "$RUNNER_TEMP/pkg/FileForge-macOS/install.command" 2>&1 | tee ci-out/installation.txt
+          echo "durée : $(( $(date +%s) - start )) s" | tee -a ci-out/installation.txt
+          D="$HOME/Library/Application Support/FileForge"
+          {
+            echo "roue : $(test -f "$D/wheel.py" && echo oui || echo NON)"
+            echo "python : $(test -x "$D/venv/bin/python" && echo oui || echo NON)"
+            echo "LibreOffice : $(test -d /Applications/LibreOffice.app -o -d "$D/LibreOffice.app" && echo oui || echo NON)"
+            echo "agent ⌃⌥G/⌃⌥F : $(test -f "$HOME/Library/LaunchAgents/fr.fileforge.hotkey.plist" && echo oui || echo NON)"
+            echo "action rapide : $(test -d "$HOME/Library/Services/FileForge.workflow" && echo oui || echo NON)"
+          } | tee ci-out/verifications.txt
+          ! grep -q NON ci-out/verifications.txt
+
+      - name: Toutes les actions (selftest)
+        if: always()
+        run: |
+          D="$HOME/Library/Application Support/FileForge"
+          cp tests/selftest.py "$D/selftest.py"
+          "$D/venv/bin/python" "$D/selftest.py" 2>&1 | tee ci-out/selftest.txt
+          grep -q " 0 échecs" ci-out/selftest.txt
+
+      - name: Conversions, recherche, roue
+        if: always()
+        run: |
+          "$HOME/Library/Application Support/FileForge/venv/bin/python" tests/mac_ci.py ci-out 2>&1 | tee ci-out/mac_ci.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Désinstallation
+        if: always()
+        run: |
+          D="$HOME/Library/Application Support/FileForge"
+          bash "$D/uninstall.command" 2>&1 | tail -3
+          sleep 2
+          echo "dossier restant : $(test -d "$D" && echo OUI || echo non) / agent restant : $(test -f "$HOME/Library/LaunchAgents/fr.fileforge.hotkey.plist" && echo OUI || echo non)" | tee ci-out/desinstallation.txt
+          ! grep -q OUI ci-out/desinstallation.txt
+
+      - name: Publier les résultats (branche ci-results-mac)
+        if: always()
+        run: |
+          printf 'commit %s\nrun %s/%s/actions/runs/%s\nstatut %s\n' "$GITHUB_SHA" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" "${{ job.status }}" > ci-out/RUN.txt
+          git config user.name "FileForge CI"; git config user.email "ci@users.noreply.github.com"
+          dir="$RUNNER_TEMP/res"; git worktree add --detach "$dir"
+          cd "$dir" && git checkout -q --orphan ci-mac && git rm -rfq . && cp -R "$GITHUB_WORKSPACE/ci-out/." . && git add -A && git commit -qm "Résultats Mac $GITHUB_SHA" && git push -f origin HEAD:ci-results-mac
+

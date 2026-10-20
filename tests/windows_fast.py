@@ -56,7 +56,7 @@ def wait_ready(n=2, timeout=40, pattern="--standby"):
 
 def open_and_time(files, want_mode="main", timeout=15):
     t0 = time.time()
-    subprocess.Popen([str(PYW), str(D / "hotkey_win.py"), "--open", *map(str, files)])
+    subprocess.Popen([str(PYW), str(D / "hotkey_win.py"), "--open", *map(str, files)], env=env)
     while time.time() - t0 < timeout:
         if js("mode", timeout=0.5).strip() == want_mode:
             return time.time() - t0
@@ -97,17 +97,38 @@ for i in range(6):
 if times:
     notes.append(f"clic droit → roue prête : médiane {statistics.median(times):.2f} s, max {max(times):.2f} s")
 
-# 2. clic droit sur deux fichiers (Windows lance un lanceur par fichier, en même temps)
+# 2. clic droit sur deux fichiers : sélection dans une vraie fenêtre de l'Explorateur, puis un lanceur par fichier
+import pythoncom, win32com.client, ctypes
+pythoncom.CoInitialize()
+subprocess.Popen(["explorer.exe", str(docs)])
+w = None
+for _ in range(40):
+    time.sleep(0.25)
+    for x in win32com.client.Dispatch("Shell.Application").Windows():
+        try:
+            if Path(x.Document.Folder.Self.Path) == docs:
+                w = x
+        except Exception:
+            pass
+    if w:
+        break
+time.sleep(1)
+for i, n in enumerate(("Devis cuisine.pdf", "Plan cuisine.png")):
+    w.Document.SelectItem(w.Document.Folder.ParseName(n), (1 | 4 | 8) if i == 0 else 1)
+ctypes.windll.user32.SetForegroundWindow(int(w.HWND)); time.sleep(0.6)
 wait_ready(1, 20)
 t0 = time.time()
 for f in ("Devis cuisine.pdf", "Plan cuisine.png"):
-    subprocess.Popen([str(PYW), str(D / "hotkey_win.py"), "--open", str(docs / f)])
+    subprocess.Popen([str(PYW), str(D / "hotkey_win.py"), "--open", str(docs / f)], env=env)
+    time.sleep(0.15)                       # l'Explorateur les lance l'un après l'autre
 dt = None
 while time.time() - t0 < 15:
     if js("mode", timeout=0.5).strip() == "main":
         dt = time.time() - t0; break
     time.sleep(0.02)
+time.sleep(1)
 title = js("S && S.title").strip()
+n_wheels = len([p for p in procs("wheel.py") if "\\python\\cpython" in p[2] and "--search" not in p[2]])
 expect("deux fichiers → une seule roue avec les deux", title == "2 éléments", f"{dt and round(dt, 2)} s, {title!r}")
 close()
 
