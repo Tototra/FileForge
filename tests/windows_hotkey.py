@@ -22,6 +22,11 @@ def expect(name, cond, info=""):
     print(("OK   " if cond else "FAIL ") + name, info, flush=True)
     if not cond:
         fails.append(name)
+        # état du panneau au moment de l'échec
+        st = js("JSON.stringify({mode: mode, v: (document.getElementById('fq') || {}).value, "
+                "focus: document.activeElement && document.activeElement.id, has: document.hasFocus()})", timeout=2)
+        print(f"      état : {st} | panneaux visibles {list(visible_panels())} | premier plan {u.GetForegroundWindow()}", flush=True)
+        shot(f"echec-{len(fails)}")
 
 
 def shot(name):
@@ -239,6 +244,7 @@ kill("hotkey_win.py"); kill("wheel.py")
 log = (D / "FileForge.log").read_text(encoding="utf-8", errors="replace") if (D / "FileForge.log").exists() else ""
 expect("journal sans erreur Python", "Traceback" not in log)
 (OUT / "FileForge-hotkey.log").write_text(log, encoding="utf-8")
+print("\n".join(l for l in log.splitlines() if "raccourci" in l or "recherche" in l))
 (OUT / "hotkey-notes.txt").write_text("\n".join(notes), encoding="utf-8")
 print("\n".join(notes))
 print(f"\n{len(fails)} échec(s) : {fails}")
