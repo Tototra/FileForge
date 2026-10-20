@@ -189,21 +189,46 @@ function Test-LibreOffice {
   return $false
 }
 
-function Step-LibreOffice {
-  if (Test-LibreOffice) { Ok "LibreOffice déjà installé"; return }
-  if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
-    Say "Installation automatique impossible (winget absent) : télécharge LibreOffice sur https://fr.libreoffice.org"
-    return
+function Test-MsOffice {
+  # Word, PowerPoint et Excel tous présents : FileForge convertit avec eux, LibreOffice est inutile
+  foreach ($app in "Word", "PowerPoint", "Excel") {
+    if (-not (Test-Path "Registry::HKEY_CLASSES_ROOT\$app.Application\CLSID")) { return $false }
   }
-  Say "Téléchargement de LibreOffice (~350 Mo), Windows peut demander une autorisation..."
-  winget install -e --id TheDocumentFoundation.LibreOffice --silent --accept-package-agreements --accept-source-agreements --disable-interactivity | Out-Null
-  if (Test-LibreOffice) { Ok "LibreOffice installé" } else { Say "LibreOffice n'a pas pu être installé (tu pourras le faire plus tard)." }
+  return $true
+}
+
+function Step-LibreOffice {
+  if (Test-MsOffice) { Ok "Microsoft Office détecté : utilisé pour convertir Word, PowerPoint et Excel"; return }
+  if (Test-LibreOffice) { Ok "LibreOffice déjà installé"; return }
+  $missing = @("Word", "PowerPoint", "Excel" | Where-Object { -not (Test-Path "Registry::HKEY_CLASSES_ROOT\$_.Application\CLSID") }) -join ", "
+  Say "Pas de $missing : installation de LibreOffice (gratuit, ~350 Mo) pour convertir ces fichiers."
+  Say "Windows va peut-être demander une autorisation : réponds Oui."
+  if (Get-Command winget -ErrorAction SilentlyContinue) {
+    winget install -e --id TheDocumentFoundation.LibreOffice --silent --accept-package-agreements --accept-source-agreements --disable-interactivity | Out-Null
+  }
+  if (-not (Test-LibreOffice)) {
+    # sans winget (ou en cas d'échec) : installateur officiel téléchargé depuis documentfoundation.org
+    try {
+      $base = "https://download.documentfoundation.org/libreoffice/stable/"
+      $vers = (Invoke-WebRequest $base -UseBasicParsing).Links.href | Where-Object { $_ -match '^\d+(\.\d+)+/$' } |
+              ForEach-Object { $_.TrimEnd('/') } | Sort-Object { [version]$_ }
+      $v = $vers[-1]
+      $msi = Join-Path $env:TEMP "LibreOffice_$v.msi"
+      Say "Téléchargement de LibreOffice $v..."
+      Download "$base$v/win/x86_64/LibreOffice_${v}_Win_x86-64.msi" $msi
+      Start-Process msiexec.exe -ArgumentList "/i `"$msi`" /qb- /norestart" -Verb RunAs -Wait
+      Remove-Item $msi -Force -ErrorAction SilentlyContinue
+    } catch { Say "Téléchargement de LibreOffice impossible : $($_.Exception.Message)" }
+  }
+  if (Test-LibreOffice) { Ok "LibreOffice installé" }
+  else { Say "LibreOffice n'a pas pu être installé : FileForge fera des conversions simplifiées (réinstalle plus tard pour réessayer)." }
 }
 
 $steps = [ordered]@{
   files = "Copie des fichiers"; python = "Python (privé à FileForge)"
   libs = "Bibliothèques (PDF, images, vidéo, interface) - quelques minutes la première fois"
   ocr = "Langues pour l'OCR"; webview = "Moteur d'affichage de la roue"; shell = "Intégration à l'Explorateur Windows"
+  libreoffice = "Conversions Office (Microsoft Office s'il est installé, sinon LibreOffice)"
 }
 $fn = @{ files = { Step-Files }; python = { Step-Python }; libs = { Step-Libs }; ocr = { Step-Ocr }
          webview = { Step-Webview }; shell = { Step-Shell }; libreoffice = { Step-LibreOffice } }
@@ -222,13 +247,6 @@ try {
   $i = 0
   foreach ($k in $steps.Keys) { $i++; Title "$i/$($steps.Count)" $steps[$k]; & $fn[$k] }
 
-  $office = Test-Path "Registry::HKEY_CLASSES_ROOT\PowerPoint.Application"
-  if (-not $office -and -not (Test-LibreOffice) -and -not $Quiet) {
-    Write-Host ""
-    Write-Host "      LibreOffice (gratuit) permet de convertir PowerPoint et Excel en PDF sans Microsoft Office."
-    $r = Read-Host "      L'installer maintenant ? (O/N)"
-    if ($r -match '^(o|oui|y|yes)$') { Step-LibreOffice }
-  }
   Write-Host ""
   Write-Host "  FileForge est installé !" -ForegroundColor Green
   Write-Host "  - Clic droit sur un fichier > FileForge...  (Windows 11 : Afficher d'autres options)"

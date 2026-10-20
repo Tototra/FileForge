@@ -133,9 +133,9 @@ launchctl bootstrap "gui/$(id -u)" "$AGENT" 2>/dev/null && ok "Recherche de fich
 step 6 "Options"
 if [[ -d "/Applications/LibreOffice.app" ]]; then ok "LibreOffice détecté"
 else
-  echo "      LibreOffice (gratuit) permet Word / PowerPoint / Excel → PDF fidèles."
+  echo "      Installation de LibreOffice (gratuit, ~350 Mo) pour convertir Word / PowerPoint / Excel en PDF…"
   if command -v brew >/dev/null; then
-    ask "L'installer avec Homebrew ?" && brew install --cask libreoffice || true
+    brew install --cask libreoffice >/dev/null 2>&1 && ok "LibreOffice installé" || echo "      LibreOffice n'a pas pu être installé : https://fr.libreoffice.org"
   else
     echo "      Sans lui, Word → PDF utilise une conversion simplifiée. Téléchargement : https://fr.libreoffice.org"
   fi

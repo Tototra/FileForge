@@ -1,7 +1,8 @@
 ; FileForge - installateur Windows en un seul fichier (compilé par tools/build.py avec makensis)
 ;   makensis /DSTAGE=<dossier préparé> /DVERSION=1.0.0 /DOUTFILE=FileForge-Setup.exe FileForge.nsi
 ; Installation pour l'utilisateur courant uniquement : aucun droit administrateur.
-; Mode silencieux : FileForge-Setup.exe /S   (ajouter /LIBREOFFICE pour installer LibreOffice)
+; Mode silencieux : FileForge-Setup.exe /S
+; Conversions Office : Microsoft Office s'il est installé (Word, PowerPoint, Excel), sinon LibreOffice est installé.
 
 Unicode true
 SetCompressor /SOLID lzma
@@ -34,17 +35,11 @@ VIAddVersionKey /LANG=1036 "LegalCopyright" "FileForge, logiciel libre"
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "${STAGE}\wizard.bmp"
 !define MUI_ABORTWARNING
 !define MUI_ABORTWARNING_TEXT "Arrêter l'installation de FileForge ?"
-!define MUI_COMPONENTSPAGE_NODESC
 
 !define MUI_WELCOMEPAGE_TITLE "Installer FileForge"
-!define MUI_WELCOMEPAGE_TEXT "FileForge convertit, compresse, rogne et signe tes fichiers depuis une roue qui s'ouvre d'un clic droit.$\r$\n$\r$\nL'installation prend quelques minutes et télécharge ce qu'il faut (environ 300 Mo). Elle ne demande aucun mot de passe administrateur et ne touche à rien en dehors de ton compte.$\r$\n$\r$\nTout se passe ensuite sur ton ordinateur : aucun fichier n'est envoyé sur Internet."
+!define MUI_WELCOMEPAGE_TEXT "FileForge convertit, compresse, rogne et signe tes fichiers depuis une roue qui s'ouvre d'un clic droit.$\r$\n$\r$\nL'installation prend quelques minutes et télécharge ce qu'il faut (environ 300 Mo, plus LibreOffice si Microsoft Office n'est pas installé). FileForge ne demande aucun mot de passe administrateur et ne touche à rien en dehors de ton compte (seul LibreOffice, s'il faut l'installer, peut faire demander une autorisation à Windows).$\r$\n$\r$\nTout se passe ensuite sur ton ordinateur : aucun fichier n'est envoyé sur Internet."
 !insertmacro MUI_PAGE_WELCOME
 
-!define MUI_PAGE_HEADER_TEXT "Options"
-!define MUI_PAGE_HEADER_SUBTEXT "Coche LibreOffice si tu veux convertir PowerPoint et Excel en PDF sans Microsoft Office."
-!define MUI_COMPONENTSPAGE_TEXT_TOP "Clique sur Installer pour continuer."
-!define MUI_COMPONENTSPAGE_TEXT_COMPLIST "Éléments :"
-!insertmacro MUI_PAGE_COMPONENTS
 
 !define MUI_PAGE_HEADER_TEXT "Installation en cours"
 !define MUI_PAGE_HEADER_SUBTEXT "Laisse la fenêtre ouverte, ça peut prendre quelques minutes."
@@ -92,6 +87,11 @@ Section "FileForge (convertir, compresser, éditer…)" SecMain
   !insertmacro RunStep ocr "Langues pour l'OCR (français, anglais)"
   !insertmacro RunStep webview "Moteur d'affichage de la roue"
   !insertmacro RunStep shell "Intégration à l'Explorateur Windows"
+  ; Word / PowerPoint / Excel : Microsoft Office s'il est là, sinon LibreOffice (facultatif : un échec n'annule rien)
+  ${If} $Failed == ""
+    !insertmacro RunStep libreoffice "Conversions Office : Microsoft Office, sinon installation de LibreOffice (~350 Mo)"
+    StrCpy $Failed ""
+  ${EndIf}
 
   ${If} $Failed != ""
     DetailPrint "Échec : $Failed"
@@ -118,12 +118,6 @@ Section "FileForge (convertir, compresser, éditer…)" SecMain
   DetailPrint "FileForge est installé."
 SectionEnd
 
-Section /o "LibreOffice : PowerPoint et Excel vers PDF sans Microsoft Office (~350 Mo)" SecLO
-  ${If} $Failed == ""
-    !insertmacro RunStep libreoffice "Installation de LibreOffice (Windows peut demander une autorisation)"
-    StrCpy $Failed ""   ; facultatif : un échec ici n'annule pas l'installation
-  ${EndIf}
-SectionEnd
 
 Function .onInit
   ; Une seule installation à la fois
@@ -132,21 +126,6 @@ Function .onInit
   ${If} $R0 == 183
     MessageBox MB_OK|MB_ICONINFORMATION "L'installation de FileForge est déjà en cours."
     Abort
-  ${EndIf}
-  ; LibreOffice coché par défaut seulement si ni Office ni LibreOffice ne sont présents
-  ClearErrors
-  ReadRegStr $0 HKCR "PowerPoint.Application\CLSID" ""
-  ${If} ${Errors}
-  ${AndIfNot} ${FileExists} "$PROGRAMFILES64\LibreOffice\program\soffice.exe"
-  ${AndIfNot} ${FileExists} "$PROGRAMFILES32\LibreOffice\program\soffice.exe"
-    IfSilent +2
-    !insertmacro SelectSection ${SecLO}
-  ${EndIf}
-  ${GetParameters} $0
-  ClearErrors
-  ${GetOptions} $0 "/LIBREOFFICE" $1
-  ${IfNot} ${Errors}
-    !insertmacro SelectSection ${SecLO}
   ${EndIf}
 FunctionEnd
 
