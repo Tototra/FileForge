@@ -18,7 +18,7 @@ TITLE = "FileForge-Recherche"          # titre de la fenêtre du panneau de rech
 MOD_ALT, MOD_CONTROL, MOD_NOREPEAT = 0x0001, 0x0002, 0x4000
 VK_G = 0x47
 WM_HOTKEY, WM_TIMER, WM_QUIT = 0x0312, 0x0113, 0x0012
-RESPAWN_MS, HEALTH_MS = 900, 30000
+RESPAWN_MS, HEALTH_MS = 400, 30000      # la réserve suivante est préparée dès que le panneau est refermé
 
 user32 = ctypes.WinDLL("user32", use_last_error=True)
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
@@ -103,7 +103,10 @@ class Agent:
 
     def ensure_standby(self):
         if self.standby is None or self.standby.poll() is not None:
+            if visible_panel():
+                return False              # pas pendant qu'on se sert du panneau : on réessaiera
             self.standby = self._spawn(True)
+        return True
 
     def on_hotkey(self):
         now = time.time()
@@ -152,10 +155,10 @@ class Agent:
                 if msg.message == WM_HOTKEY:
                     self.on_hotkey()
                 elif msg.message == WM_TIMER:
-                    if msg.wParam == self.respawn_timer:
-                        user32.KillTimer(None, self.respawn_timer)
+                    ready = self.ensure_standby()
+                    if msg.wParam == self.respawn_timer and ready:
+                        user32.KillTimer(None, self.respawn_timer)   # sinon le minuteur réessaie un peu plus tard
                         self.respawn_timer = None
-                    self.ensure_standby()
             except Exception:
                 log(traceback.format_exc())
         return 0
