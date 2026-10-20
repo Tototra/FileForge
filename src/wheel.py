@@ -11,6 +11,7 @@ _spec.loader.exec_module(ff)
 IS_WIN = sys.platform == "win32"
 IS_LINUX = sys.platform.startswith("linux")
 IS_MAC = sys.platform == "darwin"
+SEARCH_ONLY = "--search" in sys.argv   # ⌃⌥G : panneau de recherche seul, sans fichier
 if sys.stdout is None or sys.stderr is None:
     ff.LOG.parent.mkdir(parents=True, exist_ok=True)
     _lf = open(ff.LOG, "a", encoding="utf-8", buffering=1)
@@ -479,8 +480,8 @@ def run(window, files):
     try:
         while True:
             if not files:
-                ui._accept_drop = True
-                v = ui._wait({"mode": "drop"}, busy_after=False)
+                ui._accept_drop = not SEARCH_ONLY
+                v = ui._wait({"mode": "find", "standalone": True} if SEARCH_ONLY else {"mode": "drop"}, busy_after=False)
                 ui._accept_drop = False
                 if isinstance(v, dict) and v.get("find"):
                     p = v["path"]
@@ -607,6 +608,8 @@ def position():
         screens = list(AppKit.NSScreen.screens())
         idx = next((i for i, s in enumerate(screens) if AppKit.NSPointInRect(loc, s.frame())), 0)
         fr, vf = screens[idx].frame(), screens[idx].visibleFrame()
+        if SEARCH_ONLY:
+            loc = AppKit.NSMakePoint(vf.origin.x + vf.size.width / 2, vf.origin.y + vf.size.height * 0.56)
         cx = min(max(loc.x, vf.origin.x + W / 2), vf.origin.x + vf.size.width - W / 2)
         cy = min(max(loc.y, vf.origin.y + H / 2), vf.origin.y + vf.size.height - H / 2)
         x = cx - W / 2 - fr.origin.x
@@ -619,10 +622,10 @@ def position():
 
 
 def main():
-    args = [os.path.abspath(a) for a in sys.argv[1:] if os.path.exists(a)]
+    args = [os.path.abspath(a) for a in sys.argv[1:] if not a.startswith("--") and os.path.exists(a)]
     if IS_WIN and args:
         args = gather(args)
-    if not args:
+    if not args and not SEARCH_ONLY:
         args = explorer_selection() if IS_WIN else ([] if IS_LINUX else finder_selection())
     files = sorted(set(args), key=ff.natural)
     x, y, scr = position()

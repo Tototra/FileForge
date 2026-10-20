@@ -115,6 +115,7 @@ button:hover{filter:brightness(1.15)}
 <script>
 const C = 380, NS = 'http://www.w3.org/2000/svg';
 const stage = document.getElementById('stage');
+let standalone = false;
 let S = null, mode = null, query = '', kb = {level: 'cat', ci: -1, ai: -1};
 let catItems = [], fanItems = [], fanL = null, curCat = -1, ringItems = [], hubEl = null, busyText = '';
 
@@ -448,6 +449,10 @@ document.addEventListener('mousedown', e => {
   if((e.target === document.body || e.target === stage || e.target === document.documentElement) && (mode === 'main' || mode === 'drop' || mode === 'done' || mode === 'find')) api('__close__');
 });
 window.addEventListener('blur', () => {
+  if(mode === 'find' && standalone){
+    setTimeout(() => { if(!document.hasFocus() && mode === 'find') api('__close__') }, 200);
+    return;
+  }
   if(mode !== 'main' || query) return;
   const wait = (S && S.platform && S.platform.startsWith('linux')) ? 900 : 150;
   setTimeout(() => { if(!document.hasFocus() && mode === 'main') api('__close__') }, wait);
@@ -525,6 +530,7 @@ window.FF = {
       else if(st.mode === 'done') showDone(st);
       else if(st.mode === 'error') showError(st);
       else if(st.mode === 'drop') showDrop();
+      else if(st.mode === 'find'){ standalone = !!st.standalone; showFind(st.q || '') }
     }catch(err){ console.log(err); try{ window.pywebview.api.jslog(String(err && err.stack || err)) }catch(e){} }
     return true;
   }

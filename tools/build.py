@@ -37,7 +37,7 @@ def build_macos():
     p = OUT / "FileForge-macOS.zip"
     with zipfile.ZipFile(p, "w") as zf:
         b = "FileForge-macOS/"
-        for f in CORE:
+        for f in CORE + ["hotkey_mac.py"]:
             add_zip(zf, b + "app/" + f, (SRC / f).read_bytes())
         add_zip(zf, b + "install.command", (INST / "macos/install.command").read_bytes(), True)
         add_zip(zf, b + "uninstall.command", (INST / "macos/uninstall.command").read_bytes(), True)

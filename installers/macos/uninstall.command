@@ -3,6 +3,8 @@
 DEST="$HOME/Library/Application Support/FileForge"
 echo "Désinstallation de FileForge…"
 pkill -f "$DEST/wheel.py" 2>/dev/null
+launchctl bootout "gui/$(id -u)/fr.fileforge.hotkey" 2>/dev/null
+rm -f "$HOME/Library/LaunchAgents/fr.fileforge.hotkey.plist" "$HOME/Library/Caches/FileForge/index-fichiers.tsv"
 rm -rf "$HOME/Library/Services/FileForge.workflow" "$HOME/Applications/FileForge.app"
 python3 - <<'PY' 2>/dev/null || true
 import plistlib, subprocess
