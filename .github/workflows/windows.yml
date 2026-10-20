@@ -21,9 +21,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: LibreOffice (pour tester PowerPoint / Excel → PDF)
-        run: choco install libreoffice-fresh -y --no-progress | Select-Object -Last 3
-
       - name: Installation par FileForge-Setup.exe (fenêtre visible, comme un utilisateur)
         run: |
           New-Item -ItemType Directory -Force ci-out | Out-Null
@@ -66,6 +63,7 @@ jobs:
             "menu Démarrer" = Test-Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\FileForge.lnk"
             "Bureau" = Test-Path ([Environment]::GetFolderPath("Desktop") + "\FileForge.lnk")
             "désinstalleur" = Test-Path "$D\Uninstall.exe"
+            "LibreOffice (pas d'Office)" = (Test-Path "$env:ProgramFiles\LibreOffice\program\soffice.exe")
           }
           $checks.GetEnumerator() | ForEach-Object { "{0,-14} {1}" -f $_.Key, $_.Value } | Tee-Object -FilePath ci-out\installation.txt
           if ($checks.Values -contains $false) { exit 1 }
