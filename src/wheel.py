@@ -224,7 +224,7 @@ def choose_file(prompt, types=None):
     return r[0]
 
 
-TITLE = "FileForge-Roue"
+TITLE = "FileForge-Recherche" if (SEARCH_ONLY and IS_WIN) else "FileForge-Roue"   # Windows : l'agent Ctrl+Alt+G repère le panneau à ce titre
 
 
 def own_hwnd():

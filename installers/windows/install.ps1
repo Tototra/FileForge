@@ -154,7 +154,7 @@ function Step-Shell {
     $l = $sh.CreateShortcut($path)
     $l.TargetPath = $Pyw
     $l.Arguments = "`"$Dest\wheel.py`"$extra"
-    $l.WorkingDirectory = $Dest
+    $l.WorkingDirectory = $env:USERPROFILE     # pas le dossier de FileForge (il resterait verrouillé)
     $l.IconLocation = "$ico,0"
     $l.Description = "FileForge - convertir, compresser, éditer tes fichiers"
     if ($hotkey) { $l.Hotkey = $hotkey }
@@ -185,7 +185,7 @@ function Step-Shell {
   Get-CimInstance Win32_Process -Filter "Name='pythonw.exe'" -ErrorAction SilentlyContinue |
     Where-Object { $_.CommandLine -like "*FileForge*hotkey_win.py*" -or $_.CommandLine -like "*FileForge*--standby*" } |
     ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
-  Start-Process -FilePath $Pyw -ArgumentList "`"$Dest\hotkey_win.py`"" -WorkingDirectory $Dest
+  Start-Process -FilePath $Pyw -ArgumentList "`"$Dest\hotkey_win.py`"" -WorkingDirectory $env:TEMP
   Ok "Clic droit, Envoyer vers, Ctrl+Alt+F (roue), Ctrl+Alt+G (recherche) et icône sur le Bureau"
 }
 

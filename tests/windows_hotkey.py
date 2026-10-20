@@ -15,7 +15,7 @@ CMD = Path(tempfile.gettempdir()) / "ff_cmd.js"
 RES = CMD.parent / "ff_cmd.out"
 u = ctypes.windll.user32
 fails, notes = [], []
-TITLE = "FileForge-Roue"
+TITLE = "FileForge-Recherche"
 
 
 def expect(name, cond, info=""):
@@ -224,7 +224,8 @@ expect("clic à côté referme", wait_closed() is not None)
 # 7. l'agent tient le coup et la réserve se reforme
 time.sleep(4)
 expect("agent toujours actif", agent.poll() is None)
-waiting = [pid for pid, _ in procs("--standby") if int(pid) not in visible_panels()]
+# (sous un environnement virtuel, chaque panneau = un lanceur + le vrai Python : on ne compte que ce dernier)
+waiting = [pid for pid, c in procs("--standby") if "\\python\\cpython" in c and int(pid) not in visible_panels()]
 expect("une seule réserve en attente", len(waiting) == 1, f"{len(waiting)} : {procs('wheel.py')}")
 
 # 8. si la réserve a disparu (plantage), Ctrl+Alt+G marche quand même
@@ -234,7 +235,7 @@ dt, v = wait_panel(12)
 expect("sans réserve : ouverture directe", dt is not None, f"{dt and round(dt, 2)} s")
 key(0x1B); key(0x1B, True); wait_closed()
 
-agent.kill(); kill("wheel.py")
+kill("hotkey_win.py"); kill("wheel.py")
 log = (D / "FileForge.log").read_text(encoding="utf-8", errors="replace") if (D / "FileForge.log").exists() else ""
 expect("journal sans erreur Python", "Traceback" not in log)
 (OUT / "FileForge-hotkey.log").write_text(log, encoding="utf-8")

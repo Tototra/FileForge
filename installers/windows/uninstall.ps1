@@ -7,10 +7,13 @@ $Dest = Join-Path $env:LOCALAPPDATA "FileForge"
 if (-not $Quiet) { Write-Host "Désinstallation de FileForge..." -ForegroundColor Cyan }
 
 # tout ce qui tourne depuis le dossier de FileForge (roue, agent Ctrl+Alt+G, LibreOffice privé…)
-Get-CimInstance Win32_Process |
-  Where-Object { ($_.ExecutablePath -and $_.ExecutablePath -like "$Dest\*") -or
-                 (($_.Name -eq "pythonw.exe" -or $_.Name -eq "python.exe") -and $_.CommandLine -like "*FileForge*") } |
-  ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
+$all = Get-CimInstance Win32_Process
+$ours = @($all | Where-Object { ($_.ExecutablePath -and $_.ExecutablePath -like "$Dest\*") -or
+                 (($_.Name -eq "pythonw.exe" -or $_.Name -eq "python.exe") -and $_.CommandLine -like "*FileForge*") })
+$ids = @($ours | ForEach-Object { $_.ProcessId })
+# et le moteur d'affichage (Edge WebView2) lancé par la roue
+$web = @($all | Where-Object { $_.Name -eq "msedgewebview2.exe" -and $ids -contains $_.ParentProcessId })
+($ours + $web) | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
 Start-Sleep -Milliseconds 500
 
 $hk = [Microsoft.Win32.Registry]::CurrentUser
