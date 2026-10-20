@@ -44,7 +44,7 @@ function Download($url, $out) {
 function Step-Files {
   # Ferme une éventuelle roue ouverte (mise à jour)
   Get-CimInstance Win32_Process -Filter "Name='pythonw.exe'" -ErrorAction SilentlyContinue |
-    Where-Object { $_.CommandLine -like "*FileForge*wheel.py*" } |
+    Where-Object { $_.CommandLine -like "*FileForge*wheel.py*" -or $_.CommandLine -like "*FileForge*hotkey_win.py*" } |
     ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
   New-Item -ItemType Directory -Force -Path $Dest | Out-Null
   if ((Resolve-Path $Src).Path.TrimEnd('\') -ne (Resolve-Path $Dest).Path.TrimEnd('\')) {
@@ -162,8 +162,8 @@ function Step-Shell {
   }
   $Start = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs"
   NewLnk (Join-Path $Start "FileForge.lnk") "CTRL+ALT+F"
-  # Ctrl+Alt+G : panneau de recherche de fichiers seul
-  NewLnk (Join-Path $Start "FileForge - Rechercher un fichier.lnk") "CTRL+ALT+G" " --search"
+  # Recherche de fichiers : entrée du menu Démarrer (sans raccourci clavier : Ctrl+Alt+G est géré par l'agent)
+  NewLnk (Join-Path $Start "FileForge - Rechercher un fichier.lnk") $null " --search"
   NewLnk (Join-Path $env:APPDATA "Microsoft\Windows\SendTo\FileForge.lnk") $null
   NewLnk (Join-Path ([Environment]::GetFolderPath("Desktop")) "FileForge.lnk") $null
 
@@ -179,6 +179,13 @@ function Step-Shell {
     $u.SetValue("NoRepair", 1, [Microsoft.Win32.RegistryValueKind]::DWord)
     $u.Close()
   }
+  # Ctrl+Alt+G : petit agent sans fenêtre, lancé à l'ouverture de session (plus rapide et fiable qu'un raccourci du menu Démarrer)
+  $run = $hk.CreateSubKey("Software\Microsoft\Windows\CurrentVersion\Run")
+  $run.SetValue("FileForge", "`"$Pyw`" `"$Dest\hotkey_win.py`""); $run.Close()
+  Get-CimInstance Win32_Process -Filter "Name='pythonw.exe'" -ErrorAction SilentlyContinue |
+    Where-Object { $_.CommandLine -like "*FileForge*hotkey_win.py*" -or $_.CommandLine -like "*FileForge*--standby*" } |
+    ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+  Start-Process -FilePath $Pyw -ArgumentList "`"$Dest\hotkey_win.py`"" -WorkingDirectory $Dest
   Ok "Clic droit, Envoyer vers, Ctrl+Alt+F (roue), Ctrl+Alt+G (recherche) et icône sur le Bureau"
 }
 

@@ -81,7 +81,7 @@ def build_windows():
         raise SystemExit("makensis introuvable : sudo apt install nsis  (ou brew install makensis)")
     st = Path(tempfile.mkdtemp())
     (st / "app").mkdir()
-    for f in CORE:
+    for f in CORE + ["hotkey_win.py"]:
         (st / "app" / f).write_bytes((SRC / f).read_bytes())
     (st / "app" / "icon.ico").write_bytes((ASSETS / "icon.ico").read_bytes())
     (st / "install.ps1").write_bytes(windows_text((w / "install.ps1").read_bytes(), True))
