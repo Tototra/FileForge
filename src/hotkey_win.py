@@ -16,19 +16,19 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 LOG = Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / "FileForge" / "FileForge.log"
 SHOW_EVENT, READY_EVENT = "Local\\FileForgeSearchShow", "Local\\FileForgeSearchReady"
-TITLE = "FileForge-Roue"
+TITLE = "FileForge-Recherche"          # titre de la fenêtre du panneau de recherche (wheel.py --search)
 MOD_ALT, MOD_CONTROL, MOD_NOREPEAT = 0x0001, 0x0002, 0x4000
 VK_G = 0x47
 WM_HOTKEY, WM_TIMER, WM_QUIT = 0x0312, 0x0113, 0x0012
 WM_KEYDOWN, WM_SYSKEYDOWN = 0x0100, 0x0104
-RESPAWN_MS, HEALTH_MS, CAPTURE_MS = 2500, 30000, 3000
+RESPAWN_MS, HEALTH_MS, CAPTURE_MS = 900, 30000, 3000
 MODIFIERS = {0x10, 0x11, 0x12, 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0x5B, 0x5C, 0x14, 0x90, 0x91}
 SPECIAL = {0x08, 0x0D, 0x1B, 0x09, 0x26, 0x28, 0x25, 0x27}   # Retour arrière, Entrée, Échap, Tab, flèches
 
 user32 = ctypes.WinDLL("user32", use_last_error=True)
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
 for f, r in ((kernel32.CreateEventW, wintypes.HANDLE), (kernel32.CreateMutexW, wintypes.HANDLE),
-             (kernel32.GetModuleHandleW, wintypes.HMODULE), (user32.SetWindowsHookExW, ctypes.c_void_p),
+             (kernel32.GetModuleHandleW, wintypes.HMODULE), (kernel32.OpenProcess, wintypes.HANDLE), (user32.SetWindowsHookExW, ctypes.c_void_p),
              (user32.GetKeyboardLayout, ctypes.c_void_p), (user32.CallNextHookEx, ctypes.c_ssize_t)):
     f.restype = r
 user32.SetTimer.restype = ctypes.c_size_t
@@ -74,23 +74,31 @@ def pythonw():
     return str(w if w.exists() else exe)
 
 
-def visible_window(pid):
-    """Le processus a-t-il une fenêtre FileForge visible ?"""
+def visible_panel():
+    """Processus (pid) du panneau de recherche visible, ou None.
+    (le Python d'un environnement virtuel tourne sous un petit lanceur : on se fie à la fenêtre, pas au pid lancé)"""
     found = []
     buf = ctypes.create_unicode_buffer(64)
 
     @ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
     def cb(hwnd, _):
-        p = wintypes.DWORD()
-        user32.GetWindowThreadProcessId(hwnd, ctypes.byref(p))
-        if p.value == pid and user32.IsWindowVisible(hwnd):
+        if user32.IsWindowVisible(hwnd):
             user32.GetWindowTextW(hwnd, buf, 64)
             if buf.value == TITLE:
-                found.append(hwnd)
+                p = wintypes.DWORD()
+                user32.GetWindowThreadProcessId(hwnd, ctypes.byref(p))
+                found.append(p.value)
                 return False
         return True
     user32.EnumWindows(cb, 0)
-    return bool(found)
+    return found[0] if found else None
+
+
+def kill_pid(pid):
+    h = kernel32.OpenProcess(0x0001, False, pid)      # PROCESS_TERMINATE
+    if h:
+        kernel32.TerminateProcess(h, 0)
+        kernel32.CloseHandle(h)
 
 
 def send(inputs):
@@ -185,7 +193,8 @@ class Agent:
     def _spawn(self, standby):
         env = dict(os.environ, FF_AGENT_PID=str(os.getpid()))
         args = [pythonw(), str(HERE / "wheel.py"), "--search"] + (["--standby"] if standby else [])
-        return subprocess.Popen(args, cwd=str(HERE), env=env, creationflags=0x08000000)
+        # dossier de travail hors du dossier de FileForge : sinon il ne pourrait pas être supprimé à la désinstallation
+        return subprocess.Popen(args, cwd=os.environ.get("TEMP") or str(Path.home()), env=env, creationflags=0x08000000)
 
     def ensure_standby(self):
         if self.standby is None or self.standby.poll() is not None:
@@ -197,14 +206,16 @@ class Agent:
             return
         self.last = now
         a = self.active
+        shown = visible_panel()
+        if shown:
+            kill_pid(shown)                  # Ctrl+Alt+G une seconde fois : referme
+            if a is not None and a.poll() is None:
+                a.kill()
+            self.active = None
+            return
+        if self.capture.active():
+            return                           # en train de s'ouvrir : on n'en lance pas un deuxième
         if a is not None and a.poll() is None:
-            if visible_window(a.pid):
-                a.terminate()                # Ctrl+Alt+G une seconde fois : referme
-                self.active = None
-                log("fermeture du panneau")
-                return
-            if self.capture.active():
-                return                       # en train de s'ouvrir : on n'en lance pas un deuxième
             a.kill()                         # fenêtre déjà fermée, processus qui traîne
         self.active = None
         user32.AllowSetForegroundWindow(-1)  # le panneau pourra passer au premier plan
