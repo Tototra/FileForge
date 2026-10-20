@@ -5,7 +5,8 @@ _here = Path(__file__).resolve().parent
 _src = _here / "fileforge.py" if (_here / "fileforge.py").exists() else _here.parent / "src" / "fileforge.py"
 spec = u.spec_from_file_location("ff", _src)
 ff = u.module_from_spec(spec); spec.loader.exec_module(ff)
-T = Path("/tmp/ff_test"); shutil.rmtree(T, ignore_errors=True); T.mkdir()
+import tempfile
+T = Path(tempfile.gettempdir()) / "ff_test"; shutil.rmtree(T, ignore_errors=True); T.mkdir()
 
 import pymupdf
 from PIL import Image, ImageDraw
@@ -27,9 +28,9 @@ subprocess.run([ff.FFMPEG, "-y", "-loglevel", "error", "-f", "lavfi", "-i", "tes
                 "-t", "4", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", str(T / "clip.mov")], check=True)
 subprocess.run([ff.FFMPEG, "-y", "-loglevel", "error", "-f", "lavfi", "-i", "sine=frequency=330", "-t", "5", str(T / "son.wav")], check=True)
 shutil.copy(T / "son.wav", T / "son2.wav")
-(T / "data.csv").write_text("nom;age;ville\nAlice;30;Paris\nBob;25;Lyon\n")
-(T / "notes.md").write_text("# Titre\n\nUn **paragraphe** avec é à ç.\n\n| a | b |\n|---|---|\n| 1 | 2 |\n\n- point 1\n- point 2\n")
-(T / "lisez.txt").write_text("Ligne 1\nLigne 2 accentuée é\n")
+(T / "data.csv").write_text("nom;age;ville\nAlice;30;Paris\nBob;25;Lyon\n", encoding="utf-8")
+(T / "notes.md").write_text("# Titre\n\nUn **paragraphe** avec é à ç.\n\n| a | b |\n|---|---|\n| 1 | 2 |\n\n- point 1\n- point 2\n", encoding="utf-8")
+(T / "lisez.txt").write_text("Ligne 1\nLigne 2 accentuée é\n", encoding="utf-8")
 
 ANS = {}
 def choose(items, prompt, default=None, multiple=False, ok="OK"):
@@ -62,6 +63,7 @@ for a in ff.ACTIONS:
         ff.NOTES.clear()
         ANS.clear()
         if "Diviser" in a["label"]: ANS.update({"Comment": "Une page = un PDF"})
+        if "Supprimer des pages" in a["label"]: ANS.update({"ask": "2"})
         try:
             outs = a["fn"](list(files)) or []
             bad = [o for o in outs if not Path(o).exists() or (Path(o).is_file() and Path(o).stat().st_size == 0)]

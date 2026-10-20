@@ -362,6 +362,49 @@ def finder_selection():
         return []
 
 
+def win_backdrop(window):
+    """Windows : WebView2 ne sait pas rendre une fenêtre réellement transparente.
+    On photographie l'écran sous la fenêtre (encore cachée) et on s'en sert comme fond :
+    la roue paraît flotter, ombre et bords lisses compris."""
+    import base64, ctypes, io
+    from ctypes import wintypes
+    from PIL import ImageGrab
+    u = ctypes.windll.user32
+    try:
+        u.SetThreadDpiAwarenessContext(ctypes.c_void_p(-4))  # coordonnées en pixels physiques
+    except Exception:
+        pass
+    hwnd = u.FindWindowW(None, TITLE)
+    r = wintypes.RECT()
+    if not hwnd or not u.GetWindowRect(hwnd, ctypes.byref(r)) or r.right <= r.left:
+        raise RuntimeError("fenêtre introuvable")
+    im = ImageGrab.grab(bbox=(r.left, r.top, r.right, r.bottom), all_screens=True).convert("RGB")
+    buf = io.BytesIO()
+    im.save(buf, "JPEG", quality=90)
+    url = "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
+    window.evaluate_js("document.documentElement.style.background='url(%s) 0 0/100%% 100%% no-repeat';"
+                       "document.documentElement.classList.add('backdrop');true" % url)
+
+
+def win_round(window):
+    """Secours si la capture échoue : fenêtre découpée en disque (fond sombre, sans ombre)."""
+    import ctypes
+    u, g = ctypes.windll.user32, ctypes.windll.gdi32
+    window.evaluate_js("document.documentElement.style.background='#16161e';true")
+    hwnd = u.FindWindowW(None, TITLE)
+    if hwnd:
+        try:
+            u.SetThreadDpiAwarenessContext(ctypes.c_void_p(-4))
+        except Exception:
+            pass
+        from ctypes import wintypes
+        r = wintypes.RECT()
+        u.GetWindowRect(hwnd, ctypes.byref(r))
+        w = r.right - r.left
+        m = int(w * (380 - 318) / 760)
+        u.SetWindowRgn(hwnd, g.CreateEllipticRgn(m, m, w - m, w - m), True)
+
+
 def run(window, files):
     ui._win = window
     try:
@@ -379,22 +422,29 @@ def run(window, files):
         ff.log(f"drop: {e}")
     if IS_WIN:
         try:
+            window.events.loaded.wait(15)
+            try:
+                win_backdrop(window)
+            except Exception as e:
+                ff.log(f"backdrop: {e}")
+                win_round(window)
+            window.show()
             window.events.shown.wait(5)
-        except Exception:
-            pass
+        except Exception as e:
+            ff.log(f"show(win): {e}")
     activate()
     if os.environ.get("FF_DEBUG"):
         def dbg():
             import time
-            cmd = Path("/tmp/ff_cmd.js")
+            cmd = Path(tempfile.gettempdir()) / "ff_cmd.js"
             while True:
                 if cmd.exists():
                     js = cmd.read_text(); cmd.unlink()
                     try:
                         r = window.evaluate_js(js)
-                        Path("/tmp/ff_cmd.out").write_text(str(r))
+                        (cmd.parent / "ff_cmd.out").write_text(str(r), encoding="utf-8")
                     except Exception as e:
-                        Path("/tmp/ff_cmd.out").write_text("ERR " + str(e))
+                        (cmd.parent / "ff_cmd.out").write_text("ERR " + str(e), encoding="utf-8")
                 time.sleep(0.2)
         threading.Thread(target=dbg, daemon=True).start()
     try:
@@ -430,7 +480,8 @@ def run(window, files):
             except Close:
                 raise
             except Exception as e:
-                ff.log(traceback.format_exc())
+                # ValueError = saisie ou fichier inadapté : message clair, pas de trace technique
+                ff.log(f"  ✗ {e}" if isinstance(e, ValueError) else traceback.format_exc())
                 v = ui._wait({"mode": "error", "text": str(e), "items": ["Retour", "Journal", "Fermer"]}, busy_after=False)
                 if v == "Journal":
                     subprocess.run(["open", "-e", str(ff.LOG)]) if IS_MAC else ff.open_path(ff.LOG)
@@ -536,8 +587,11 @@ def main():
         args = explorer_selection() if IS_WIN else ([] if IS_LINUX else finder_selection())
     files = sorted(set(args), key=ff.natural)
     x, y, scr = position()
-    kw = dict(width=W, height=H, frameless=True, transparent=True, on_top=True, resizable=False,
+    kw = dict(width=W, height=H, frameless=True, transparent=not IS_WIN, on_top=True, resizable=False,
               easy_drag=False, shadow=False, js_api=ui, background_color="#000000")
+    if IS_WIN:
+        # fenêtre cachée tant que le fond n'est pas prêt (voir win_backdrop)
+        kw.update(hidden=True, background_color="#1b1b24")
     if x is not None:
         kw.update(x=x, y=y)
     if scr is not None:

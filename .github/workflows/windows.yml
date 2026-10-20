@@ -1,0 +1,120 @@
+name: Test Windows
+
+# Installe FileForge-Setup.exe sur un vrai Windows, exécute toutes les actions,
+# pilote la roue et en prend des captures. Les résultats sont publiés sur la branche ci-results.
+on:
+  push:
+    branches: [windows]
+    paths: ["src/**", "installers/windows/**", "site/downloads/FileForge-Setup.exe", "tests/**", ".github/workflows/windows.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: LibreOffice (pour tester PowerPoint / Excel → PDF)
+        run: choco install libreoffice-fresh -y --no-progress | Select-Object -Last 3
+
+      - name: Installation par FileForge-Setup.exe (fenêtre visible, comme un utilisateur)
+        run: |
+          New-Item -ItemType Directory -Force ci-out | Out-Null
+          Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+          function Shot($n) {
+            $b = [System.Windows.Forms.SystemInformation]::VirtualScreen
+            $bmp = New-Object System.Drawing.Bitmap $b.Width, $b.Height
+            [System.Drawing.Graphics]::FromImage($bmp).CopyFromScreen($b.Left, $b.Top, 0, 0, $bmp.Size)
+            $bmp.Save("ci-out\$n.png"); $bmp.Dispose()
+          }
+          $ws = New-Object -ComObject WScript.Shell
+          $p = Start-Process site\downloads\FileForge-Setup.exe -PassThru
+          Start-Sleep 6; Shot "inst-1-accueil"
+          $null = $ws.AppActivate($p.Id); $ws.SendKeys("{ENTER}"); Start-Sleep 3; Shot "inst-2-options"
+          $null = $ws.AppActivate($p.Id); $ws.SendKeys("{ENTER}"); Start-Sleep 25; Shot "inst-3-progression"
+          $py = "$env:LOCALAPPDATA\FileForge\venv\Scripts\python.exe"
+          $t = 0
+          while (-not $p.HasExited -and $t -lt 1200) {
+            if ((Test-Path "$env:LOCALAPPDATA\FileForge\Uninstall.exe") -and
+                (Get-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\FileForge" -ErrorAction SilentlyContinue).DisplayVersion) { break }
+            Start-Sleep 5; $t += 5
+            if ($t % 120 -eq 0) { Shot "inst-3-progression-$t" }
+          }
+          Start-Sleep 4; Shot "inst-4-fin"
+          Write-Host "Installation : $t s"
+          if (-not $p.HasExited) {
+            # décoche « Ouvrir FileForge » n'est pas nécessaire : on veut aussi voir la roue s'ouvrir
+            $null = $ws.AppActivate($p.Id); $ws.SendKeys("{ENTER}"); Start-Sleep 10; Shot "inst-5-roue-ouverte"
+            Get-Process pythonw -ErrorAction SilentlyContinue | Stop-Process -Force
+          }
+          if (-not (Test-Path $py)) { Write-Host "::error::Python n'a pas été installé"; exit 1 }
+
+      - name: Fichiers et intégration installés
+        run: |
+          $D = "$env:LOCALAPPDATA\FileForge"
+          $checks = @{
+            "wheel.py" = Test-Path "$D\wheel.py"; "venv" = Test-Path "$D\venv\Scripts\pythonw.exe"
+            "tessdata" = Test-Path "$D\tessdata\fra.traineddata"; "clic droit" = Test-Path "HKCU:\Software\Classes\*\shell\FileForge\command"
+            "Envoyer vers" = Test-Path "$env:APPDATA\Microsoft\Windows\SendTo\FileForge.lnk"
+            "menu Démarrer" = Test-Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\FileForge.lnk"
+            "Bureau" = Test-Path ([Environment]::GetFolderPath("Desktop") + "\FileForge.lnk")
+            "désinstalleur" = Test-Path "$D\Uninstall.exe"
+          }
+          $checks.GetEnumerator() | ForEach-Object { "{0,-14} {1}" -f $_.Key, $_.Value } | Tee-Object -FilePath ci-out\installation.txt
+          if ($checks.Values -contains $false) { exit 1 }
+
+      - name: Toutes les actions (selftest)
+        if: always()
+        run: |
+          $D = "$env:LOCALAPPDATA\FileForge"
+          Copy-Item tests\selftest.py $D\selftest.py -Force
+          $env:PYTHONIOENCODING = "utf-8"
+          & "$D\venv\Scripts\python.exe" "$D\selftest.py" *>&1 | Tee-Object -FilePath ci-out\selftest.txt
+          if (-not (Select-String -Path ci-out\selftest.txt -Pattern " 0 échecs" -Quiet)) { exit 1 }
+
+      - name: Tests propres à Windows (Office, encodages, noms accentués)
+        if: always()
+        run: |
+          $env:PYTHONIOENCODING = "utf-8"
+          & "$env:LOCALAPPDATA\FileForge\venv\Scripts\python.exe" tests\windows_ci.py *>&1 | Tee-Object -FilePath ci-out\windows_ci.txt
+          exit $LASTEXITCODE
+
+      - name: La roue, pilotée et photographiée
+        if: always()
+        run: |
+          $env:PYTHONIOENCODING = "utf-8"
+          & "$env:LOCALAPPDATA\FileForge\venv\Scripts\python.exe" tests\windows_ui.py ci-out *>&1 | Tee-Object -FilePath ci-out\windows_ui.txt
+          exit $LASTEXITCODE
+
+      - name: Désinstallation
+        if: always()
+        run: |
+          $D = "$env:LOCALAPPDATA\FileForge"
+          Start-Process "$D\Uninstall.exe" -ArgumentList "/S" -Wait
+          $t = 0; while ((Test-Path $D) -and $t -lt 60) { Start-Sleep 2; $t += 2 }
+          $left = @((Test-Path $D), (Test-Path "HKCU:\Software\Classes\*\shell\FileForge"),
+                    (Test-Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\FileForge"))
+          "dossier restant : $($left[0]) / clic droit restant : $($left[1]) / entrée Applications : $($left[2])" | Tee-Object -FilePath ci-out\desinstallation.txt
+          if ($left -contains $true) { exit 1 }
+
+      - name: Publier les résultats (branche ci-results)
+        if: always()
+        run: |
+          "commit $env:GITHUB_SHA`nrun $env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID`nstatut ${{ job.status }}" | Set-Content ci-out\RUN.txt -Encoding utf8
+          Get-ChildItem "$env:LOCALAPPDATA\FileForge\FileForge.log" -ErrorAction SilentlyContinue | Copy-Item -Destination ci-out\
+          git config user.name "FileForge CI"; git config user.email "ci@users.noreply.github.com"
+          $dir = "$env:RUNNER_TEMP\res"
+          git worktree add --orphan -b ci-tmp $dir 2>$null
+          if (-not $?) { git worktree add --detach $dir; Push-Location $dir; git checkout --orphan ci-tmp; git rm -rfq . ; Pop-Location }
+          Copy-Item ci-out\* $dir -Recurse -Force
+          Push-Location $dir
+          git add -A; git commit -qm "Résultats Windows $env:GITHUB_SHA"
+          git push -f origin HEAD:ci-results
+          Pop-Location
