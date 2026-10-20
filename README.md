@@ -28,7 +28,7 @@ Télécharge le paquet de ton système depuis le site, ou construis-les toi-mêm
 | Système | Installation | Ouvrir la roue |
 | --- | --- | --- |
 | macOS 12+ | clic droit sur `install.command` → Ouvrir | <kbd>⌃</kbd><kbd>⌥</kbd><kbd>F</kbd> dans le Finder, ou clic droit → Actions rapides |
-| Windows 10/11 | double-clic sur `Installer FileForge.bat` | <kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>F</kbd> dans l'Explorateur, ou clic droit |
+| Windows 10/11 | double-clic sur `FileForge-Setup.exe` | <kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>F</kbd> dans l'Explorateur, ou clic droit |
 | Linux (Arch, Hyprland…) | `./install.sh` | <kbd>Super</kbd><kbd>Alt</kbd><kbd>F</kbd>, clic droit (Nautilus, Dolphin, Thunar, Nemo) ou `fileforge fichiers…` |
 
 Aucun droit administrateur n'est nécessaire (sauf `sudo pacman` pour les dépendances système sous Linux).
@@ -48,7 +48,8 @@ assets/         icônes
 site/           site de présentation (statique, prêt pour Cloudflare Pages)
   downloads/      paquets générés par tools/build.py
 tools/          build.py (paquets), site_data.py (données de la démo), make_icon.py
-tests/          selftest.py : exécute toutes les actions sur des fichiers générés
+tests/          selftest.py : toutes les actions ; windows_ci.py / windows_ui.py : tests sur un vrai Windows
+.github/        workflow « Test Windows » : installe le .exe, teste et photographie la roue (branche windows)
 ```
 
 ## Développer
@@ -63,7 +64,7 @@ python src/wheel.py un_fichier.pdf    # ouvre la roue
 Après une modification :
 
 ```bash
-python3 tools/build.py      # régénère site/downloads/ (archives reproductibles + manifest.json)
+python3 tools/build.py      # régénère site/downloads/ (archives, FileForge-Setup.exe via makensis, manifest.json)
 python3 tools/site_data.py  # si les actions ou catégories ont changé (démo du site)
 ```
 

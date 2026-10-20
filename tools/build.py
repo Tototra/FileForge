@@ -5,7 +5,7 @@
 
 Produit :
   site/downloads/FileForge-macOS.zip
-  site/downloads/FileForge-Windows.zip
+  site/downloads/FileForge-Setup.exe  (nécessite makensis)
   site/downloads/FileForge-Linux.tar.gz
   site/downloads/manifest.json   (version, tailles, empreintes SHA-256 — lu par le site)
 """
@@ -48,18 +48,49 @@ def build_macos():
     return p
 
 
+def wizard_bitmap(dst):
+    """Image latérale de l'installateur (164x314) aux couleurs de FileForge."""
+    from PIL import Image, ImageDraw
+    w, h = 164, 314
+    im = Image.new("RGB", (w, h), "#15161d")
+    d = ImageDraw.Draw(im)
+    for y in range(h):  # léger dégradé violet vers le bas
+        t = y / h
+        d.line([(0, y), (w, y)], fill=(int(21 + 30 * t), int(22 + 10 * t), int(29 + 60 * t)))
+    cols = ["#7c5cff", "#ec4899", "#3b82f6", "#10b981", "#06b6d4", "#f59e0b", "#8b93a7"]
+    cx, cy, r0, r1 = w // 2, 150, 34, 66
+    for i, c in enumerate(cols):  # la roue
+        a0, a1 = i * 360 / 7 - 90 + 1.5, (i + 1) * 360 / 7 - 90 - 1.5
+        d.pieslice([cx - r1, cy - r1, cx + r1, cy + r1], a0, a1, fill=c)
+    d.ellipse([cx - r0 + 4, cy - r0 + 4, cx + r0 - 4, cy + r0 - 4], fill="#1d1e29")
+    icon = Image.open(ASSETS / "icon.png").convert("RGBA").resize((40, 40), Image.LANCZOS)
+    im.paste(icon, (cx - 20, cy - 20), icon)
+    im.save(dst, "BMP")
+
+
 def build_windows():
-    p = OUT / "FileForge-Windows.zip"
+    """FileForge-Setup.exe : un seul fichier à double-cliquer (NSIS, compilé avec makensis)."""
+    import shutil, subprocess, tempfile
+    p = OUT / "FileForge-Setup.exe"
     w = INST / "windows"
-    with zipfile.ZipFile(p, "w") as zf:
-        b = "FileForge-Windows/"
-        for f in CORE:
-            add_zip(zf, b + "app/" + f, (SRC / f).read_bytes())
-        add_zip(zf, b + "app/icon.ico", (ASSETS / "icon.ico").read_bytes())
-        add_zip(zf, b + "install.ps1", windows_text((w / "install.ps1").read_bytes(), True))
-        add_zip(zf, b + "uninstall.ps1", windows_text((w / "uninstall.ps1").read_bytes(), True))
-        add_zip(zf, b + "LISEZ-MOI.txt", windows_text((w / "LISEZ-MOI.txt").read_bytes(), True))
-        add_zip(zf, b + "Installer FileForge.bat", windows_text((w / "Installer FileForge.bat").read_bytes(), False))
+    if not shutil.which("makensis"):
+        raise SystemExit("makensis introuvable : sudo apt install nsis  (ou brew install makensis)")
+    st = Path(tempfile.mkdtemp())
+    (st / "app").mkdir()
+    for f in CORE:
+        (st / "app" / f).write_bytes((SRC / f).read_bytes())
+    (st / "app" / "icon.ico").write_bytes((ASSETS / "icon.ico").read_bytes())
+    (st / "install.ps1").write_bytes(windows_text((w / "install.ps1").read_bytes(), True))
+    (st / "uninstall.ps1").write_bytes(windows_text((w / "uninstall.ps1").read_bytes(), True))
+    wizard_bitmap(st / "wizard.bmp")
+    r = subprocess.run(["makensis", "-V2", "-INPUTCHARSET", "UTF8", f"-DSTAGE={st}", f"-DVERSION={VERSION}",
+                        f"-DOUTFILE={p}", str(w / "FileForge.nsi")], capture_output=True, text=True)
+    shutil.rmtree(st, ignore_errors=True)
+    if r.returncode != 0:
+        raise SystemExit("makensis :\n" + r.stdout + r.stderr)
+    old = OUT / "FileForge-Windows.zip"
+    if old.exists():
+        old.unlink()
     return p
 
 

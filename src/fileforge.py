@@ -8,7 +8,7 @@ import os, sys, re, io, json, math, shutil, subprocess, traceback, datetime, zip
 from pathlib import Path
 
 APP = "FileForge"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 HOME_DIR = Path(__file__).resolve().parent
 IS_WIN = sys.platform == "win32"
 IS_MAC = sys.platform == "darwin"
@@ -90,7 +90,7 @@ class Cancel(Exception):
 
 def log(msg):
     try:
-        with open(LOG, "a") as f:
+        with open(LOG, "a", encoding="utf-8") as f:
             f.write(f"[{datetime.datetime.now():%Y-%m-%d %H:%M:%S}] {msg}\n")
     except Exception:
         pass
@@ -245,6 +245,35 @@ def parse_ranges(s, n):
     return [p - 1 for p in res]
 
 
+def ask_pages(prompt, default, n, allow_empty=False):
+    """Demande des numéros de pages ; en cas de saisie invalide, explique et redemande."""
+    msg = prompt
+    while True:
+        s = ask(msg, default)
+        if allow_empty and not s.strip():
+            return []
+        try:
+            r = parse_ranges(s, n)
+            if r:
+                return r
+            raise ValueError("Aucune page indiquée.")
+        except ValueError as e:
+            err = str(e)
+            if err.startswith("invalid literal"):
+                err = f"« {s} » n'est pas compris."
+            msg = f"⚠ {err}\n\n{prompt}"
+            default = s
+
+
+def ask_int(prompt, default, lo=1):
+    q = prompt
+    while True:
+        v = ask(q, default).strip()
+        if v.isdigit() and int(v) >= lo:
+            return int(v)
+        q, default = f"⚠ Indique un nombre entier (au moins {lo}).\n\n{prompt}", v
+
+
 def parse_time(s):
     s = s.strip().replace(",", ".")
     if not s:
@@ -254,6 +283,18 @@ def parse_time(s):
     for x in parts:
         t = t * 60 + x
     return t
+
+
+def install_hint(what):
+    """Comment installer un composant manquant, selon le système."""
+    if IS_WIN:
+        return {"libreoffice": "Relance l'installateur de FileForge et coche LibreOffice, ou télécharge-le sur fr.libreoffice.org."
+                }.get(what, f"Réinstalle FileForge pour récupérer {what}.")
+    if IS_LINUX:
+        return {"libreoffice": "sudo pacman -S libreoffice-fresh (ou apt install libreoffice)",
+                "tesseract": "sudo pacman -S tesseract tesseract-data-fra", "ffmpeg": "sudo pacman -S ffmpeg"}.get(what, "")
+    return {"libreoffice": "brew install --cask libreoffice", "tesseract": "brew install tesseract",
+            "ffmpeg": "brew install ffmpeg"}.get(what, "")
 
 
 def which(name, *extra):
@@ -277,7 +318,7 @@ if not FFMPEG:
 
 def ff(*args):
     if not FFMPEG:
-        raise RuntimeError("ffmpeg est introuvable." + ("" if IS_WIN else " Installe-le avec : brew install ffmpeg"))
+        raise RuntimeError("ffmpeg est introuvable. " + install_hint("ffmpeg"))
     r = subprocess.run([FFMPEG, "-y", "-hide_banner", "-loglevel", "error", *map(str, args)],
                        capture_output=True, text=True)
     if r.returncode != 0:
@@ -589,7 +630,7 @@ def pdf_split(files):
     import pymupdf
     mode = choose(["Une page = un PDF", "Toutes les N pages", "Selon des plages (ex : 1-3; 4-8; 9-fin)"],
                   "Comment diviser ?")
-    k = int(ask("Nombre de pages par fichier :", "2")) if mode.startswith("Toutes") else 0
+    k = ask_int("Nombre de pages par fichier :", "2") if mode.startswith("Toutes") else 0
     outs = []
     for f in files:
         doc = open_pdf(f)
@@ -599,8 +640,15 @@ def pdf_split(files):
         elif k:
             groups = [list(range(i, min(i + k, n))) for i in range(0, n, k)]
         else:
-            s = ask(f"« {Path(f).name} » ({n} pages)\nPlages séparées par des points-virgules :", "1-2; 3-fin")
-            groups = [parse_ranges(g, n) for g in s.split(";") if g.strip()]
+            q, s = f"« {Path(f).name} » ({n} pages)\nPlages séparées par des points-virgules :", "1-2; 3-fin"
+            while True:
+                s = ask(q, s)
+                try:
+                    groups = [parse_ranges(g, n) for g in s.split(";") if g.strip()]
+                    if groups:
+                        break
+                except ValueError as e:
+                    q = f"⚠ {e if not str(e).startswith('invalid') else 'Saisie non comprise.'}\n\n« {Path(f).name} » ({n} pages)\nPlages séparées par des points-virgules :"
         d = outdir(f, "divisé")
         for gi, g in enumerate(groups, 1):
             nd = pymupdf.open()
@@ -617,8 +665,10 @@ def pdf_extract(files):
     outs = []
     for f in files:
         doc = open_pdf(f)
-        sel = parse_ranges(ask(f"Pages à extraire de « {Path(f).name} » ({doc.page_count} pages)\n"
-                               "ex : 1-3, 5, 8-fin", "1"), doc.page_count)
+        if doc.page_count < 2:
+            raise ValueError(f"« {Path(f).name} » n'a qu'une seule page : rien à extraire.")
+        sel = ask_pages(f"Pages à extraire de « {Path(f).name} » ({doc.page_count} pages)\n"
+                        "ex : 1-3, 5, 8-fin", "1", doc.page_count)
         doc.select(sel)
         outs.append(save_pdf(doc, out(f, "extrait")))
     return outs
@@ -630,10 +680,14 @@ def pdf_delete(files):
     for f in files:
         doc = open_pdf(f)
         n = doc.page_count
-        s = ask(f"Pages à SUPPRIMER de « {Path(f).name} » ({n} pages)\nex : 2, 5-7", "")
-        if not s.strip() or s.strip().lower() in ("tout", "toutes", "*"):
-            raise ValueError("Indique les numéros des pages à supprimer (ex : 2, 5-7).")
-        rm = set(parse_ranges(s, n))
+        if n < 2:
+            raise ValueError(f"« {Path(f).name} » n'a qu'une seule page.")
+        q = f"Pages à SUPPRIMER de « {Path(f).name} » ({n} pages)\nex : 2, 5-7"
+        while True:
+            rm = set(ask_pages(q, "", n))
+            if len(rm) < n:
+                break
+            q = f"⚠ Impossible de supprimer toutes les pages.\n\nPages à SUPPRIMER de « {Path(f).name} » ({n} pages)"
         keep = [i for i in range(n) if i not in rm]
         if not keep:
             raise ValueError("Impossible de supprimer toutes les pages.")
@@ -652,8 +706,8 @@ def pdf_reorder(files):
         if mode.startswith("Inverser"):
             order = list(range(n - 1, -1, -1))
         else:
-            order = parse_ranges(ask(f"Nouvel ordre pour « {Path(f).name} » ({n} pages)\n"
-                                     "ex : 3, 1, 2, 4-fin   (une page peut être répétée)", f"1-{n}"), n)
+            order = ask_pages(f"Nouvel ordre pour « {Path(f).name} » ({n} pages)\n"
+                              "ex : 3, 1, 2, 4-fin   (une page peut être répétée)", f"1-{n}", n)
         doc.select(order)
         outs.append(save_pdf(doc, out(f, "réorganisé")))
     return outs
@@ -663,11 +717,12 @@ def pdf_reorder(files):
 def pdf_rotate(files):
     a = choose(["90° vers la droite", "90° vers la gauche", "180°"], "Rotation :")
     angle = {"90° vers la droite": 90, "90° vers la gauche": 270, "180°": 180}[a]
-    pages = ask("Pages à pivoter (ex : 1, 3-5) — « tout » pour toutes :", "tout")
     outs = []
     for f in files:
         doc = open_pdf(f)
-        for p in parse_ranges(pages, doc.page_count):
+        pages = ask_pages(f"Pages à pivoter de « {Path(f).name} » ({doc.page_count} pages)\nex : 1, 3-5 — « tout » pour toutes",
+                          "tout", doc.page_count) if doc.page_count > 1 else [0]
+        for p in pages:
             pg = doc[p]
             pg.set_rotation((pg.rotation + angle) % 360)
         outs.append(save_pdf(doc, out(f, "pivoté")))
@@ -921,7 +976,7 @@ def pdf_numbers(files):
     import pymupdf
     fmt = choose(["1", "Page 1 / N", "1 / N", "- 1 -"], "Format :", default="Page 1 / N")
     pos = choose(["Bas centre", "Bas droite", "Bas gauche", "Haut droite"], "Position :", default="Bas centre")
-    first = int(ask("Commencer la numérotation à partir de la page :", "1"))
+    first = ask_int("Commencer la numérotation à partir de la page :", "1")
     outs = []
     for f in files:
         doc = open_pdf(f)
@@ -1021,7 +1076,7 @@ def pdf_ocr(files):
     import pymupdf
     langs = tess_langs()
     if langs is None:
-        raise RuntimeError("L'OCR nécessite Tesseract. Installe-le avec : brew install tesseract")
+        raise RuntimeError("L'OCR nécessite les langues Tesseract. " + install_hint("tesseract"))
     lang = "+".join(l for l in ("fra", "eng") if l in langs) or "eng"
     outs = []
     notify("OCR en cours… (quelques secondes par page)")
@@ -1367,8 +1422,8 @@ def img_watermark(files):
 @action("🎞️ Images · Créer un GIF animé", IMG, minf=2)
 def img_gif(files):
     from PIL import Image
-    ms = int(ask("Durée de chaque image (millisecondes) :", "600"))
-    width = int(ask("Largeur du GIF (pixels) :", "800"))
+    ms = ask_int("Durée de chaque image (millisecondes) :", "600", 20)
+    width = ask_int("Largeur du GIF (pixels) :", "800", 16)
     frames = []
     for f in files:
         im = load_img(f).convert("RGB")
@@ -1599,10 +1654,29 @@ CSS = ("body{font-family:sans-serif;font-size:11pt;line-height:1.45;color:#111}"
        "blockquote{color:#555;margin-left:14pt}")
 
 
+def read_any_text(f):
+    """Texte en UTF-8 ou, à défaut, dans l'encodage historique de Windows (fichiers Bloc-notes, Excel…)."""
+    b = Path(f).read_bytes()
+    for enc in ("utf-8-sig", "cp1252"):
+        try:
+            return b.decode(enc)
+        except UnicodeDecodeError:
+            pass
+    return b.decode("latin-1")
+
+
+def text_encoding(f):
+    try:
+        Path(f).read_bytes().decode("utf-8-sig")
+        return "utf-8-sig"
+    except UnicodeDecodeError:
+        return "cp1252"
+
+
 def to_html(f):
     import html as H
     e = ext(f)
-    raw = Path(f).read_text(encoding="utf-8", errors="replace")
+    raw = read_any_text(f)
     if e in ("md", "markdown"):
         import markdown
         return markdown.markdown(raw, extensions=["tables", "fenced_code", "sane_lists"])
@@ -1629,9 +1703,21 @@ def html_to_pdf(html, dst, base=None):
 
 
 def soffice():
-    return which("soffice", "/Applications/LibreOffice.app/Contents/MacOS/soffice",
-                 r"C:\Program Files\LibreOffice\program\soffice.exe",
-                 r"C:\Program Files (x86)\LibreOffice\program\soffice.exe")
+    if IS_WIN:
+        # soffice.com attend la fin de la conversion (soffice.exe rend parfois la main tout de suite)
+        cands = [Path(os.environ.get(v, "")) / "LibreOffice" / "program"
+                 for v in ("ProgramFiles", "ProgramFiles(x86)", "ProgramW6432", "LOCALAPPDATA")]
+        try:
+            import winreg
+            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\LibreOffice\UNO\InstallPath") as k:
+                cands.insert(0, Path(winreg.QueryValueEx(k, "")[0]))
+        except Exception:
+            pass
+        for d in cands:
+            for exe in ("soffice.com", "soffice.exe"):
+                if (d / exe).exists():
+                    return str(d / exe)
+    return which("soffice", "/Applications/LibreOffice.app/Contents/MacOS/soffice")
 
 
 def word_app():
@@ -1643,14 +1729,27 @@ def lo_convert(src, fmt, dst):
     so = soffice()
     if not so:
         return False
+    import time
     tmp = Path(tempfile.mkdtemp())
     prof = Path(tempfile.mkdtemp())
+    # copie sous un nom simple : LibreOffice gère mal certains noms (accents, espaces) sous Windows
+    work = tmp / "in"
+    work.mkdir()
+    simple = work / ("document." + ext(src))
+    shutil.copy2(src, simple)
     try:
-        subprocess.run([so, f"-env:UserInstallation=file://{prof}", "--headless", "--norestore",
-                        "--convert-to", fmt, "--outdir", str(tmp), str(src)],
-                       capture_output=True, timeout=600)
-        res = next(tmp.glob("*." + fmt.split(":")[0]), None)
+        # profil séparé : fonctionne même si LibreOffice est déjà ouvert
+        r = subprocess.run([so, f"-env:UserInstallation={prof.as_uri()}", "--headless", "--norestore",
+                            "--nologo", "--nodefault", "--convert-to", fmt, "--outdir", str(tmp), str(simple)],
+                           capture_output=True, timeout=600)
+        res = None
+        for _ in range(40):  # au cas où soffice rendrait la main avant d'avoir écrit le fichier
+            res = next(tmp.glob("document." + fmt.split(":")[0]), None)
+            if res and res.stat().st_size > 0:
+                break
+            time.sleep(0.5)
         if not res or res.stat().st_size == 0:
+            log(f"LibreOffice ({r.returncode}) : {(r.stdout + r.stderr).decode('utf-8', 'replace').strip()[-500:]}")
             return False
         shutil.move(str(res), dst)
         return True
@@ -1659,30 +1758,61 @@ def lo_convert(src, fmt, dst):
         shutil.rmtree(prof, ignore_errors=True)
 
 
-def word_com_to_pdf(src, dst):
-    """Windows : conversion fidèle via Microsoft Word s'il est installé."""
+SLIDES = {"pptx", "ppt", "odp"}
+SHEETS = {"xlsx", "xls", "ods"}
+
+
+def office_app(e):
+    """Windows : application Microsoft Office capable d'ouvrir ce type, si elle est installée."""
+    if not IS_WIN:
+        return None
+    prog = "PowerPoint.Application" if e in SLIDES else "Excel.Application" if e in SHEETS else "Word.Application"
+    try:
+        import winreg
+        winreg.CloseKey(winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, prog + "\\CLSID"))
+        return prog
+    except Exception:
+        return None
+
+
+def office_com_to_pdf(src, dst):
+    """Windows : conversion fidèle par Word, PowerPoint ou Excel s'ils sont installés."""
+    prog = office_app(ext(src))
+    if not prog:
+        return False
     try:
         import pythoncom
         import win32com.client
     except Exception:
         return False
     pythoncom.CoInitialize()
-    word = None
+    app = doc = None
+    s, d = str(Path(src).resolve()), str(Path(dst).resolve())
     try:
-        word = win32com.client.DispatchEx("Word.Application")
-        word.Visible = False
-        word.DisplayAlerts = 0
-        doc = word.Documents.Open(str(Path(src).resolve()), ReadOnly=True, AddToRecentFiles=False)
-        doc.SaveAs2(str(Path(dst).resolve()), FileFormat=17)
-        doc.Close(False)
-        return Path(dst).exists()
+        app = win32com.client.DispatchEx(prog)
+        app.DisplayAlerts = 0 if prog != "PowerPoint.Application" else 1  # ppAlertsNone = 1
+        if prog == "Word.Application":
+            app.Visible = False
+            doc = app.Documents.Open(s, ReadOnly=True, AddToRecentFiles=False, ConfirmConversions=False)
+            doc.ExportAsFixedFormat(d, 17)                       # wdExportFormatPDF
+            doc.Close(False)
+        elif prog == "PowerPoint.Application":
+            doc = app.Presentations.Open(s, True, False, False)  # lecture seule, sans fenêtre
+            doc.SaveAs(d, 32)                                    # ppSaveAsPDF
+            doc.Close()
+        else:
+            app.Visible = False
+            doc = app.Workbooks.Open(s, 0, True)
+            doc.ExportAsFixedFormat(0, d)                        # xlTypePDF
+            doc.Close(False)
+        return Path(d).exists() and Path(d).stat().st_size > 0
     except Exception as err:
-        log(f"Word COM : {err}")
+        log(f"{prog} : {err}")
         return False
     finally:
         try:
-            if word is not None:
-                word.Quit()
+            if app is not None:
+                app.Quit()
         except Exception:
             pass
         pythoncom.CoUninitialize()
@@ -1712,12 +1842,13 @@ def doc_to_pdf(files):
         dst = unique(Path(f).with_suffix(".pdf"))
         if e in TEXT:
             html_to_pdf(to_html(f), dst, Path(f).parent)
+        elif office_app(e) and (notify("Conversion en PDF par Microsoft Office…") or office_com_to_pdf(f, dst)):
+            pass
         elif soffice():
             notify("Conversion en PDF en cours…")
             if not lo_convert(f, "pdf", dst):
-                raise RuntimeError(f"LibreOffice n'a pas pu convertir {Path(f).name}.")
-        elif e in WORDS and IS_WIN and word_com_to_pdf(f, dst):
-            pass
+                raise RuntimeError(f"LibreOffice n'a pas pu convertir « {Path(f).name} ».\n"
+                                   "Le fichier est peut-être protégé ou endommagé. Détails dans le journal.")
         elif e in WORDS:
             if IS_MAC:
                 textutil_to_pdf(f, dst)
@@ -1729,8 +1860,8 @@ def doc_to_pdf(files):
                 raise RuntimeError(f"Pour convertir les fichiers .{e} en PDF, installe LibreOffice ou Microsoft Word.")
             NOTES.append("Conversion simplifiée (installe LibreOffice pour une mise en page fidèle).")
         else:
-            raise RuntimeError(f"Pour convertir les fichiers .{e} en PDF, installe LibreOffice (gratuit) :\n"
-                               "brew install --cask libreoffice\nPuis relance l'action.")
+            raise RuntimeError(f"Pour convertir les fichiers .{e} en PDF, il faut Microsoft Office ou LibreOffice (gratuit).\n"
+                               + install_hint("libreoffice"))
         outs.append(dst)
     return outs
 
@@ -1738,7 +1869,7 @@ def doc_to_pdf(files):
 @action("📝 Office · Convertir (Word ⇄ ODT, PowerPoint, Excel…)", OFFICE)
 def office_convert(files):
     if not soffice():
-        raise RuntimeError("Cette action nécessite LibreOffice : brew install --cask libreoffice")
+        raise RuntimeError("Cette action nécessite LibreOffice (gratuit).\n" + install_hint("libreoffice"))
     groups = {"docx": ["docx", "odt", "rtf", "txt", "html"], "pptx": ["pptx", "odp"], "xlsx": ["xlsx", "ods", "csv"]}
     fam = "pptx" if ext(files[0]) in ("pptx", "ppt", "odp") else "xlsx" if ext(files[0]) in ("xlsx", "xls", "ods") else "docx"
     tgt = choose([x.upper() for x in groups[fam] if x != ext(files[0])], "Convertir en :").lower()
@@ -1789,7 +1920,8 @@ def read_tables(f):
     import pandas as pd
     e = ext(f)
     if e in ("csv", "tsv"):
-        return {Path(f).stem: pd.read_csv(f, sep="\t" if e == "tsv" else None, engine="python", encoding_errors="replace")}
+        return {Path(f).stem: pd.read_csv(f, sep="\t" if e == "tsv" else None, engine="python", encoding=text_encoding(f),
+                                            encoding_errors="replace")}
     if e == "json":
         data = json.loads(Path(f).read_text(encoding="utf-8"))
         if isinstance(data, dict) and all(isinstance(v, list) for v in data.values()):
