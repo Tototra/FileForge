@@ -5,8 +5,6 @@
 Lancé à l'ouverture de session (clé Run de l'utilisateur), sans fenêtre.
 - écoute Ctrl+Alt+G directement (RegisterHotKey) : pas de délai de l'Explorateur ;
 - garde un panneau déjà chargé en réserve (wheel.py --search --standby) : il s'affiche aussitôt ;
-- retient ce qui est tapé entre l'appui et l'instant où le champ est prêt, puis le recopie dedans :
-  aucune lettre perdue, rien n'arrive dans l'application d'avant ;
 - un second Ctrl+Alt+G referme le panneau ouvert.
 """
 import ctypes, datetime, os, subprocess, sys, time, traceback
@@ -15,49 +13,20 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 LOG = Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / "FileForge" / "FileForge.log"
-SHOW_EVENT, READY_EVENT = "Local\\FileForgeSearchShow", "Local\\FileForgeSearchReady"
+SHOW_EVENT = "Local\\FileForgeSearchShow"
 TITLE = "FileForge-Recherche"          # titre de la fenêtre du panneau de recherche (wheel.py --search)
 MOD_ALT, MOD_CONTROL, MOD_NOREPEAT = 0x0001, 0x0002, 0x4000
 VK_G = 0x47
 WM_HOTKEY, WM_TIMER, WM_QUIT = 0x0312, 0x0113, 0x0012
-WM_KEYDOWN, WM_SYSKEYDOWN = 0x0100, 0x0104
-RESPAWN_MS, HEALTH_MS, CAPTURE_MS = 900, 30000, 3000
-MODIFIERS = {0x10, 0x11, 0x12, 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0x5B, 0x5C, 0x14, 0x90, 0x91}
-SPECIAL = {0x08, 0x0D, 0x1B, 0x09, 0x26, 0x28, 0x25, 0x27}   # Retour arrière, Entrée, Échap, Tab, flèches
+RESPAWN_MS, HEALTH_MS = 900, 30000
 
 user32 = ctypes.WinDLL("user32", use_last_error=True)
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
 for f, r in ((kernel32.CreateEventW, wintypes.HANDLE), (kernel32.CreateMutexW, wintypes.HANDLE),
-             (kernel32.GetModuleHandleW, wintypes.HMODULE), (kernel32.OpenProcess, wintypes.HANDLE), (user32.SetWindowsHookExW, ctypes.c_void_p),
-             (user32.GetKeyboardLayout, ctypes.c_void_p), (user32.CallNextHookEx, ctypes.c_ssize_t)):
+             (kernel32.OpenProcess, wintypes.HANDLE)):
     f.restype = r
 user32.SetTimer.restype = ctypes.c_size_t
 user32.SetTimer.argtypes = [wintypes.HWND, ctypes.c_size_t, wintypes.UINT, ctypes.c_void_p]
-user32.CallNextHookEx.argtypes = [ctypes.c_void_p, ctypes.c_int, wintypes.WPARAM, wintypes.LPARAM]
-user32.SetWindowsHookExW.argtypes = [ctypes.c_int, ctypes.c_void_p, wintypes.HMODULE, wintypes.DWORD]
-user32.UnhookWindowsHookEx.argtypes = [ctypes.c_void_p]
-user32.ToUnicodeEx.argtypes = [wintypes.UINT, wintypes.UINT, ctypes.c_char_p, wintypes.LPWSTR, ctypes.c_int,
-                               wintypes.UINT, ctypes.c_void_p]
-
-
-class KBDLLHOOKSTRUCT(ctypes.Structure):
-    _fields_ = [("vkCode", wintypes.DWORD), ("scanCode", wintypes.DWORD), ("flags", wintypes.DWORD),
-                ("time", wintypes.DWORD), ("dwExtraInfo", ctypes.c_size_t)]
-
-
-class KEYBDINPUT(ctypes.Structure):
-    _fields_ = [("wVk", wintypes.WORD), ("wScan", wintypes.WORD), ("dwFlags", wintypes.DWORD),
-                ("time", wintypes.DWORD), ("dwExtraInfo", ctypes.c_size_t)]
-
-
-class INPUT(ctypes.Structure):
-    class _U(ctypes.Union):
-        _fields_ = [("ki", KEYBDINPUT), ("pad", ctypes.c_byte * 32)]
-    _anonymous_ = ("u",)
-    _fields_ = [("type", wintypes.DWORD), ("u", _U)]
-
-
-HOOKPROC = ctypes.WINFUNCTYPE(ctypes.c_ssize_t, ctypes.c_int, wintypes.WPARAM, wintypes.LPARAM)
 
 
 def log(*m):
@@ -74,7 +43,7 @@ def pythonw():
     return str(w if w.exists() else exe)
 
 
-def visible_panel():
+def visible_panel(with_hwnd=False):
     """Processus (pid) du panneau de recherche visible, ou None.
     (le Python d'un environnement virtuel tourne sous un petit lanceur : on se fie à la fenêtre, pas au pid lancé)"""
     found = []
@@ -87,11 +56,27 @@ def visible_panel():
             if buf.value == TITLE:
                 p = wintypes.DWORD()
                 user32.GetWindowThreadProcessId(hwnd, ctypes.byref(p))
-                found.append(p.value)
+                found.append((p.value, hwnd))
                 return False
         return True
     user32.EnumWindows(cb, 0)
-    return found[0] if found else None
+    if not found:
+        return None
+    return found[0] if with_hwnd else found[0][0]
+
+
+def bring_to_front(timeout=1.5):
+    """L'agent vient de recevoir le raccourci : il a le droit de choisir la fenêtre active. Il l'exerce pour le panneau."""
+    t = time.time()
+    while time.time() - t < timeout:
+        r = visible_panel(True)
+        if r:
+            pid, hwnd = r
+            user32.SetForegroundWindow(hwnd)
+            if user32.GetForegroundWindow() == hwnd:
+                return int((time.time() - t) * 1000)
+        time.sleep(0.015)
+    return None
 
 
 def kill_pid(pid):
@@ -101,97 +86,14 @@ def kill_pid(pid):
         kernel32.CloseHandle(h)
 
 
-def send(inputs):
-    arr = (INPUT * len(inputs))(*inputs)
-    user32.SendInput(len(inputs), arr, ctypes.sizeof(INPUT))
-
-
-def key_input(vk=0, scan=0, flags=0):
-    i = INPUT(type=1)
-    i.ki = KEYBDINPUT(vk, scan, flags, 0, 0)
-    return i
-
-
-class Capture:
-    """Retient les touches tapées pendant l'ouverture du panneau (crochet clavier bas niveau)."""
-
-    def __init__(self):
-        self.hook = None
-        self.items = []
-        self._proc = HOOKPROC(self._on_key)   # garder une référence
-
-    def start(self):
-        self.items = []
-        if not self.hook:
-            self.hook = user32.SetWindowsHookExW(13, self._proc, kernel32.GetModuleHandleW(None), 0)  # WH_KEYBOARD_LL
-
-    def active(self):
-        return bool(self.hook)
-
-    def stop(self):
-        if self.hook:
-            user32.UnhookWindowsHookEx(self.hook)
-            self.hook = None
-        items, self.items = self.items, []
-        return items
-
-    def _char(self, vk, scan):
-        state = (ctypes.c_ubyte * 256)()
-        for k in (0x10, 0xA0, 0xA1):                       # Maj (Ctrl/Alt ignorés : souvent encore tenus)
-            if user32.GetAsyncKeyState(k) & 0x8000:
-                state[k] = state[0x10] = 0x80
-        if user32.GetKeyState(0x14) & 1:                   # Verr. Maj
-            state[0x14] = 0x01
-        fg = user32.GetForegroundWindow()
-        layout = user32.GetKeyboardLayout(user32.GetWindowThreadProcessId(fg, None))
-        buf = ctypes.create_unicode_buffer(8)
-        n = user32.ToUnicodeEx(vk, scan, ctypes.cast(state, ctypes.c_char_p), buf, 8, 4, layout)  # 4 : sans toucher aux touches mortes
-        return buf.value[:n] if n > 0 else ""
-
-    def _on_key(self, code, wparam, lparam):
-        try:
-            if code == 0:
-                k = ctypes.cast(lparam, ctypes.POINTER(KBDLLHOOKSTRUCT)).contents
-                if k.vkCode not in MODIFIERS:              # Ctrl, Alt, Maj… passent : pas de touche « collée »
-                    down = wparam in (WM_KEYDOWN, WM_SYSKEYDOWN)
-                    hotkey_g = k.vkCode == VK_G and user32.GetAsyncKeyState(0x11) & 0x8000
-                    if down and not hotkey_g:
-                        if k.vkCode in SPECIAL:
-                            self.items.append(("vk", k.vkCode))
-                        else:
-                            c = self._char(k.vkCode, k.scanCode)
-                            if c and c.isprintable():
-                                self.items.append(("char", c))
-                            else:
-                                self.items.append(("vk", k.vkCode))   # caractère non traduit : on rejoue la touche telle quelle
-                    return 1                               # avalée : n'arrive pas dans l'application d'avant
-        except Exception:
-            log(traceback.format_exc())
-        return user32.CallNextHookEx(None, code, wparam, lparam)
-
-
-def replay(items):
-    seq = []
-    for kind, v in items:
-        if kind == "char":
-            for ch in v:
-                seq += [key_input(0, ord(ch), 0x0004), key_input(0, ord(ch), 0x0004 | 0x0002)]   # KEYEVENTF_UNICODE
-        else:
-            seq += [key_input(v), key_input(v, 0, 0x0002)]
-    if seq:
-        send(seq)
-
-
 class Agent:
     def __init__(self):
         self.show = kernel32.CreateEventW(None, False, False, SHOW_EVENT)    # remise à zéro automatique
-        self.ready = kernel32.CreateEventW(None, False, False, READY_EVENT)
         self.standby = None     # panneau chargé, caché, qui attend le signal
-        self.active = None      # panneau affiché
-        self.respawn_timer = self.capture_timer = None
+        self.active = None      # panneau affiché (ou en train de s'afficher)
+        self.opening_until = 0.0
+        self.respawn_timer = None
         self.last = 0.0
-        self.capture = Capture()
-        self.t0 = 0.0
 
     def _spawn(self, standby):
         env = dict(os.environ, FF_AGENT_PID=str(os.getpid()))
@@ -215,36 +117,26 @@ class Agent:
             if a is not None and a.poll() is None:
                 a.kill()
             self.active = None
+            log("fermeture du panneau")
             return
-        if self.capture.active():
+        if a is not None and a.poll() is None and now < self.opening_until:
             return                           # en train de s'ouvrir : on n'en lance pas un deuxième
         if a is not None and a.poll() is None:
             a.kill()                         # fenêtre déjà fermée, processus qui traîne
-        self.active = None
-        self.t0 = time.time()
         user32.AllowSetForegroundWindow(-1)  # le panneau pourra passer au premier plan
-        kernel32.ResetEvent(self.ready)
-        self.capture.start()
-        self.capture_timer = user32.SetTimer(None, 0, CAPTURE_MS, None)
+        self.opening_until = now + 3
         if self.standby is not None and self.standby.poll() is None:
             kernel32.SetEvent(self.show)     # le panneau en réserve s'affiche
             self.active, self.standby = self.standby, None
-            log("ouverture (réserve)")
+            ms = bring_to_front()
+            log(f"ouverture (réserve), premier plan {'en ' + str(ms) + ' ms' if ms is not None else 'NON obtenu'}")
         else:
             self.active = self._spawn(False)
-            log("pas de réserve : ouverture directe")
+            ms = bring_to_front(6)
+            log(f"pas de réserve : ouverture directe, premier plan {'en ' + str(ms) + ' ms' if ms is not None else 'NON obtenu'}")
         if self.respawn_timer:
             user32.KillTimer(None, self.respawn_timer)
         self.respawn_timer = user32.SetTimer(None, 0, RESPAWN_MS, None)
-
-    def end_capture(self, why):
-        if self.capture_timer:
-            user32.KillTimer(None, self.capture_timer)
-            self.capture_timer = None
-        items = self.capture.stop()
-        log(f"{why} après {int((time.time() - self.t0) * 1000)} ms, {len(items)} touche(s) recopiée(s)")
-        if items:
-            replay(items)
 
     def run(self):
         ok = user32.RegisterHotKey(None, 1, MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, VK_G)
@@ -255,32 +147,18 @@ class Agent:
         self.ensure_standby()
         user32.SetTimer(None, 0, HEALTH_MS, None)
         msg = wintypes.MSG()
-        handles = (wintypes.HANDLE * 1)(self.ready)
-        while True:
-            r = user32.MsgWaitForMultipleObjects(1, handles, False, 0xFFFFFFFF, 0x04FF)   # QS_ALLINPUT
-            if r == 0:                                  # le champ du panneau a le focus
-                if self.capture.active():
-                    self.end_capture("champ prêt")
-                continue
-            while user32.PeekMessageW(ctypes.byref(msg), None, 0, 0, 1):              # PM_REMOVE
-                if msg.message == WM_QUIT:
-                    return 0
-                try:
-                    if msg.message == WM_HOTKEY:
-                        self.on_hotkey()
-                    elif msg.message == WM_TIMER:
-                        if msg.wParam == self.capture_timer:
-                            self.end_capture("délai dépassé")      # le panneau tarde : on rend la main quand même
-                        else:
-                            if msg.wParam == self.respawn_timer:
-                                user32.KillTimer(None, self.respawn_timer)
-                                self.respawn_timer = None
-                            self.ensure_standby()
-                    else:
-                        user32.TranslateMessage(ctypes.byref(msg))
-                        user32.DispatchMessageW(ctypes.byref(msg))
-                except Exception:
-                    log(traceback.format_exc())
+        while user32.GetMessageW(ctypes.byref(msg), None, 0, 0) > 0:
+            try:
+                if msg.message == WM_HOTKEY:
+                    self.on_hotkey()
+                elif msg.message == WM_TIMER:
+                    if msg.wParam == self.respawn_timer:
+                        user32.KillTimer(None, self.respawn_timer)
+                        self.respawn_timer = None
+                    self.ensure_standby()
+            except Exception:
+                log(traceback.format_exc())
+        return 0
 
 
 def main():
