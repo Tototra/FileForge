@@ -53,7 +53,7 @@ if [[ -x "$DEST/uv/uv" ]]; then
   PIP=("$DEST/uv/uv" pip install --python "$DEST/venv/bin/python" --quiet)
 fi
 "${PIP[@]}" pymupdf pymupdf4llm pdf2docx pillow pillow-heif openpyxl pandas xlrd odfpy mammoth markdown \
-  python-pptx pywebview imageio-ffmpeg
+  python-pptx pywebview imageio-ffmpeg rapidfuzz
 rm -rf "$DEST/cache"
 "$DEST/venv/bin/python" -c "import webview, pymupdf, tkinter, imageio_ffmpeg; imageio_ffmpeg.get_ffmpeg_exe()" \
   || { warn "La vérification des bibliothèques a échoué."; exit 1; }

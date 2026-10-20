@@ -137,6 +137,25 @@ class UI:
     def jslog(self, m):
         ff.log("JS: " + str(m))
 
+    # recherche de fichiers (appelée directement par la roue, hors de la boucle d'actions)
+    def find_warmup(self):
+        try:
+            finder().INDEXED.ensure()
+        except Exception as e:
+            ff.log(f"recherche (préparation) : {e}")
+
+    def find(self, q):
+        try:
+            fs = finder()
+            if fs.index_age() is None and fs.INDEXED.count() == 0:
+                fs.INDEXED.ensure()
+                return {"building": True, "results": [], "info": {}}
+            res, info = fs.search(str(q or ""), 12)
+            return {"results": res, "info": info, "building": fs.INDEXED.building}
+        except Exception:
+            ff.log(traceback.format_exc())
+            return {"results": [], "info": {"mode": "erreur"}}
+
     def _send(self, st):
         self._win.evaluate_js("FF.show(%s)" % json.dumps(st, ensure_ascii=False))
 
@@ -156,6 +175,16 @@ class UI:
 
 
 ui = UI()
+_finder = None
+
+
+def finder():
+    global _finder
+    if _finder is None:
+        sp = importlib.util.spec_from_file_location("ff_search", HERE / "search.py")
+        _finder = importlib.util.module_from_spec(sp)
+        sp.loader.exec_module(_finder)
+    return _finder
 
 
 def choose(items, prompt, default=None, multiple=False, ok="OK"):
@@ -453,6 +482,16 @@ def run(window, files):
                 ui._accept_drop = True
                 v = ui._wait({"mode": "drop"}, busy_after=False)
                 ui._accept_drop = False
+                if isinstance(v, dict) and v.get("find"):
+                    p = v["path"]
+                    if not os.path.exists(p):
+                        continue
+                    ff.log(f"recherche → {v['find']} {p}")
+                    if v["find"] == "wheel":
+                        files = [p]
+                        continue
+                    ff.open_path(p) if v["find"] == "open" else ff.reveal(p)
+                    break
                 if v == "__browse__":
                     files = sorted(_dialog(True), key=ff.natural)
                     activate()

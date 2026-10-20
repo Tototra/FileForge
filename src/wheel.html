@@ -69,6 +69,43 @@ button:hover{filter:brightness(1.15)}
 .drag .halo{border-color:var(--acc);box-shadow:0 0 0 8px rgba(124,92,255,.15),0 0 60px rgba(124,92,255,.45)}
 .check path,.check polyline{stroke-dasharray:40;stroke-dashoffset:40;animation:draw .5s .15s ease forwards}
 @keyframes draw{to{stroke-dashoffset:0}}
+/* recherche de fichiers */
+.orb{position:absolute;left:50px;top:50px;width:660px;height:660px;border-radius:50%;box-sizing:border-box;
+  background:radial-gradient(circle at 50% 22%,rgba(46,46,64,.985),var(--bg) 62%);border:1px solid var(--line);
+  box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.07);
+  transform:scale(.62);opacity:0;transition:transform .34s cubic-bezier(.2,.9,.25,1.12),opacity .2s}
+.orb.in{transform:none;opacity:1}
+.f-q{position:absolute;left:140px;top:72px;width:380px;height:46px;box-sizing:border-box;display:flex;align-items:center;gap:10px;
+  padding:0 16px;border-radius:14px;background:rgba(0,0,0,.32);border:1px solid rgba(255,255,255,.12);color:var(--mut)}
+.f-q:focus-within{border-color:var(--acc);box-shadow:0 0 0 3px rgba(124,92,255,.28)}
+.f-q input{all:unset;flex:1;font-size:16px;font-weight:550;color:var(--txt);-webkit-user-select:text;user-select:text}
+.f-q input::placeholder{color:#6f6f86}
+.f-list{position:absolute;left:68px;top:140px;width:524px;height:340px;display:flex;flex-direction:column;gap:2px}
+.f-row{display:flex;align-items:center;gap:11px;height:46px;flex:none;padding:0 12px;border-radius:12px;cursor:pointer;
+  box-sizing:border-box;transition:background .1s}
+.f-row.on{background:rgba(124,92,255,.22);box-shadow:inset 0 0 0 1px rgba(124,92,255,.45)}
+.f-ic{width:30px;height:30px;flex:none;border-radius:8px;display:grid;place-items:center;color:var(--c);
+  background:color-mix(in srgb,var(--c) 16%,transparent)}
+.f-tx{flex:1;min-width:0}
+.f-nm{font-size:13px;font-weight:620;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f-nm mark{background:none;color:#c4b5fd;text-decoration:underline;text-decoration-color:rgba(167,139,250,.6);text-underline-offset:2px}
+.f-dr{font-size:10.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;direction:rtl;text-align:left}
+.f-dr bdi{direction:ltr}
+.f-mt{font-size:10.5px;color:var(--mut);text-align:right;flex:none;line-height:1.35}
+.f-act{display:none;gap:4px;flex:none}
+.f-row.on .f-act{display:flex}
+.f-row.on .f-mt{display:none}
+.f-act span{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--txt);background:rgba(255,255,255,.08)}
+.f-act span:hover{background:var(--acc)}
+.f-empty{margin:70px auto 0;text-align:center;color:var(--mut);font-size:12.5px;line-height:1.5}
+.f-empty b{display:block;color:var(--txt);font-size:14px;margin:8px 0 4px}
+.f-sec{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#7c7c96;padding:2px 12px 4px}
+.f-help{position:absolute;left:150px;top:496px;width:360px;text-align:center;font-size:10.5px;color:var(--mut);line-height:1.7}
+.f-help kbd{font:600 10px -apple-system,"Segoe UI",sans-serif;padding:1px 5px;border-radius:4px;background:rgba(255,255,255,.1);color:var(--txt)}
+.f-count{position:absolute;left:200px;top:548px;width:260px;text-align:center;font-size:10px;color:#6f6f86}
+.find-pill{margin-top:10px;font-size:11px;color:var(--mut);cursor:pointer;padding:5px 11px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.12);display:inline-flex;align-items:center;gap:6px}
+.find-pill:hover{color:var(--txt);border-color:var(--acc)}
 .search{font-size:15px;font-weight:650;color:#fff}
 .search small{display:block;font-size:10.5px;color:var(--mut);font-weight:500;margin-top:5px}
 </style>
@@ -282,8 +319,125 @@ function showDrop(){
   const h = hub(170, `<div class="big" style="--c:#a78bfa">${icon('upload', 38)}</div>
     <div class="title" style="font-size:16px">Dépose tes fichiers ici</div>
     <div class="sub" style="margin:6px 0 14px">PDF, images, vidéos, audio, documents…</div>
-    <button id="br">Parcourir…</button><div class="hint">Échap pour fermer</div>`);
+    <button id="br">Parcourir…</button>
+    <div class="find-pill" id="fp">${icon('search', 13)} Chercher un fichier</div>
+    <div class="hint">ou tape directement son nom · Échap pour fermer</div>`);
   h.querySelector('#br').onclick = () => api('__browse__');
+  h.querySelector('#fp').onclick = () => showFind('');
+  try{ window.pywebview.api.find_warmup() }catch(e){}
+}
+
+/* ───────── RECHERCHE DE FICHIERS ───────── */
+const KIND = {pdf:['file-text','#ef4444'], image:['image','#22c55e'], video:['film','#a855f7'], audio:['music','#f59e0b'],
+  word:['file-text','#3b82f6'], excel:['sheet','#10b981'], powerpoint:['presentation','#f97316'], archive:['archive','#94a3b8'],
+  folder:['folder','#60a5fa'], app:['app-window','#e2e8f0'], file:['file','#a3a3b8'], gone:['file','#64748b']};
+let F = {res:[], sel:0, seq:0, q:'', timer:null};
+function showFind(q){
+  reset(); mode = 'find'; F = {res:[], sel:0, seq:0, q:null, timer:null};
+  const o = document.createElement('div'); o.className = 'orb';
+  o.innerHTML = `<label class="f-q">${icon('search', 18)}<input id="fq" spellcheck="false" autocomplete="off"
+      placeholder="Nom du fichier… (ex : facture edf pdf)"></label>
+    <div class="f-list" id="fl"></div>
+    <div class="f-help"><kbd>↩</kbd> afficher dans le dossier · <kbd>${S && S.platform === 'darwin' || navigator.platform.startsWith('Mac') ? '⌘' : 'Ctrl'}↩</kbd> ouvrir · <kbd>Tab</kbd> roue FileForge</div>
+    <div class="f-count" id="fc"></div>`;
+  stage.appendChild(o); enter(o); hubEl = o;
+  const inp = o.querySelector('#fq'); inp.value = q || '';
+  inp.addEventListener('input', () => findQuery(inp.value));
+  inp.addEventListener('keydown', findKey);
+  inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length);
+  findQuery(inp.value, true);
+}
+function findQuery(q, now){
+  clearTimeout(F.timer);
+  F.timer = setTimeout(async () => {
+    const seq = ++F.seq;
+    let r;
+    try{ r = await window.pywebview.api.find(q) }catch(e){ console.log(e); return }
+    if(seq !== F.seq || mode !== 'find') return;   // une frappe plus récente est arrivée
+    if(r.building){ setTimeout(() => { if(F.seq === seq) findQuery(q, true) }, 500) }
+    F.res = r.results || []; F.sel = 0; F.q = q; renderFind(r);
+  }, now ? 0 : 70);
+}
+function when(t){
+  const d = new Date(t * 1000), n = new Date(), day = 864e5;
+  const d0 = new Date(n.getFullYear(), n.getMonth(), n.getDate()).getTime();
+  const hm = d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+  if(d.getTime() >= d0) return "aujourd'hui " + hm;
+  if(d.getTime() >= d0 - day) return 'hier ' + hm;
+  if(d.getTime() >= d0 - 6 * day) return d.toLocaleDateString('fr-FR', {weekday:'long'});
+  return d.toLocaleDateString('fr-FR', {day:'numeric', month:'short', year: d.getFullYear() === n.getFullYear() ? undefined : 'numeric'});
+}
+function human(n){
+  if(n == null) return '';
+  const u = ['o','Ko','Mo','Go']; let i = 0;
+  while(n >= 1024 && i < 3){ n /= 1024; i++ }
+  return (i ? n.toFixed(n < 10 ? 1 : 0) : n) + ' ' + u[i];
+}
+function hlName(name, spans){
+  let out = '', k = 0;
+  for(const [a, b] of spans || []){ out += esc(name.slice(k, a)) + '<mark>' + esc(name.slice(a, b)) + '</mark>'; k = b }
+  return out + esc(name.slice(k));
+}
+function renderFind(r){
+  const fl = document.getElementById('fl'), fc = document.getElementById('fc');
+  if(!fl) return;
+  const info = r.info || {};
+  if(r.building && !F.res.length){
+    fl.innerHTML = `<div class="f-empty">${icon('loader-circle', 26)}<b>Je fais l'inventaire de tes fichiers…</b>Quelques secondes, la première fois seulement.</div>`;
+    fc.textContent = ''; return;
+  }
+  if(!F.res.length){
+    fl.innerHTML = `<div class="f-empty">${icon('search-x', 28)}<b>Aucun fichier ne correspond</b>Essaie avec un seul mot, ou une partie du nom.</div>`;
+  }else{
+    const head = info.mode === 'recents' ? '<div class="f-sec">Modifiés récemment</div>'
+      : info.mode === 'flou' ? '<div class="f-sec">Rien d\'exact — noms qui ressemblent</div>' : '';
+    const rows = F.res.slice(0, head ? 6 : 7);
+    fl.innerHTML = head + rows.map((x, i) => {
+      const [ic, col] = KIND[x.kind] || KIND.file;
+      return `<div class="f-row${i === F.sel ? ' on' : ''}" data-i="${i}">
+        <div class="f-ic" style="--c:${col}">${icon(ic, 17)}</div>
+        <div class="f-tx"><div class="f-nm">${hlName(x.name, x.hl)}</div><div class="f-dr"><bdi>${esc(x.dir)}</bdi></div></div>
+        <div class="f-mt">${esc(when(x.mtime))}<br>${esc(human(x.size))}</div>
+        <div class="f-act"><span data-a="open" title="Ouvrir">${icon('external-link', 15)}</span><span data-a="wheel" title="Roue FileForge">${icon('disc-3', 15)}</span></div>
+      </div>`;
+    }).join('');
+    F.res = rows;
+    fl.querySelectorAll('.f-row').forEach(el => {
+      const i = +el.dataset.i;
+      el.addEventListener('mouseenter', () => findSel(i));
+      el.addEventListener('click', e => {
+        const a = e.target.closest('[data-a]');
+        findPick(a ? a.dataset.a : 'reveal', i);
+      });
+    });
+  }
+  const n = info.indexed || info.total || 0;
+  fc.textContent = info.mode === 'recents' ? (n ? n.toLocaleString('fr-FR') + ' éléments indexés' : '')
+    : (info.total > F.res.length ? (info.total > 20000 ? 'plus de 20 000' : info.total.toLocaleString('fr-FR')) + ' résultats · affine ta recherche' : '');
+}
+function findSel(i){
+  F.sel = i;
+  document.querySelectorAll('.f-row').forEach(el => el.classList.toggle('on', +el.dataset.i === i));
+}
+function findPick(action, i){
+  const x = F.res[i ?? F.sel]; if(!x) return;
+  if(action === 'wheel') showBusy('Ouverture de la roue…');
+  api({find: action, path: x.path});
+}
+function findKey(e){
+  const k = e.key;
+  e.stopPropagation();
+  if(k === 'ArrowDown' || k === 'ArrowUp'){
+    e.preventDefault();
+    if(F.res.length) findSel((F.sel + (k === 'ArrowDown' ? 1 : -1) + F.res.length) % F.res.length);
+  }else if(k === 'Enter'){
+    e.preventDefault(); findPick(e.metaKey || e.ctrlKey ? 'open' : e.altKey ? 'wheel' : 'reveal');
+  }else if(k === 'Tab'){
+    e.preventDefault(); findPick('wheel');
+  }else if(k === 'Escape'){
+    e.preventDefault();
+    if(e.target.value){ e.target.value = ''; findQuery('', true) } else api('__close__');
+  }
 }
 
 /* ───────── clavier / souris ───────── */
@@ -291,7 +445,7 @@ document.addEventListener('dragover', e => { e.preventDefault(); document.body.c
 document.addEventListener('dragleave', e => { if(!e.relatedTarget) document.body.classList.remove('drag') });
 document.addEventListener('drop', e => { e.preventDefault(); document.body.classList.remove('drag') });
 document.addEventListener('mousedown', e => {
-  if((e.target === document.body || e.target === stage || e.target === document.documentElement) && (mode === 'main' || mode === 'drop' || mode === 'done')) api('__close__');
+  if((e.target === document.body || e.target === stage || e.target === document.documentElement) && (mode === 'main' || mode === 'drop' || mode === 'done' || mode === 'find')) api('__close__');
 });
 window.addEventListener('blur', () => {
   if(mode !== 'main' || query) return;
@@ -300,8 +454,20 @@ window.addEventListener('blur', () => {
 });
 
 document.addEventListener('keydown', e => {
+  if(mode === 'find'){
+    // frappe arrivée avant que le champ ait le focus : on la lui transmet
+    const inp = document.getElementById('fq');
+    if(inp && document.activeElement !== inp){
+      inp.focus();
+      if(e.key.length === 1 && !e.metaKey && !e.ctrlKey){ e.preventDefault(); inp.value += e.key; findQuery(inp.value) }
+      else if(e.key === 'Backspace'){ e.preventDefault(); inp.value = inp.value.slice(0, -1); findQuery(inp.value) }
+      else findKey.call(inp, Object.assign(e, {}));
+    }
+    return;
+  }
   if(mode === 'ask' || mode === 'busy') return;
   const k = e.key;
+  if(mode === 'drop' && k.length === 1 && k !== ' ' && !e.metaKey && !e.ctrlKey){ e.preventDefault(); showFind(k); return }
   if(k === 'Escape'){
     e.preventDefault();
     if(mode === 'main'){ if(query){ query = ''; renderSearch() } else api('__close__') }
