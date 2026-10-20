@@ -96,6 +96,13 @@ jobs:
           & "$env:LOCALAPPDATA\FileForge\venv\Scripts\python.exe" tests\windows_ui.py ci-out *>&1 | Tee-Object -FilePath ci-out\windows_ui.txt
           exit $LASTEXITCODE
 
+      - name: Vitesse de la roue (clic droit, plusieurs fichiers, sans agent)
+        if: always()
+        run: |
+          $env:PYTHONIOENCODING = "utf-8"
+          & "$env:LOCALAPPDATA\FileForge\venv\Scripts\python.exe" tests\windows_fast.py ci-out *>&1 | Tee-Object -FilePath ci-out\windows_fast.txt
+          exit $LASTEXITCODE
+
       - name: Ctrl+Alt+F sur une sélection de l'Explorateur
         if: always()
         run: |

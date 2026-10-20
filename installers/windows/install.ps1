@@ -133,7 +133,9 @@ function Step-Webview {
 
 function Step-Shell {
   $ico = Join-Path $Dest "icon.ico"
-  $cmd = "`"$Pyw`" `"$Dest\wheel.py`" `"%1`""
+  # tout passe par le petit lanceur, qui confie les fichiers à l'agent (roue déjà chargée : ouverture instantanée)
+  $open = "`"$Pyw`" `"$Dest\hotkey_win.py`" --open"
+  $cmd = "$open `"%1`""
   $hk = [Microsoft.Win32.Registry]::CurrentUser
   foreach ($base in "Software\Classes\*\shell\FileForge", "Software\Classes\Directory\shell\FileForge") {
     $k = $hk.CreateSubKey($base)
@@ -147,13 +149,13 @@ function Step-Shell {
   $k = $hk.CreateSubKey("Software\Classes\Directory\Background\shell\FileForge")
   $k.SetValue("", "FileForge..."); $k.SetValue("Icon", $ico); $k.Close()
   $c = $hk.CreateSubKey("Software\Classes\Directory\Background\shell\FileForge\command")
-  $c.SetValue("", "`"$Pyw`" `"$Dest\wheel.py`""); $c.Close()
+  $c.SetValue("", $open); $c.Close()
 
   $sh = New-Object -ComObject WScript.Shell
   function NewLnk($path, $hotkey, $extra = "") {
     $l = $sh.CreateShortcut($path)
     $l.TargetPath = $Pyw
-    $l.Arguments = "`"$Dest\wheel.py`"$extra"
+    $l.Arguments = if ($extra) { "`"$Dest\wheel.py`"$extra" } else { "`"$Dest\hotkey_win.py`" --open" }
     $l.WorkingDirectory = $env:USERPROFILE     # pas le dossier de FileForge (il resterait verrouillé)
     $l.IconLocation = "$ico,0"
     $l.Description = "FileForge - convertir, compresser, éditer tes fichiers"

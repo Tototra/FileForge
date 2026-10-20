@@ -13,6 +13,7 @@ IS_LINUX = sys.platform.startswith("linux")
 IS_MAC = sys.platform == "darwin"
 SEARCH_ONLY = "--search" in sys.argv   # ⌃⌥G : panneau de recherche seul, sans fichier
 STANDBY = IS_WIN and "--standby" in sys.argv   # Windows : panneau préchargé, affiché sur signal de l'agent
+STANDBY_WHEEL = IS_WIN and "--standby-wheel" in sys.argv   # Windows : roue préchargée (Ctrl+Alt+F, clic droit…)
 if sys.stdout is None or sys.stderr is None:
     ff.LOG.parent.mkdir(parents=True, exist_ok=True)
     _lf = open(ff.LOG, "a", encoding="utf-8", buffering=1)
@@ -474,13 +475,13 @@ def win_round(window):
         u.SetWindowRgn(hwnd, g.CreateEllipticRgn(m, m, w - m, w - m), True)
 
 
-def wait_for_show():
-    """Mode réserve : attend Ctrl+Alt+G (événement de l'agent) ; se termine si l'agent disparaît."""
+def wait_for_show(name="Local\\FileForgeSearchShow"):
+    """Mode réserve : attend le signal de l'agent ; se termine si l'agent disparaît."""
     import ctypes
     k = ctypes.windll.kernel32
     k.CreateEventW.restype = ctypes.c_void_p
     k.OpenProcess.restype = ctypes.c_void_p
-    ev = k.CreateEventW(None, False, False, "Local\\FileForgeSearchShow")
+    ev = k.CreateEventW(None, False, False, name)
     handles = [ev]
     try:
         agent = k.OpenProcess(0x00100000, False, int(os.environ.get("FF_AGENT_PID", "0")))  # SYNCHRONIZE
@@ -492,6 +493,25 @@ def wait_for_show():
     r = k.WaitForMultipleObjects(len(handles), arr, False, 0xFFFFFFFF)
     if r != 0:
         os._exit(0)          # agent arrêté : la réserve n'a plus lieu d'être
+
+
+def prewarm():
+    """Roue en réserve : charge d'avance les bibliothèques des actions (PDF, images) pour qu'elles démarrent aussitôt."""
+    try:
+        import pymupdf  # noqa: F401
+        from PIL import Image  # noqa: F401
+    except Exception:
+        pass
+
+
+def take_request():
+    req = Path(tempfile.gettempdir()) / "fileforge_wheel_request.json"
+    try:
+        files = json.loads(req.read_text(encoding="utf-8"))
+        req.unlink()
+    except Exception:
+        return []
+    return sorted({f for f in files if os.path.exists(f)}, key=ff.natural)
 
 
 def run(window, files):
@@ -512,11 +532,16 @@ def run(window, files):
     if IS_WIN:
         try:
             window.events.loaded.wait(15)
-            if STANDBY:
-                ui.find_warmup()                 # index déjà chargé quand le panneau apparaît
-                # page de recherche déjà affichée (cachée) : à l'appui, il ne reste qu'à montrer la fenêtre
-                window.evaluate_js("FF.show({mode:'find', standalone:true}); true")
-                wait_for_show()
+            if STANDBY or STANDBY_WHEEL:
+                if STANDBY:
+                    ui.find_warmup()             # index déjà chargé quand le panneau apparaît
+                    # page de recherche déjà affichée (cachée) : à l'appui, il ne reste qu'à montrer la fenêtre
+                    window.evaluate_js("FF.show({mode:'find', standalone:true}); true")
+                    wait_for_show()
+                else:
+                    threading.Thread(target=prewarm, daemon=True).start()
+                    wait_for_show("Local\\FileForgeWheelShow")
+                    files[:] = take_request()    # fichiers transmis par l'agent (Ctrl+Alt+F, clic droit…)
                 ui._woke = time.time()
                 try:
                     # la réserve a été créée « non activable » (pour ne jamais voler le clavier) : on lui rend ce droit
@@ -725,7 +750,7 @@ def main():
     args = [os.path.abspath(a) for a in sys.argv[1:] if not a.startswith("--") and os.path.exists(a)]
     if IS_WIN and args and "--direct" not in sys.argv:
         args = gather(args)   # clic droit : Windows lance un processus par fichier, on les regroupe
-    if not args and not SEARCH_ONLY and "--no-selection" not in sys.argv:
+    if not args and not SEARCH_ONLY and not STANDBY_WHEEL and "--no-selection" not in sys.argv:
         args = explorer_selection() if IS_WIN else ([] if IS_LINUX else finder_selection())
     files = sorted(set(args), key=ff.natural)
     x, y, scr = position()
@@ -734,8 +759,8 @@ def main():
     if IS_WIN:
         # fenêtre cachée tant que le fond n'est pas prêt (voir win_backdrop)
         kw.update(hidden=True, background_color="#1b1b24")
-        if STANDBY:
-            kw["focus"] = False   # en réserve : ne doit jamais prendre le clavier au panneau ouvert
+        if STANDBY or STANDBY_WHEEL:
+            kw["focus"] = False   # en réserve : ne doit jamais prendre le clavier à la fenêtre ouverte
     if x is not None:
         kw.update(x=x, y=y)
     if scr is not None:

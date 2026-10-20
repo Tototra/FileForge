@@ -81,7 +81,7 @@ print(f"onglets dans la fenêtre : {tabs}")
 # 4. l'agent lance la roue sur la sélection : temps jusqu'à la roue prête, et bon fichier affiché
 select(["Contrat de location.pdf"])
 ctypes.windll.user32.SetForegroundWindow(hwnd); time.sleep(0.5)
-ag = hk.Agent.__new__(hk.Agent)
+ag = hk.Agent()
 os.environ["FF_DEBUG"] = "1"
 t0 = time.time()
 orig = hk.explorer_selection
