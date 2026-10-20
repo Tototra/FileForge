@@ -11,6 +11,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: windows-test
+  cancel-in-progress: true
+
 jobs:
   windows:
     runs-on: windows-latest
@@ -63,7 +67,8 @@ jobs:
             "menu Démarrer" = Test-Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\FileForge.lnk"
             "Bureau" = Test-Path ([Environment]::GetFolderPath("Desktop") + "\FileForge.lnk")
             "désinstalleur" = Test-Path "$D\Uninstall.exe"
-            "LibreOffice (pas d'Office)" = (Test-Path "$env:ProgramFiles\LibreOffice\program\soffice.exe")
+            "LibreOffice privé (pas d'Office)" = [bool](Get-ChildItem "$D\libreoffice" -Recurse -Filter soffice.com -ErrorAction SilentlyContinue)
+            "LibreOffice pas installé dans Windows" = -not (Test-Path "$env:ProgramFiles\LibreOffice")
           }
           $checks.GetEnumerator() | ForEach-Object { "{0,-14} {1}" -f $_.Key, $_.Value } | Tee-Object -FilePath ci-out\installation.txt
           if ($checks.Values -contains $false) { exit 1 }
