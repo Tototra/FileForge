@@ -512,6 +512,15 @@ def run(window, files):
             if STANDBY:
                 ui.find_warmup()                 # index déjà chargé quand le panneau apparaît
                 wait_for_show()
+                try:
+                    # la réserve a été créée « non activable » (pour ne jamais voler le clavier) : on lui rend ce droit
+                    import ctypes
+                    hw = own_hwnd()
+                    if hw:
+                        ux = ctypes.windll.user32
+                        ux.SetWindowLongW(hw, -20, ux.GetWindowLongW(hw, -20) & ~0x08000000)   # GWL_EXSTYLE, WS_EX_NOACTIVATE
+                except Exception as e:
+                    ff.log(f"réserve : {e}")
                 x, y, _ = position()             # écran de la souris au moment de l'appui
                 if x is not None:
                     window.move(x, y)
@@ -715,6 +724,8 @@ def main():
     if IS_WIN:
         # fenêtre cachée tant que le fond n'est pas prêt (voir win_backdrop)
         kw.update(hidden=True, background_color="#1b1b24")
+        if STANDBY:
+            kw["focus"] = False   # en réserve : ne doit jamais prendre le clavier au panneau ouvert
     if x is not None:
         kw.update(x=x, y=y)
     if scr is not None:
