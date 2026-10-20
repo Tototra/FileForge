@@ -47,7 +47,7 @@ SKIP_BUNDLES = (".bundle", ".framework", ".xcodeproj", ".xcworkspace", ".lproj",
 # sous-dossiers de Library utiles sur Mac (iCloud Drive)
 EXTRA_ROOTS = [HOME / "Library" / "Mobile Documents" / "com~apple~CloudDocs"] if IS_MAC else []
 # fichiers techniques jamais cherchés
-SKIP_FILES = re.compile(r"^(\.DS_Store|desktop\.ini|Thumbs\.db|\.localized|Icon\r)$|\.(pyc|o|tmp|crdownload|part)$", re.I)
+SKIP_FILES = re.compile(r"^(\.DS_Store|desktop\.ini|Thumbs\.db|\.localized|Icon\r|ntuser\..*|NTUSER\..*)$|\.(pyc|o|tmp|crdownload|part)$", re.I)
 
 FAMILIES = {
     "pdf": {"pdf"},
@@ -111,6 +111,8 @@ def scan():
             n = e.name
             try:
                 if e.is_dir(follow_symlinks=False):
+                    if IS_WIN and (e.is_junction() if hasattr(e, "is_junction") else False):
+                        continue                         # « Mes documents », « Application Data »… : boucles
                     if n.endswith(KEEP_WHOLE):           # applications, photothèques : un seul résultat
                         out.append((e.stat(follow_symlinks=False).st_mtime, 1 + code, e.path))
                         continue

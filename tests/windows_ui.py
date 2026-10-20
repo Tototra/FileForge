@@ -3,7 +3,7 @@
     python windows_ui.py <dossier de résultats>
 La roue est lancée avec FF_DEBUG=1 : elle exécute le JavaScript déposé dans %TEMP%\\ff_cmd.js.
 """
-import ctypes, json, os, subprocess, sys, tempfile, time
+import ctypes, json, os, shutil, subprocess, sys, tempfile, time
 from pathlib import Path
 from PIL import ImageGrab
 
@@ -128,6 +128,52 @@ time.sleep(2)
 for q in (p,):
     if q.poll() is None:
         q.kill()
+
+# 6. recherche de fichiers : panneau seul (Ctrl+Alt+G lance « wheel.py --search »)
+DOCS = Path(os.environ["USERPROFILE"]) / "Documents" / "Factures"
+DOCS.mkdir(parents=True, exist_ok=True)
+for n in ("Facture EDF été 2026.pdf", "Facture Orange mars.pdf", "Budget vacances.xlsx"):
+    shutil.copy(PDF, DOCS / n) if n.endswith(".pdf") else (DOCS / n).write_bytes(b"PK")
+
+
+def launch_search():
+    ctypes.windll.user32.SetCursorPos(700, 420)
+    env = dict(os.environ, FF_DEBUG="1")
+    p = subprocess.Popen([str(D / "venv" / "Scripts" / "pythonw.exe"), str(D / "wheel.py"), "--search"], env=env)
+    t = time.time()
+    while time.time() - t < 40:
+        if js("document.getElementById('fq') ? 'pret' : 'non'", settle=0, timeout=3) == "pret":
+            return p, time.time() - t
+        time.sleep(0.2)
+    return p, None
+
+
+p, dt = launch_search()
+expect("panneau de recherche seul", mode() == "find" and js("standalone", settle=0) == "True", f"ouvert en {dt and round(dt, 1)} s")
+time.sleep(1.5)
+shot("12-recherche-vide")
+found = ""
+for _ in range(40):   # premier lancement : le temps de construire l'index
+    js("document.getElementById('fq').value='factrue edf'; findQuery('factrue edf', true); true", settle=0.8)
+    found = js("JSON.stringify(F.res.map(x => x.name))", settle=0)
+    if "EDF" in found:
+        break
+    time.sleep(0.5)
+expect("faute de frappe tolérée (factrue edf)", "Facture EDF été 2026.pdf" in found, found[:160])
+shot("13-recherche-faute")
+js("document.getElementById('fq').value='facture'; findQuery('facture', true); true", settle=1)
+r = js("JSON.stringify(F.res.map(x => x.name + ' | ' + x.dir))", settle=0)
+expect("recherche « facture »", "Facture Orange mars.pdf" in r, r[:200])
+shot("14-recherche-facture")
+js("findPick('wheel'); true", settle=3)
+expect("Tab → roue sur le fichier", mode() == "main", js("S && S.title", settle=0))
+shot("15-recherche-vers-roue")
+js("api('__close__'); true", settle=0)
+time.sleep(2)
+if p.poll() is None:
+    p.kill()
+idx = Path(os.environ["LOCALAPPDATA"]) / "FileForge" / "cache-recherche" / "index-fichiers.tsv"
+expect("index créé", idx.exists(), f"{sum(1 for _ in open(idx, encoding='utf-8')) if idx.exists() else 0} éléments")
 
 log = D / "FileForge.log"
 txt = log.read_text(encoding="utf-8", errors="replace") if log.exists() else ""

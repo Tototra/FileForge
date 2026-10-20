@@ -51,7 +51,7 @@ VIAddVersionKey /LANG=1036 "LegalCopyright" "FileForge, logiciel libre"
 !insertmacro MUI_PAGE_INSTFILES
 
 !define MUI_FINISHPAGE_TITLE "FileForge est installé"
-!define MUI_FINISHPAGE_TEXT "Pour l'utiliser :$\r$\n$\r$\n•  clic droit sur un fichier, puis FileForge…$\r$\n    (Windows 11 : « Afficher d'autres options »)$\r$\n•  ou Ctrl + Alt + F dans l'Explorateur$\r$\n•  ou glisse des fichiers sur l'icône FileForge du Bureau"
+!define MUI_FINISHPAGE_TEXT "Pour l'utiliser :$\r$\n$\r$\n•  clic droit sur un fichier, puis FileForge…$\r$\n    (Windows 11 : « Afficher d'autres options »)$\r$\n•  ou Ctrl + Alt + F dans l'Explorateur$\r$\n•  Ctrl + Alt + G partout : chercher un fichier par son nom$\r$\n•  ou glisse des fichiers sur l'icône FileForge du Bureau"
 !define MUI_FINISHPAGE_RUN
 !define MUI_FINISHPAGE_RUN_TEXT "Ouvrir FileForge maintenant"
 !define MUI_FINISHPAGE_RUN_FUNCTION LaunchWheel

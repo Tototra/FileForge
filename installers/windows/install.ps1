@@ -150,10 +150,10 @@ function Step-Shell {
   $c.SetValue("", "`"$Pyw`" `"$Dest\wheel.py`""); $c.Close()
 
   $sh = New-Object -ComObject WScript.Shell
-  function NewLnk($path, $hotkey) {
+  function NewLnk($path, $hotkey, $extra = "") {
     $l = $sh.CreateShortcut($path)
     $l.TargetPath = $Pyw
-    $l.Arguments = "`"$Dest\wheel.py`""
+    $l.Arguments = "`"$Dest\wheel.py`"$extra"
     $l.WorkingDirectory = $Dest
     $l.IconLocation = "$ico,0"
     $l.Description = "FileForge - convertir, compresser, éditer tes fichiers"
@@ -162,6 +162,8 @@ function Step-Shell {
   }
   $Start = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs"
   NewLnk (Join-Path $Start "FileForge.lnk") "CTRL+ALT+F"
+  # Ctrl+Alt+G : panneau de recherche de fichiers seul
+  NewLnk (Join-Path $Start "FileForge - Rechercher un fichier.lnk") "CTRL+ALT+G" " --search"
   NewLnk (Join-Path $env:APPDATA "Microsoft\Windows\SendTo\FileForge.lnk") $null
   NewLnk (Join-Path ([Environment]::GetFolderPath("Desktop")) "FileForge.lnk") $null
 
@@ -177,7 +179,7 @@ function Step-Shell {
     $u.SetValue("NoRepair", 1, [Microsoft.Win32.RegistryValueKind]::DWord)
     $u.Close()
   }
-  Ok "Clic droit, Envoyer vers, raccourci Ctrl+Alt+F et icône sur le Bureau"
+  Ok "Clic droit, Envoyer vers, Ctrl+Alt+F (roue), Ctrl+Alt+G (recherche) et icône sur le Bureau"
 }
 
 function Test-LibreOffice {

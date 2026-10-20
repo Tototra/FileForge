@@ -587,6 +587,8 @@ def position_win():
     except Exception:
         pass
     w, h, r = W * scale, H * scale, mi.rcWork
+    if SEARCH_ONLY:   # Ctrl+Alt+G : panneau centré sur l'écran de la souris
+        pt.x, pt.y = (r.left + r.right) // 2, int(r.top + (r.bottom - r.top) * 0.44)
     cx = min(max(pt.x, r.left + w / 2), r.right - w / 2)
     cy = min(max(pt.y, r.top + h / 2), r.bottom - h / 2)
     return int((cx - w / 2) / scale), int((cy - h / 2) / scale), None
