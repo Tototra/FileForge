@@ -1707,6 +1707,8 @@ def soffice():
         # soffice.com attend la fin de la conversion (soffice.exe rend parfois la main tout de suite)
         cands = [Path(os.environ.get(v, "")) / "LibreOffice" / "program"
                  for v in ("ProgramFiles", "ProgramFiles(x86)", "ProgramW6432", "LOCALAPPDATA")]
+        # LibreOffice privé, déballé par l'installateur de FileForge
+        cands += [p.parent for p in (HOME_DIR / "libreoffice").glob("**/program/soffice.com")]
         try:
             import winreg
             with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\LibreOffice\UNO\InstallPath") as k:
@@ -1717,7 +1719,8 @@ def soffice():
             for exe in ("soffice.com", "soffice.exe"):
                 if (d / exe).exists():
                     return str(d / exe)
-    return which("soffice", "/Applications/LibreOffice.app/Contents/MacOS/soffice")
+    return which("soffice", "/Applications/LibreOffice.app/Contents/MacOS/soffice",
+                 str(HOME_DIR / "LibreOffice.app" / "Contents" / "MacOS" / "soffice"))
 
 
 def word_app():

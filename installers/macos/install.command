@@ -131,14 +131,23 @@ launchctl bootout "gui/$(id -u)/fr.fileforge.hotkey" 2>/dev/null || true
 launchctl bootstrap "gui/$(id -u)" "$AGENT" 2>/dev/null && ok "Recherche de fichiers : ⌃⌥G partout"
 
 step 6 "Options"
-if [[ -d "/Applications/LibreOffice.app" ]]; then ok "LibreOffice détecté"
+if [[ -d "/Applications/LibreOffice.app" || -d "$DEST/LibreOffice.app" ]]; then ok "LibreOffice détecté"
 else
-  echo "      Installation de LibreOffice (gratuit, ~350 Mo) pour convertir Word / PowerPoint / Excel en PDF…"
-  if command -v brew >/dev/null; then
-    brew install --cask libreoffice >/dev/null 2>&1 && ok "LibreOffice installé" || echo "      LibreOffice n'a pas pu être installé : https://fr.libreoffice.org"
-  else
-    echo "      Sans lui, Word → PDF utilise une conversion simplifiée. Téléchargement : https://fr.libreoffice.org"
+  # FileForge récupère LibreOffice lui-même (image officielle) et le garde dans son dossier : rien à faire
+  echo "      Téléchargement de LibreOffice (~350 Mo) pour convertir Word / PowerPoint / Excel en PDF…"
+  BASE="https://download.documentfoundation.org/libreoffice/stable/"
+  V=$(curl -fsSL "$BASE" | grep -oE 'href="[0-9]+(\.[0-9]+)+/"' | grep -oE '[0-9]+(\.[0-9]+)+' | sort -t. -k1,1n -k2,2n -k3,3n | tail -1)
+  if [[ "$(uname -m)" == "arm64" ]]; then A="aarch64"; F="aarch64"; else A="x86_64"; F="x86-64"; fi
+  DMG="$TMPDIR/fileforge-libreoffice.dmg"; MNT="$TMPDIR/fileforge-lo-mnt"
+  if [[ -n "$V" ]] && curl -fsSL -o "$DMG" "$BASE$V/mac/$A/LibreOffice_${V}_MacOS_${F}.dmg"; then
+    mkdir -p "$MNT"
+    if hdiutil attach -nobrowse -readonly -quiet -mountpoint "$MNT" "$DMG"; then
+      ditto "$MNT/LibreOffice.app" "$DEST/LibreOffice.app" && ok "LibreOffice $V prêt (privé à FileForge)"
+      hdiutil detach -quiet "$MNT" || true
+    fi
+    rm -f "$DMG"
   fi
+  [[ -d "$DEST/LibreOffice.app" ]] || echo "      LibreOffice n'a pas pu être récupéré : conversions simplifiées (relance l'installation plus tard)."
 fi
 
 echo

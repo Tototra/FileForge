@@ -37,7 +37,7 @@ VIAddVersionKey /LANG=1036 "LegalCopyright" "FileForge, logiciel libre"
 !define MUI_ABORTWARNING_TEXT "Arrêter l'installation de FileForge ?"
 
 !define MUI_WELCOMEPAGE_TITLE "Installer FileForge"
-!define MUI_WELCOMEPAGE_TEXT "FileForge convertit, compresse, rogne et signe tes fichiers depuis une roue qui s'ouvre d'un clic droit.$\r$\n$\r$\nL'installation prend quelques minutes et télécharge ce qu'il faut (environ 300 Mo, plus LibreOffice si Microsoft Office n'est pas installé). FileForge ne demande aucun mot de passe administrateur et ne touche à rien en dehors de ton compte (seul LibreOffice, s'il faut l'installer, peut faire demander une autorisation à Windows).$\r$\n$\r$\nTout se passe ensuite sur ton ordinateur : aucun fichier n'est envoyé sur Internet."
+!define MUI_WELCOMEPAGE_TEXT "FileForge convertit, compresse, rogne et signe tes fichiers depuis une roue qui s'ouvre d'un clic droit.$\r$\n$\r$\nL'installation prend quelques minutes et télécharge ce qu'il faut (environ 300 Mo, et 350 Mo de plus pour LibreOffice si Microsoft Office n'est pas installé). FileForge ne demande aucun mot de passe administrateur et ne touche à rien en dehors de ton compte.$\r$\n$\r$\nTout se passe ensuite sur ton ordinateur : aucun fichier n'est envoyé sur Internet."
 !insertmacro MUI_PAGE_WELCOME
 
 
@@ -89,7 +89,7 @@ Section "FileForge (convertir, compresser, éditer…)" SecMain
   !insertmacro RunStep shell "Intégration à l'Explorateur Windows"
   ; Word / PowerPoint / Excel : Microsoft Office s'il est là, sinon LibreOffice (facultatif : un échec n'annule rien)
   ${If} $Failed == ""
-    !insertmacro RunStep libreoffice "Conversions Office : Microsoft Office, sinon installation de LibreOffice (~350 Mo)"
+    !insertmacro RunStep libreoffice "Conversions Word / PowerPoint / Excel : Microsoft Office, sinon LibreOffice (~350 Mo)"
     StrCpy $Failed ""
   ${EndIf}
 

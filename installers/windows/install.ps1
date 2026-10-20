@@ -182,11 +182,13 @@ function Step-Shell {
   Ok "Clic droit, Envoyer vers, Ctrl+Alt+F (roue), Ctrl+Alt+G (recherche) et icône sur le Bureau"
 }
 
+$LoDir = Join-Path $Dest "libreoffice"   # LibreOffice privé à FileForge (sans installation système)
+
 function Test-LibreOffice {
   foreach ($d in $env:ProgramFiles, ${env:ProgramFiles(x86)}, $env:ProgramW6432) {
     if ($d -and (Test-Path (Join-Path $d "LibreOffice\program\soffice.exe"))) { return $true }
   }
-  return $false
+  return [bool](Get-ChildItem $LoDir -Recurse -Filter "soffice.com" -ErrorAction SilentlyContinue | Select-Object -First 1)
 }
 
 function Test-MsOffice {
@@ -199,29 +201,35 @@ function Test-MsOffice {
 
 function Step-LibreOffice {
   if (Test-MsOffice) { Ok "Microsoft Office détecté : utilisé pour convertir Word, PowerPoint et Excel"; return }
-  if (Test-LibreOffice) { Ok "LibreOffice déjà installé"; return }
-  $missing = @("Word", "PowerPoint", "Excel" | Where-Object { -not (Test-Path "Registry::HKEY_CLASSES_ROOT\$_.Application\CLSID") }) -join ", "
-  Say "Pas de $missing : installation de LibreOffice (gratuit, ~350 Mo) pour convertir ces fichiers."
-  Say "Windows va peut-être demander une autorisation : réponds Oui."
-  if (Get-Command winget -ErrorAction SilentlyContinue) {
-    winget install -e --id TheDocumentFoundation.LibreOffice --silent --accept-package-agreements --accept-source-agreements --disable-interactivity | Out-Null
+  if (Test-LibreOffice) { Ok "LibreOffice déjà présent"; return }
+  # Pas d'Office complet : FileForge récupère LibreOffice lui-même et le déballe dans son dossier.
+  # « msiexec /a » extrait les fichiers sans rien installer dans Windows : aucune autorisation administrateur.
+  $base = "https://download.documentfoundation.org/libreoffice/stable/"
+  $vers = (Invoke-WebRequest $base -UseBasicParsing).Links.href | Where-Object { $_ -match '^\d+(\.\d+)+/$' } |
+          ForEach-Object { $_.TrimEnd('/') } | Sort-Object { [version]$_ }
+  $v = $vers[-1]
+  $msi = Join-Path $env:TEMP "fileforge-libreoffice-$v.msi"
+  Say "Téléchargement de LibreOffice $v (~350 Mo) pour convertir Word, PowerPoint et Excel..."
+  if (-not (Test-Path $msi) -or (Get-Item $msi).Length -lt 100MB) {
+    Download "$base$v/win/x86_64/LibreOffice_${v}_Win_x86-64.msi" $msi
   }
-  if (-not (Test-LibreOffice)) {
-    # sans winget (ou en cas d'échec) : installateur officiel téléchargé depuis documentfoundation.org
-    try {
-      $base = "https://download.documentfoundation.org/libreoffice/stable/"
-      $vers = (Invoke-WebRequest $base -UseBasicParsing).Links.href | Where-Object { $_ -match '^\d+(\.\d+)+/$' } |
-              ForEach-Object { $_.TrimEnd('/') } | Sort-Object { [version]$_ }
-      $v = $vers[-1]
-      $msi = Join-Path $env:TEMP "LibreOffice_$v.msi"
-      Say "Téléchargement de LibreOffice $v..."
-      Download "$base$v/win/x86_64/LibreOffice_${v}_Win_x86-64.msi" $msi
-      Start-Process msiexec.exe -ArgumentList "/i `"$msi`" /qb- /norestart" -Verb RunAs -Wait
-      Remove-Item $msi -Force -ErrorAction SilentlyContinue
-    } catch { Say "Téléchargement de LibreOffice impossible : $($_.Exception.Message)" }
-  }
-  if (Test-LibreOffice) { Ok "LibreOffice installé" }
-  else { Say "LibreOffice n'a pas pu être installé : FileForge fera des conversions simplifiées (réinstalle plus tard pour réessayer)." }
+  Say "Préparation de LibreOffice..."
+  Remove-Item $LoDir -Recurse -Force -ErrorAction SilentlyContinue
+  $p = Start-Process msiexec.exe -ArgumentList "/a `"$msi`" /qn TARGETDIR=`"$LoDir`"" -Wait -PassThru
+  Remove-Item $msi -Force -ErrorAction SilentlyContinue
+  Get-ChildItem $LoDir -Filter "*.msi" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+  $so = Get-ChildItem $LoDir -Recurse -Filter "soffice.com" -ErrorAction SilentlyContinue | Select-Object -First 1
+  if (-not $so) { throw "LibreOffice n'a pas pu être préparé (code $($p.ExitCode))." }
+  # vérifie qu'il démarre vraiment (bibliothèques Windows nécessaires présentes)
+  $t = Join-Path $env:TEMP "ff-lo-test"; Remove-Item $t -Recurse -Force -ErrorAction SilentlyContinue
+  New-Item -ItemType Directory -Force -Path $t | Out-Null
+  Set-Content -Path "$t\test.txt" -Value "FileForge" -Encoding UTF8
+  $prof = ([Uri](Join-Path $t "profil")).AbsoluteUri
+  & $so.FullName "-env:UserInstallation=$prof" --headless --norestore --convert-to pdf --outdir $t "$t\test.txt" | Out-Null
+  $ok = Test-Path "$t\test.pdf"
+  Remove-Item $t -Recurse -Force -ErrorAction SilentlyContinue
+  if ($ok) { Ok "LibreOffice $v prêt (privé à FileForge)" }
+  else { Say "LibreOffice est installé mais ne démarre pas : FileForge fera des conversions simplifiées." }
 }
 
 $steps = [ordered]@{
