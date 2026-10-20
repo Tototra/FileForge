@@ -384,19 +384,12 @@ def expand(paths):
 
 
 def explorer_selection():
-    """Fichiers sélectionnés dans la fenêtre de l'Explorateur au premier plan."""
+    """Fichiers sélectionnés dans la fenêtre de l'Explorateur au premier plan (onglets Windows 11 compris)."""
     try:
-        import ctypes
-        import pythoncom
-        import win32com.client
-        pythoncom.CoInitialize()
-        fg = ctypes.windll.user32.GetForegroundWindow()
-        for w in win32com.client.Dispatch("Shell.Application").Windows():
-            try:
-                if int(w.HWND) == fg:
-                    return [it.Path for it in w.Document.SelectedItems() if os.path.exists(it.Path)]
-            except Exception:
-                continue
+        sp = importlib.util.spec_from_file_location("ff_hotkey", HERE / "hotkey_win.py")
+        hk = importlib.util.module_from_spec(sp)
+        sp.loader.exec_module(hk)
+        return hk.explorer_selection()
     except Exception as e:
         ff.log(f"explorer_selection: {e}")
     return []
@@ -730,9 +723,9 @@ def position():
 
 def main():
     args = [os.path.abspath(a) for a in sys.argv[1:] if not a.startswith("--") and os.path.exists(a)]
-    if IS_WIN and args:
-        args = gather(args)
-    if not args and not SEARCH_ONLY:
+    if IS_WIN and args and "--direct" not in sys.argv:
+        args = gather(args)   # clic droit : Windows lance un processus par fichier, on les regroupe
+    if not args and not SEARCH_ONLY and "--no-selection" not in sys.argv:
         args = explorer_selection() if IS_WIN else ([] if IS_LINUX else finder_selection())
     files = sorted(set(args), key=ff.natural)
     x, y, scr = position()

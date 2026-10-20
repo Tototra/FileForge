@@ -96,6 +96,13 @@ jobs:
           & "$env:LOCALAPPDATA\FileForge\venv\Scripts\python.exe" tests\windows_ui.py ci-out *>&1 | Tee-Object -FilePath ci-out\windows_ui.txt
           exit $LASTEXITCODE
 
+      - name: Ctrl+Alt+F sur une sélection de l'Explorateur
+        if: always()
+        run: |
+          $env:PYTHONIOENCODING = "utf-8"
+          & "$env:LOCALAPPDATA\FileForge\venv\Scripts\python.exe" tests\windows_selection.py ci-out *>&1 | Tee-Object -FilePath ci-out\windows_selection.txt
+          exit $LASTEXITCODE
+
       - name: Ctrl+Alt+G, batterie de tests (vraies touches)
         if: always()
         run: |
