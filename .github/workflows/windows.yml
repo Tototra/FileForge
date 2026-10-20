@@ -98,10 +98,12 @@ jobs:
         run: |
           $D = "$env:LOCALAPPDATA\FileForge"
           Start-Process "$D\Uninstall.exe" -ArgumentList "/S" -Wait
-          $t = 0; while ((Test-Path $D) -and $t -lt 60) { Start-Sleep 2; $t += 2 }
+          $t = 0; while ((Test-Path $D) -and $t -lt 240) { Start-Sleep 2; $t += 2 }
+          if (Test-Path $D) { Get-ChildItem $D -Force | Select-Object -First 20 | Format-Table Name, Length | Out-String | Tee-Object -FilePath ci-out\restes.txt }
+          "durée : $t s" | Tee-Object -FilePath ci-out\desinstallation.txt
           $left = @((Test-Path $D), (Test-Path "HKCU:\Software\Classes\*\shell\FileForge"),
                     (Test-Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\FileForge"))
-          "dossier restant : $($left[0]) / clic droit restant : $($left[1]) / entrée Applications : $($left[2])" | Tee-Object -FilePath ci-out\desinstallation.txt
+          "dossier restant : $($left[0]) / clic droit restant : $($left[1]) / entrée Applications : $($left[2])" | Tee-Object -Append -FilePath ci-out\desinstallation.txt
           if ($left -contains $true) { exit 1 }
 
       - name: Publier les résultats (branche ci-results)

@@ -159,5 +159,9 @@ Section "Uninstall"
   Pop $0
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileForge"
   SetOutPath "$TEMP"
+  DetailPrint "Suppression des fichiers..."
+  ; rmdir est bien plus rapide que RMDir /r sur les milliers de fichiers de Python
+  nsExec::Exec '"$SYSDIR\cmd.exe" /c rmdir /s /q "$INSTDIR"'
+  Pop $0
   RMDir /r "$INSTDIR"
 SectionEnd
