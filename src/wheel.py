@@ -55,7 +55,8 @@ try:
 except Exception as _e:
     ff.log(f"patch evaluate_js: {_e}")
 
-W = H = 760
+W = H = 760          # taille de référence de la roue (pixels logiques)
+PLACE = {}           # Windows : rectangle réel (pixels physiques) et facteur de zoom, voir position_win
 
 CATS = [
     ("convert", "Convertir", "repeat", "#7c5cff"),
@@ -69,6 +70,7 @@ CATS = [
 
 META = {
     # PDF
+    "pdf_edit": ("edit", "Modifier le PDF", "file-pen-line"),
     "pdf_merge": ("pages", "Fusionner", "combine"), "pdf_split": ("pages", "Diviser", "split"),
     "pdf_extract": ("pages", "Extraire des pages", "file-output"), "pdf_delete": ("pages", "Supprimer des pages", "trash-2"),
     "pdf_reorder": ("pages", "Réorganiser", "arrow-up-down"), "pdf_rotate": ("pages", "Pivoter", "rotate-cw"),
@@ -553,8 +555,10 @@ def run(window, files):
                 except Exception as e:
                     ff.log(f"réserve : {e}")
                 x, y, _ = position()             # écran de la souris au moment de l'appui
-                if x is not None:
-                    window.move(x, y)
+            try:
+                win_place(window)
+            except Exception as e:
+                ff.log(f"placement: {e}")
             try:
                 win_backdrop(window)
             except Exception as e:
@@ -709,12 +713,39 @@ def position_win():
         scale = dx.value / 96 or 1.0
     except Exception:
         pass
-    w, h, r = W * scale, H * scale, mi.rcWork
+    r = mi.rcWork
+    wa = os.environ.get("FF_WORKAREA")               # tests : simule une zone utile plus petite (« largeurxhauteur »)
+    if wa:
+        ww, wh = (int(v) for v in wa.lower().split("x"))
+        r.right, r.bottom = r.left + int(ww * scale), r.top + int(wh * scale)
+    # la roue ne doit jamais dépasser la zone utile de l'écran (petits écrans, mise à l'échelle 125–175 %)
+    avail = min(r.right - r.left, r.bottom - r.top) / scale
+    size = max(360, min(W, int(avail) - 6))
+    w = h = size * scale
     if SEARCH_ONLY:   # Ctrl+Alt+G : panneau centré sur l'écran de la souris
         pt.x, pt.y = (r.left + r.right) // 2, int(r.top + (r.bottom - r.top) * 0.44)
     cx = min(max(pt.x, r.left + w / 2), r.right - w / 2)
     cy = min(max(pt.y, r.top + h / 2), r.bottom - h / 2)
+    PLACE.update(x=int(cx - w / 2), y=int(cy - h / 2), w=int(w), h=int(h), zoom=size / W, scale=scale,
+                 work=(r.left, r.top, r.right, r.bottom))
     return int((cx - w / 2) / scale), int((cy - h / 2) / scale), None
+
+
+def win_place(window):
+    """Place la fenêtre en pixels réels sur l'écran de la souris (pas de décalage entre écrans d'échelles
+    différentes) et adapte la taille de la roue à la place disponible."""
+    import ctypes
+    u = ctypes.windll.user32
+    try:
+        u.SetThreadDpiAwarenessContext(ctypes.c_void_p(-4))
+    except Exception:
+        pass
+    hw = own_hwnd()
+    if not hw or not PLACE:
+        return
+    for _ in range(2):   # 2e passage : la fenêtre a pu être remise à l'échelle en changeant d'écran
+        u.SetWindowPos(hw, 0, PLACE["x"], PLACE["y"], PLACE["w"], PLACE["h"], 0x0014)   # SWP_NOZORDER|SWP_NOACTIVATE
+    window.evaluate_js("FF.fit(%.4f); true" % PLACE["zoom"])
 
 
 def position():

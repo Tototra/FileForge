@@ -53,7 +53,7 @@ cases = {
 }
 ok = fail = 0
 for a in ff.ACTIONS:
-    if "Renommer" in a["label"] or "Informations" in a["label"]:
+    if "Renommer" in a["label"] or "Informations" in a["label"] or "éditeur" in a["label"]:
         continue
     for name, files in cases.items():
         if len(files) < a["minf"] or (a["types"] and not all(ff.ext(f) in a["types"] for f in files)):

@@ -20,7 +20,7 @@ $hk = [Microsoft.Win32.Registry]::CurrentUser
 $run = $hk.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\Run", $true)
 if ($run) { $run.DeleteValue("FileForge", $false); $run.Close() }
 foreach ($k in "Software\Classes\*\shell\FileForge", "Software\Classes\Directory\shell\FileForge",
-               "Software\Classes\Directory\Background\shell\FileForge",
+               "Software\Classes\Directory\Background\shell\FileForge", "Software\Classes\SystemFileAssociations\.pdf\shell\FileForgeEdit",
                "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileForge") {
   $hk.DeleteSubKeyTree($k, $false)
 }

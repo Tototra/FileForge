@@ -145,6 +145,11 @@ function Step-Shell {
     $k.Close()
     $c = $hk.CreateSubKey("$base\command"); $c.SetValue("", $cmd); $c.Close()
   }
+  # clic droit sur un PDF : « Modifier avec FileForge » (éditeur)
+  $k = $hk.CreateSubKey("Software\Classes\SystemFileAssociations\.pdf\shell\FileForgeEdit")
+  $k.SetValue("", "Modifier avec FileForge"); $k.SetValue("Icon", $ico); $k.Close()
+  $c = $hk.CreateSubKey("Software\Classes\SystemFileAssociations\.pdf\shell\FileForgeEdit\command")
+  $c.SetValue("", "`"$Pyw`" `"$Dest\editor.py`" `"%1`""); $c.Close()
   # clic droit dans le vide d'un dossier : ouvre la roue sur la sélection / zone de dépôt
   $k = $hk.CreateSubKey("Software\Classes\Directory\Background\shell\FileForge")
   $k.SetValue("", "FileForge..."); $k.SetValue("Icon", $ico); $k.Close()

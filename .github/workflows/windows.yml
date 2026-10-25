@@ -61,7 +61,9 @@ jobs:
         run: |
           $D = "$env:LOCALAPPDATA\FileForge"
           $checks = @{
-            "wheel.py" = Test-Path "$D\wheel.py"; "venv" = Test-Path "$D\venv\Scripts\pythonw.exe"
+            "wheel.py" = Test-Path "$D\wheel.py"; "editor.py" = Test-Path "$D\editor.py"; "editor.html" = Test-Path "$D\editor.html"
+            "clic droit PDF : Modifier" = Test-Path "HKCU:\Software\Classes\SystemFileAssociations\.pdf\shell\FileForgeEdit\command"
+            "venv" = Test-Path "$D\venv\Scripts\pythonw.exe"
             "tessdata" = Test-Path "$D\tessdata\fra.traineddata"; "clic droit" = Test-Path "HKCU:\Software\Classes\*\shell\FileForge\command"
             "Envoyer vers" = Test-Path "$env:APPDATA\Microsoft\Windows\SendTo\FileForge.lnk"
             "menu Démarrer" = Test-Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\FileForge.lnk"
@@ -101,6 +103,27 @@ jobs:
         run: |
           $env:PYTHONIOENCODING = "utf-8"
           & "$env:LOCALAPPDATA\FileForge\venv\Scripts\python.exe" tests\windows_fast.py ci-out *>&1 | Tee-Object -FilePath ci-out\windows_fast.txt
+          exit $LASTEXITCODE
+
+      - name: Toutes les actions PDF × 11 documents (scan, chiffré, 60 pages, abîmé…)
+        if: always()
+        run: |
+          $env:PYTHONIOENCODING = "utf-8"
+          & "$env:LOCALAPPDATA\FileForge\venv\Scripts\python.exe" tests\windows_pdf_suite.py ci-out *>&1 | Tee-Object -FilePath ci-out\windows_pdf_suite.txt
+          exit $LASTEXITCODE
+
+      - name: La roue tient entièrement à l'écran (tailles d'écran, coins, catégories)
+        if: always()
+        run: |
+          $env:PYTHONIOENCODING = "utf-8"
+          & "$env:LOCALAPPDATA\FileForge\venv\Scripts\python.exe" tests\windows_geometry.py ci-out *>&1 | Tee-Object -FilePath ci-out\windows_geometry.txt
+          exit $LASTEXITCODE
+
+      - name: Éditeur PDF, piloté et vérifié
+        if: always()
+        run: |
+          $env:PYTHONIOENCODING = "utf-8"
+          & "$env:LOCALAPPDATA\FileForge\venv\Scripts\python.exe" tests\windows_editor.py ci-out *>&1 | Tee-Object -FilePath ci-out\windows_editor.txt
           exit $LASTEXITCODE
 
       - name: Ctrl+Alt+F sur une sélection de l'Explorateur

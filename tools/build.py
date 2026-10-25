@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC, ASSETS, INST = ROOT / "src", ROOT / "assets", ROOT / "installers"
 OUT = ROOT / "site" / "downloads"
 VERSION = re.search(r'__version__ = "([^"]+)"', (SRC / "fileforge.py").read_text(encoding="utf-8")).group(1)
-CORE = ["fileforge.py", "wheel.py", "wheel.html", "search.py", "lucide.min.js"]
+CORE = ["fileforge.py", "wheel.py", "wheel.html", "search.py", "editor.py", "editor.html", "lucide.min.js"]
 # horodatage fixe : archives reproductibles (même contenu → même empreinte)
 EPOCH = (2026, 1, 1, 0, 0, 0)
 

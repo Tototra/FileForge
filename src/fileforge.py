@@ -612,6 +612,26 @@ def content_bbox(page):
     return bb
 
 
+def launch_editor(f):
+    """Ouvre l'éditeur PDF dans son propre processus (la roue se ferme aussitôt)."""
+    exe = Path(sys.executable)
+    if IS_WIN and exe.name.lower() == "python.exe" and (exe.parent / "pythonw.exe").exists():
+        exe = exe.parent / "pythonw.exe"
+    kw = {"cwd": tempfile.gettempdir(), "stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL}
+    if IS_WIN:
+        kw["creationflags"] = 0x08000000 | 0x00000200   # sans console, nouveau groupe
+    else:
+        kw["start_new_session"] = True
+    return subprocess.Popen([str(exe), str(Path(__file__).with_name("editor.py")), str(f)], **kw)
+
+
+@action("📄 PDF · Modifier (éditeur)", PDF)
+def pdf_edit(files):
+    for f in files[:4]:
+        launch_editor(f)
+    return []
+
+
 @action("📄 PDF · Fusionner en un seul PDF", PDF | IMG, minf=2)
 def pdf_merge(files):
     import pymupdf
@@ -766,11 +786,15 @@ def pdf_crop(files):
                                "Navigue avec ◀ ▶ pour vérifier les autres pages.")
             pi, [r] = next(iter(sel.items()))
             R = doc[pi].rect
-            l, t, rr, b = r[0], r[1], R.width - r[2], R.height - r[3]
+            fr = (r[0] / R.width, r[1] / R.height, r[2] / R.width, r[3] / R.height)   # zone en proportions
             scope = choose(["Toutes les pages", f"Seulement la page {pi + 1}"], "Appliquer le rognage à :")
             targets = range(doc.page_count) if scope.startswith("Toutes") else [pi]
             for p in targets:
-                crop_page(doc[p], l, t, rr, b)
+                Q = doc[p].rect
+                if p == pi or (abs(Q.width - R.width) < 1 and abs(Q.height - R.height) < 1):
+                    crop_page(doc[p], r[0], r[1], R.width - r[2], R.height - r[3])
+                else:   # page d'un autre format : même zone, proportionnellement
+                    crop_page(doc[p], fr[0] * Q.width, fr[1] * Q.height, (1 - fr[2]) * Q.width, (1 - fr[3]) * Q.height)
         elif mode.startswith("Retirer"):
             v = [float(x) * mm for x in re.split(r"[,; ]+", ask(
                 "Marges à retirer en mm : haut, droite, bas, gauche\n(une seule valeur = partout)", "10")) if x]
@@ -891,6 +915,18 @@ def pdf_to_text(files):
             txt, e = pymupdf4llm.to_markdown(doc), "md"
         else:
             txt, e = "\n\n".join(p.get_text() for p in doc), "txt"
+        if not txt.strip():
+            # document scanné : pas de texte, on passe par l'OCR
+            langs = tess_langs()
+            if not langs:
+                raise ValueError(f"« {Path(f).name} » ne contient aucun texte (document scanné). "
+                                 "Utilise d'abord « OCR ». " + install_hint("tesseract"))
+            lang = "+".join(l for l in ("fra", "eng") if l in langs) or "eng"
+            notify("Document scanné : reconnaissance du texte (OCR)…")
+            txt = "\n\n".join(p.get_textpage_ocr(language=lang, dpi=300, full=True).extractText() for p in doc)
+            NOTES.append("Document scanné : texte obtenu par OCR.")
+            if not txt.strip():
+                raise ValueError(f"Aucun texte trouvé dans « {Path(f).name} », même par OCR.")
         dst = unique(Path(f).with_suffix("." + e))
         dst.write_text(txt, encoding="utf-8")
         outs.append(dst)

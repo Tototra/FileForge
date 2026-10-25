@@ -522,6 +522,17 @@ document.addEventListener('keydown', e => {
 });
 
 window.FF = {
+  // Windows : roue réduite si l'écran est trop petit (tout reste dans la fenêtre, rien n'est coupé)
+  fit(k){ stage.style.zoom = k < 0.999 ? k : ''; return true },
+  // tests : boîte englobante de tout ce qui est dessiné, en pixels de la fenêtre
+  bounds(){
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    stage.querySelectorAll('path, .hub, .orb, .lbl, .spin').forEach(e => {
+      const r = e.getBoundingClientRect(); if(!r.width) return;
+      x0 = Math.min(x0, r.left); y0 = Math.min(y0, r.top); x1 = Math.max(x1, r.right); y1 = Math.max(y1, r.bottom);
+    });
+    return JSON.stringify({x0, y0, x1, y1, w: innerWidth, h: innerHeight, zoom: stage.style.zoom || 1});
+  },
   show(st){
     try{
       if(st.mode === 'main') showMain(st);

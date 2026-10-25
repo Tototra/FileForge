@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>FileForge — Éditeur PDF</title>
+<script src="lucide.min.js"></script>
+<style>
+:root{--bg:#16171f;--panel:#1e1f2a;--panel2:#262836;--line:rgba(255,255,255,.09);--txt:#f2f2f7;--mut:#9d9db3;--acc:#7c5cff;--acc2:#a78bfa}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
+  font:13px "Segoe UI Variable Text","Segoe UI",-apple-system,system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
+header{height:54px;display:flex;align-items:center;gap:6px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:9px;min-width:0;margin-right:8px}
+.brand b{font-size:13px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}
+.brand i{font-style:normal;color:var(--mut);font-size:11px}
+.grp{display:flex;gap:2px;padding:3px;border-radius:11px;background:rgba(0,0,0,.18)}
+.sep{width:1px;height:26px;background:var(--line);margin:0 4px}
+button{all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;height:34px;padding:0 10px;border-radius:9px;color:var(--txt);
+  font-size:12.5px;font-weight:550;white-space:nowrap}
+button:hover{background:rgba(255,255,255,.07)}
+button.on{background:var(--acc);color:#fff}
+button:disabled{opacity:.35;cursor:default;background:none}
+button svg{flex:none}
+.primary{background:var(--acc);color:#fff;padding:0 14px}
+.brand{flex:0 1 auto}
+@media (max-width:1480px){ #tools button:not(.on) span, #b-rot span, #b-del span, #b-undo span{display:none} .brand b{max-width:170px} }
+@media (max-width:980px){ #tools button span, .brand div{display:none} }
+.primary:hover{background:#8b6dff}
+.spacer{flex:1}
+.zoom{min-width:44px;text-align:center;color:var(--mut);font-variant-numeric:tabular-nums}
+#opts{height:44px;display:flex;align-items:center;gap:12px;padding:0 16px;background:var(--panel2);border-bottom:1px solid var(--line);color:var(--mut)}
+#opts .hint{font-size:12px}
+.sw{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
+.sw.on{border-color:#fff}
+select{background:var(--panel);color:var(--txt);border:1px solid var(--line);border-radius:7px;padding:4px 6px;font:inherit}
+.seg{display:flex;gap:2px;background:rgba(0,0,0,.2);padding:2px;border-radius:8px}
+.seg button{height:26px;padding:0 9px;font-size:12px}
+#view{position:absolute;top:98px;left:0;right:0;bottom:0;overflow:auto;padding:28px 0 60px}
+.page{position:relative;margin:0 auto 26px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.45);border-radius:2px}
+.page img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.page .ov{position:absolute;inset:0;touch-action:none}
+.page .num{position:absolute;left:0;right:0;bottom:-20px;text-align:center;color:var(--mut);font-size:11px}
+.page.cur{outline:2px solid rgba(124,92,255,.55);outline-offset:3px}
+.tool-edit .ov{cursor:text}
+.tool-addtext .ov{cursor:copy}
+.tool-highlight .ov,.tool-rect .ov,.tool-whiteout .ov,.tool-draw .ov,.tool-image .ov{cursor:crosshair}
+.ln{position:absolute;border-radius:2px;outline:1px dashed transparent}
+.tool-edit .ln:hover{outline-color:rgba(124,92,255,.8);background:rgba(124,92,255,.08)}
+.box{position:absolute;min-width:30px;outline:2px solid var(--acc);background:#fff;color:#000;white-space:pre;line-height:1.18;
+  -webkit-user-select:text;user-select:text;padding:0 1px;z-index:5}
+.box:focus{outline-color:var(--acc2)}
+.drag{position:absolute;border:1.5px dashed var(--acc);background:rgba(124,92,255,.12);pointer-events:none}
+.drag.hl{background:rgba(255,212,0,.35);border-color:#d4a000}
+.drag.wo{background:#fff;border-color:#888}
+svg.ink{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);opacity:0;transition:.2s;
+  background:#2c2e3e;border:1px solid var(--line);padding:10px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.4);
+  display:flex;align-items:center;gap:12px;z-index:50}
+#toast.in{opacity:1;transform:translateX(-50%)}
+#toast button{height:28px;font-size:12px;background:rgba(255,255,255,.08)}
+.modal{position:fixed;inset:0;background:rgba(10,10,16,.6);display:none;align-items:center;justify-content:center;z-index:60}
+.modal.in{display:flex}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.card h3{margin:0 0 6px;font-size:15px}
+.card p{margin:0 0 14px;color:var(--mut);font-size:12.5px;line-height:1.45}
+.card input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.3);color:var(--txt);font:inherit;outline:none;-webkit-user-select:text;user-select:text}
+.card .row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+#busy{position:fixed;top:60px;right:16px;color:var(--mut);font-size:11.5px;display:none;align-items:center;gap:6px}
+#busy.in{display:flex}
+</style>
+</head>
+<body class="tool-edit">
+<header>
+  <div class="brand"><span id="logo"></span><div><b id="fname">Document</b><br><i id="pinfo"></i></div></div>
+  <div class="grp" id="tools">
+    <button data-t="edit" class="on" title="Modifier le texte existant (clic sur une ligne)"></button>
+    <button data-t="addtext" title="Ajouter du texte (clic sur la page)"></button>
+    <button data-t="highlight" title="Surligner, souligner ou barrer (tracer une zone)"></button>
+    <button data-t="draw" title="Dessiner à main levée"></button>
+    <button data-t="rect" title="Encadrer une zone"></button>
+    <button data-t="whiteout" title="Effacer une zone (remplie de blanc, contenu supprimé)"></button>
+    <button data-t="image" title="Insérer une image (puis cliquer sur la page)"></button>
+  </div>
+  <div class="sep"></div>
+  <button id="b-rot" title="Pivoter la page courante"></button>
+  <button id="b-del" title="Supprimer la page courante"></button>
+  <div class="sep"></div>
+  <button id="b-undo" title="Annuler (Ctrl+Z)" disabled></button>
+  <div class="spacer"></div>
+  <button id="b-zo" title="Dézoomer"></button><span class="zoom" id="zl">100 %</span><button id="b-zi" title="Zoomer"></button>
+  <div class="sep"></div>
+  <button id="b-save" class="primary" title="Enregistrer une copie modifiée (Ctrl+S)"></button>
+</header>
+<div id="opts"></div>
+<div id="busy"></div>
+<main id="view"></main>
+<div id="toast"></div>
+<div class="modal" id="m-pass"><div class="card"><h3>Document protégé</h3><p>Ce PDF est protégé par un mot de passe. Saisis-le pour l'ouvrir.</p>
+  <input id="pw" type="password" autocomplete="off"><div class="row"><button id="pw-ok" class="primary">Ouvrir</button></div></div></div>
+<script>
+const $ = s => document.querySelector(s);
+const api = () => window.pywebview.api;
+function icon(n, s = 17){ try{ const p = n.split('-').map(w => w[0].toUpperCase() + w.slice(1)).join('');
+  const e = lucide.createElement(lucide.icons[p]); e.setAttribute('width', s); e.setAttribute('height', s); e.setAttribute('stroke-width', '1.9'); return e.outerHTML }catch(e){ return '' } }
+const TOOLS = {edit:['text-cursor-input','Modifier le texte'], addtext:['type','Ajouter du texte'], highlight:['highlighter','Surligner'],
+  draw:['pencil','Dessiner'], rect:['square','Cadre'], whiteout:['eraser','Effacer'], image:['image-plus','Image']};
+const COLORS = {text:['#000000','#1f3a93','#c00000','#00804a','#6b21a8','#7a7a7a'], hl:['#ffd400','#7cf08c','#7cd3ff','#ff9de2','#ffb066'],
+  draw:['#0050ff','#e11d48','#000000','#00a86b','#ff8a00']};
+const S = {info:null, zoom:1, tool:'edit', color:'#000000', hlColor:'#ffd400', drawColor:'#0050ff', size:12, width:2, hlStyle:'highlight',
+  pages:[], cur:0, ops:0, editing:null, pendingImage:null, busy:0};
+
+/* ───────── barre d'outils ───────── */
+$('#logo').innerHTML = icon('file-pen-line', 22).replace('<svg', '<svg style="color:#a78bfa"');
+document.querySelectorAll('#tools button').forEach(b => { const [ic, lab] = TOOLS[b.dataset.t]; b.innerHTML = icon(ic) + `<span>${lab}</span>`; b.onclick = () => setTool(b.dataset.t) });
+$('#b-rot').innerHTML = icon('rotate-cw') + '<span>Pivoter</span>'; $('#b-del').innerHTML = icon('trash-2') + '<span>Supprimer</span>';
+$('#b-undo').innerHTML = icon('undo-2') + '<span>Annuler</span>'; $('#b-zo').innerHTML = icon('zoom-out'); $('#b-zi').innerHTML = icon('zoom-in');
+$('#b-save').innerHTML = icon('save') + '<span>Enregistrer</span>';
+
+function setTool(t){
+  commitEdit(); S.tool = t; S.pendingImage = t === 'image' ? S.pendingImage : null;
+  document.body.className = 'tool-' + t;
+  document.querySelectorAll('#tools button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  renderOpts(); S.pages.forEach(p => drawLines(p));
+  if(t === 'image' && !S.pendingImage) pickImage();
+}
+function swatches(list, cur, key){
+  return list.map(c => `<span class="sw${c === cur ? ' on' : ''}" data-c="${c}" data-k="${key}" style="background:${c}"></span>`).join('');
+}
+function renderOpts(){
+  const o = $('#opts'); const t = S.tool;
+  const sizes = [8,9,10,11,12,14,16,18,20,24,28,32,40].map(v => `<option${v == S.size ? ' selected' : ''}>${v}</option>`).join('');
+  if(t === 'edit') o.innerHTML = `<span class="hint">Clique sur une ligne de texte pour la modifier, puis Entrée pour valider (Échap pour annuler). Couleur :</span>${swatches(COLORS.text, S.color, 'color')}`;
+  else if(t === 'addtext') o.innerHTML = `<span class="hint">Clique où placer le texte.</span>${swatches(COLORS.text, S.color, 'color')}
+    <select id="o-size">${sizes}</select><span class="hint">pt</span><div class="seg"><button id="o-b" class="${S.bold ? 'on' : ''}"><b>G</b></button><button id="o-i" class="${S.italic ? 'on' : ''}"><i>I</i></button></div>`;
+  else if(t === 'highlight') o.innerHTML = `<div class="seg">${[['highlight','Surligner'],['underline','Souligner'],['strike','Barrer']].map(([k, l]) =>
+    `<button data-hs="${k}" class="${S.hlStyle === k ? 'on' : ''}">${l}</button>`).join('')}</div>${swatches(COLORS.hl, S.hlColor, 'hlColor')}<span class="hint">Trace une zone sur le texte.</span>`;
+  else if(t === 'draw' || t === 'rect') o.innerHTML = `${swatches(COLORS.draw, S.drawColor, 'drawColor')}<select id="o-w">${[1,2,3,5,8].map(v => `<option${v == S.width ? ' selected' : ''} value="${v}">${v} px</option>`).join('')}</select>
+    <span class="hint">${t === 'draw' ? 'Dessine en maintenant le clic.' : 'Trace le cadre.'}</span>`;
+  else if(t === 'whiteout') o.innerHTML = `<span class="hint">Trace la zone à effacer : son contenu est réellement supprimé et remplacé par du blanc.</span>`;
+  else if(t === 'image') o.innerHTML = `<span class="hint">${S.pendingImage ? `« ${esc(S.pendingImage.name)} » : clique sur la page pour la placer (ou trace sa taille).` : 'Choisis une image…'}</span><button id="o-pick">Choisir une autre image</button>`;
+  o.querySelectorAll('.sw').forEach(e => e.onclick = () => { S[e.dataset.k] = e.dataset.c; renderOpts() });
+  o.querySelectorAll('[data-hs]').forEach(e => e.onclick = () => { S.hlStyle = e.dataset.hs; renderOpts() });
+  const sz = $('#o-size'); if(sz) sz.onchange = () => S.size = +sz.value;
+  const w = $('#o-w'); if(w) w.onchange = () => S.width = +w.value;
+  const ob = $('#o-b'); if(ob) ob.onclick = () => { S.bold = !S.bold; renderOpts() };
+  const oi = $('#o-i'); if(oi) oi.onclick = () => { S.italic = !S.italic; renderOpts() };
+  const op = $('#o-pick'); if(op) op.onclick = pickImage;
+}
+function esc(s){ return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) }
+
+/* ───────── pages ───────── */
+async function load(){
+  let info = await api().info();
+  if(info.needs_pass){ info = await askPassword(); if(!info) return }
+  S.info = info; $('#fname').textContent = info.name;
+  const maxw = Math.max(...info.pages.map(p => p.w));
+  S.zoom = Math.max(0.5, Math.min(1.25, ($('#view').clientWidth - 90) / maxw));
+  build();
+}
+function build(){
+  const v = $('#view'); v.innerHTML = ''; S.pages = [];
+  S.info.pages.forEach((p, i) => {
+    const d = document.createElement('div'); d.className = 'page'; d.dataset.i = i;
+    d.innerHTML = `<img alt=""><div class="ov"></div><div class="num">Page ${i + 1} / ${S.info.pages.length}</div>`;
+    v.appendChild(d);
+    const P = {i, el:d, img:d.querySelector('img'), ov:d.querySelector('.ov'), w:p.w, h:p.h, lines:[], z:0};
+    sizePage(P); bindPage(P); S.pages.push(P); io.observe(d);
+  });
+  $('#pinfo').textContent = `${S.info.pages.length} page${S.info.pages.length > 1 ? 's' : ''}`;
+  $('#b-undo').disabled = !S.info.can_undo; $('#zl').textContent = Math.round(S.zoom * 100) + ' %';
+  setCur(Math.min(S.cur, S.pages.length - 1));
+}
+function sizePage(P){ P.el.style.width = P.w * S.zoom + 'px'; P.el.style.height = P.h * S.zoom + 'px' }
+const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ const P = S.pages[+e.target.dataset.i]; if(P && P.z !== S.zoom) renderPage(P) } }), {root:document.getElementById('view'), rootMargin:'600px'});
+async function renderPage(P){
+  P.z = S.zoom; busy(1);
+  try{
+    const r = await api().render(P.i, S.zoom * (window.devicePixelRatio || 1));
+    if(r.error){ toast('Erreur : ' + r.error); return }
+    P.img.src = r.img; P.lines = r.lines; P.w = r.w; P.h = r.h; sizePage(P); drawLines(P);
+  }finally{ busy(-1) }
+}
+function rerender(pages){ (pages || S.pages).forEach(P => { P.z = 0; renderPage(P) }) }
+function drawLines(P){
+  P.ov.querySelectorAll('.ln').forEach(e => e.remove());
+  if(S.tool !== 'edit') return;
+  for(const l of P.lines){
+    const [x0, y0, x1, y1] = l.bbox, e = document.createElement('div'); e.className = 'ln'; e.dataset.id = l.id;
+    Object.assign(e.style, {left:x0 * S.zoom + 'px', top:y0 * S.zoom + 'px', width:(x1 - x0) * S.zoom + 'px', height:(y1 - y0) * S.zoom + 'px'});
+    P.ov.appendChild(e);
+  }
+}
+function setCur(i){ S.cur = i; S.pages.forEach(P => P.el.classList.toggle('cur', P.i === i && S.pages.length > 1)) }
+function busy(d){ S.busy += d; const b = $('#busy'); b.classList.toggle('in', S.busy > 0); b.innerHTML = icon('loader-circle', 14) + 'Mise à jour…' }
+
+/* ───────── interactions ───────── */
+function pt(P, e){ const r = P.ov.getBoundingClientRect(); return [(e.clientX - r.left) / S.zoom, (e.clientY - r.top) / S.zoom] }
+function bindPage(P){
+  let start = null, prev = null, path = null, svg = null;
+  // le clic ne doit pas retirer le focus de la zone de saisie qu'on vient d'ouvrir
+  P.ov.addEventListener('mousedown', e => { if(!e.target.closest('.box')) e.preventDefault() });
+  P.ov.addEventListener('pointerdown', e => {
+    if(e.target.closest('.box')) return;
+    setCur(P.i); const [x, y] = pt(P, e);
+    if(S.tool === 'edit'){
+      const ln = e.target.closest('.ln'); commitEdit();
+      if(ln) startEdit(P, P.lines[+ln.dataset.id]);
+      return;
+    }
+    if(S.tool === 'addtext'){ commitEdit(); startAdd(P, x, y); e.preventDefault(); return }
+    commitEdit();
+    if(S.tool === 'image' && !S.pendingImage){ pickImage(); return }
+    start = [x, y]; try{ P.ov.setPointerCapture(e.pointerId) }catch(_){}
+    if(S.tool === 'draw'){
+      path = [[x, y]]; svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('class', 'ink');
+      svg.innerHTML = `<polyline fill="none" stroke="${S.drawColor}" stroke-width="${S.width * S.zoom}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      P.ov.appendChild(svg);
+    }else{
+      prev = document.createElement('div'); prev.className = 'drag' + (S.tool === 'highlight' ? ' hl' : S.tool === 'whiteout' ? ' wo' : '');
+      P.ov.appendChild(prev); moveRect(prev, start, start);
+    }
+  });
+  P.ov.addEventListener('pointermove', e => {
+    if(!start) return; const p = pt(P, e);
+    if(path){ path.push(p); svg.firstChild.setAttribute('points', path.map(([a, b]) => `${a * S.zoom},${b * S.zoom}`).join(' ')) }
+    else if(prev) moveRect(prev, start, p);
+  });
+  const end = async e => {
+    if(!start) return; const p = pt(P, e), s0 = start; start = null;
+    if(path){ const pts = path; path = null; const el = svg; svg = null;
+      if(pts.length > 1) await doOp({type:'ink', page:P.i, points:pts, color:S.drawColor, width:S.width}, [P]); el.remove(); return }
+    if(prev){ prev.remove(); prev = null }
+    const r = [Math.min(s0[0], p[0]), Math.min(s0[1], p[1]), Math.max(s0[0], p[0]), Math.max(s0[1], p[1])];
+    const small = r[2] - r[0] < 4 || r[3] - r[1] < 4;
+    if(S.tool === 'image'){
+      const im = S.pendingImage, w = small ? P.w * 0.3 : r[2] - r[0], h = small ? w * im.h / im.w : r[3] - r[1];
+      await doOp({type:'image', page:P.i, rect:[r[0], r[1], r[0] + w, r[1] + h], data:im.data}, [P]); return;
+    }
+    if(small) return;
+    if(S.tool === 'highlight') await doOp({type:S.hlStyle, page:P.i, rect:r, color:S.hlColor}, [P]);
+    else if(S.tool === 'rect') await doOp({type:'rect', page:P.i, rect:r, color:S.drawColor, width:S.width}, [P]);
+    else if(S.tool === 'whiteout') await doOp({type:'whiteout', page:P.i, rect:r}, [P]);
+  };
+  P.ov.addEventListener('pointerup', end); P.ov.addEventListener('pointercancel', () => { start = null; path = null; if(prev){ prev.remove(); prev = null } if(svg){ svg.remove(); svg = null } });
+}
+function moveRect(el, a, b){ Object.assign(el.style, {left:Math.min(a[0], b[0]) * S.zoom + 'px', top:Math.min(a[1], b[1]) * S.zoom + 'px',
+  width:Math.abs(b[0] - a[0]) * S.zoom + 'px', height:Math.abs(b[1] - a[1]) * S.zoom + 'px'}) }
+
+function family(l){ return l.mono ? 'Consolas,Courier New,monospace' : l.serif ? '"Times New Roman",Georgia,serif' : 'Helvetica,Arial,"Segoe UI",sans-serif' }
+function startEdit(P, l){
+  const b = document.createElement('div'); b.className = 'box'; b.contentEditable = 'plaintext-only'; b.textContent = l.text;
+  const [x0, y0, x1, y1] = l.bbox;
+  Object.assign(b.style, {left:x0 * S.zoom - 2 + 'px', top:y0 * S.zoom - 1 + 'px', minWidth:(x1 - x0) * S.zoom + 4 + 'px', minHeight:(y1 - y0) * S.zoom + 2 + 'px',
+    fontSize:l.size * S.zoom + 'px', fontFamily:family(l), fontWeight:l.bold ? 700 : 400, fontStyle:l.italic ? 'italic' : 'normal', color:l.color});
+  P.ov.appendChild(b); S.editing = {P, l, el:b, kind:'edit'}; focusEnd(b); keys(b);
+}
+function startAdd(P, x, y){
+  const b = document.createElement('div'); b.className = 'box'; b.contentEditable = 'plaintext-only';
+  Object.assign(b.style, {left:x * S.zoom + 'px', top:y * S.zoom + 'px', fontSize:S.size * S.zoom + 'px', color:S.color,
+    fontFamily:family({}), fontWeight:S.bold ? 700 : 400, fontStyle:S.italic ? 'italic' : 'normal', minHeight:S.size * 1.2 * S.zoom + 'px'});
+  P.ov.appendChild(b); S.editing = {P, x, y, el:b, kind:'add'}; focusEnd(b); keys(b);
+}
+function keys(b){
+  b.addEventListener('keydown', e => {
+    if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); commitEdit() }
+    else if(e.key === 'Escape'){ e.preventDefault(); cancelEdit() }
+    e.stopPropagation();
+  });
+}
+function focusEnd(b){ b.focus(); requestAnimationFrame(() => { if(document.activeElement !== b) b.focus() }); const r = document.createRange(); r.selectNodeContents(b); r.collapse(false); const s = getSelection(); s.removeAllRanges(); s.addRange(r) }
+function cancelEdit(){ if(S.editing){ S.editing.el.remove(); S.editing = null } }
+async function commitEdit(){
+  const ed = S.editing; if(!ed) return; S.editing = null;
+  const text = ed.el.innerText.replace(/\r/g, '').replace(/\u00a0/g, ' ').replace(/\n+$/, '');
+  if(ed.kind === 'edit'){
+    if(text !== ed.l.text) await doOp({type:'text_edit', page:ed.P.i, line:ed.l.id, text, color:S.color !== '#000000' ? S.color : null}, [ed.P]);
+  }else if(text.trim()){
+    await doOp({type:'text_add', page:ed.P.i, x:ed.x, y:ed.y + S.size * 0.85, text, size:S.size, color:S.color, bold:!!S.bold, italic:!!S.italic}, [ed.P]);
+  }
+  ed.el.remove();
+}
+async function doOp(op, pages){
+  busy(1);
+  try{
+    const r = await api().do(op);
+    if(!r || r.error){ toast('Modification impossible : ' + (r && r.error)); return false }
+    S.ops++; S.info = r.info; $('#b-undo').disabled = false;
+    if(op.type === 'delete_page' || op.type === 'rotate'){ build(); rerender() } else rerender(pages);
+    return true;
+  }finally{ busy(-1) }
+}
+async function undo(){
+  cancelEdit(); busy(1);
+  try{ const r = await api().undo(); S.ops = Math.max(0, S.ops - 1); S.info = r.info; build(); rerender() }finally{ busy(-1) }
+}
+async function pickImage(){
+  const r = await api().pick_image();
+  if(r && !r.error){ S.pendingImage = r; if(S.tool !== 'image') setTool('image'); else renderOpts() }
+  else if(!S.pendingImage) setTool('edit');
+}
+async function save(){
+  await commitEdit(); busy(1);
+  try{
+    const r = await api().save();
+    if(r.error){ toast('Enregistrement impossible : ' + r.error); return }
+    S.saved = r.path;
+    toast(`${icon('circle-check', 16).replace('<svg', '<svg style="color:#22c55e"')} Enregistré : <b>${esc(r.path.split(/[\\/]/).pop())}</b>
+      <button id="t-open">Ouvrir</button><button id="t-show">Afficher</button>`, 9000);
+    $('#t-open').onclick = () => api().open_path(r.path); $('#t-show').onclick = () => api().reveal(r.path);
+    return r.path;
+  }finally{ busy(-1) }
+}
+let tt = null;
+function toast(html, ms = 4000){ const t = $('#toast'); t.innerHTML = html; t.classList.add('in'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('in'), ms) }
+function askPassword(){
+  return new Promise(res => {
+    $('#m-pass').classList.add('in'); const inp = $('#pw'); inp.focus();
+    const go = async () => { if(await api().unlock(inp.value)){ $('#m-pass').classList.remove('in'); res(await api().info()) } else { inp.value = ''; inp.placeholder = 'Mot de passe incorrect' } };
+    $('#pw-ok').onclick = go; inp.onkeydown = e => { if(e.key === 'Enter') go() };
+  });
+}
+function setZoom(z){ S.zoom = Math.max(0.3, Math.min(4, z)); $('#zl').textContent = Math.round(S.zoom * 100) + ' %'; cancelEdit();
+  S.pages.forEach(P => { sizePage(P); P.z = 0; drawLines(P) }); S.pages.forEach(P => { const r = P.el.getBoundingClientRect(); if(r.bottom > -600 && r.top < innerHeight + 600) renderPage(P) }) }
+$('#b-zi').onclick = () => setZoom(S.zoom * 1.2); $('#b-zo').onclick = () => setZoom(S.zoom / 1.2);
+$('#b-undo').onclick = undo; $('#b-save').onclick = save;
+$('#b-rot').onclick = () => doOp({type:'rotate', page:S.cur, angle:90});
+$('#b-del').onclick = () => { if(S.pages.length < 2){ toast('Impossible de supprimer la seule page.'); return } doOp({type:'delete_page', page:S.cur}) };
+$('#view').addEventListener('scroll', () => {
+  const mid = innerHeight / 2; let best = S.cur, d = 1e9;
+  S.pages.forEach(P => { const r = P.el.getBoundingClientRect(), c = Math.abs((r.top + r.bottom) / 2 - mid); if(c < d){ d = c; best = P.i } });
+  if(best !== S.cur) setCur(best);
+});
+document.addEventListener('keydown', e => {
+  const mod = e.ctrlKey || e.metaKey;
+  if(mod && e.key.toLowerCase() === 'z'){ e.preventDefault(); undo() }
+  else if(mod && e.key.toLowerCase() === 's'){ e.preventDefault(); save() }
+  else if(mod && (e.key === '+' || e.key === '=')){ e.preventDefault(); setZoom(S.zoom * 1.2) }
+  else if(mod && e.key === '-'){ e.preventDefault(); setZoom(S.zoom / 1.2) }
+});
+renderOpts();
+
+/* ───────── outils pour les tests automatiques ───────── */
+window.ED = {
+  state(){ return JSON.stringify({ready:!!S.info, pages:S.pages.length, rendered:S.pages.filter(P => P.z).length, ops:S.ops, busy:S.busy,
+    tool:S.tool, zoom:S.zoom, saved:S.saved || null, lines:S.pages.map(P => P.lines.length)}) },
+  lines(i){ return JSON.stringify(S.pages[i].lines.map(l => ({id:l.id, text:l.text}))) },
+  // vrais événements souris (pointeur) sur la page, en points PDF affichés
+  pointer(i, type, x, y){ const P = S.pages[i], v = $('#view');
+    if(type === 'pointerdown'){ const r0 = P.ov.getBoundingClientRect(), vr = v.getBoundingClientRect(), py = r0.top + y * S.zoom;
+      if(py < vr.top + 40 || py > vr.bottom - 40) v.scrollTop += py - (vr.top + vr.bottom) / 2 }
+    const r = P.ov.getBoundingClientRect();
+    const tgt = type === 'pointerdown' ? (document.elementFromPoint(r.left + x * S.zoom, r.top + y * S.zoom) || P.ov) : P.ov;
+    tgt.dispatchEvent(new PointerEvent(type, {bubbles:true, clientX:r.left + x * S.zoom, clientY:r.top + y * S.zoom, pointerId:1, isPrimary:true})); return true },
+  type(text){ if(!S.editing) return false; S.editing.el.textContent = text; return true },
+  commit(){ commitEdit(); return true }, tool(t){ setTool(t); return true }, opt(k, v){ S[k] = v; renderOpts(); return true },
+  image(data, w, h, name){ S.pendingImage = {data, w, h, name:name || 'image.png'}; setTool('image'); return true },
+  save(){ save(); return true }, undo(){ undo(); return true }, rotate(){ $('#b-rot').click(); return true }, del(){ $('#b-del').click(); return true },
+};
+window.addEventListener('pywebviewready', load);
+</script>
+</body>
+</html>
