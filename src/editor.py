@@ -300,6 +300,7 @@ def main():
     if len(sys.argv) < 2 or not Path(sys.argv[1]).exists():
         ff.log("éditeur : fichier introuvable")
         return
+    ff.log(f"éditeur : ouverture de {sys.argv[1]}")
     api = Api(sys.argv[1])
     w, h = window_size()
     win = webview.create_window(f"{TITLE} — {Path(sys.argv[1]).name}", str(HERE / "editor.html"), js_api=api,

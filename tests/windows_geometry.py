@@ -171,6 +171,8 @@ def cursors():
 base = screen()
 print("écran", base, "· résolutions possibles :", sorted(resolutions()))
 for wa in ["", "1366x728", "1280x680", "1097x617", "1024x700", "800x560"]:
+    if wa and (int(wa.split("x")[0]) > base[0] or int(wa.split("x")[1]) > base[1]):
+        continue          # zone simulée plus grande que l'écran réel : sans objet (testé en vraie résolution plus bas)
     for name, pos in cursors().items():
         if wa and name not in ("centre", "coin bas-droit", "coin haut-gauche"):
             continue

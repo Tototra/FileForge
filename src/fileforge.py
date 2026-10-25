@@ -617,12 +617,16 @@ def launch_editor(f):
     exe = Path(sys.executable)
     if IS_WIN and exe.name.lower() == "python.exe" and (exe.parent / "pythonw.exe").exists():
         exe = exe.parent / "pythonw.exe"
-    kw = {"cwd": tempfile.gettempdir(), "stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL}
+    lf = open(LOG, "a", encoding="utf-8")      # les erreurs de démarrage de l'éditeur vont dans le journal
+    kw = {"cwd": tempfile.gettempdir(), "stdout": lf, "stderr": lf, "stdin": subprocess.DEVNULL}
     if IS_WIN:
         kw["creationflags"] = 0x08000000 | 0x00000200   # sans console, nouveau groupe
     else:
         kw["start_new_session"] = True
-    return subprocess.Popen([str(exe), str(Path(__file__).with_name("editor.py")), str(f)], **kw)
+    try:
+        return subprocess.Popen([str(exe), str(Path(__file__).with_name("editor.py")), str(f)], **kw)
+    finally:
+        lf.close()
 
 
 @action("📄 PDF · Modifier (éditeur)", PDF)

@@ -122,9 +122,9 @@ d.new_page().insert_text((72, 80), "Page 2", fontsize=14)
 d.save(T / "Formulaire.pdf"); DOCS["formulaire"] = T / "Formulaire.pdf"
 d = pymupdf.open(text_pdf(T / "_a.pdf", 3))
 d[0].add_highlight_annot(pymupdf.Rect(70, 75, 300, 95)); d[1].add_text_annot((300, 300), "Note")
-d.save(T / "Annoté.pdf"); DOCS["annotations"] = T / "Annoté.pdf"
+d.save(T / "Annoté.pdf"); d.close(); DOCS["annotations"] = T / "Annoté.pdf"
 d = pymupdf.open(text_pdf(T / "_c.pdf", 3))
-d.save(T / "Chiffré.pdf", encryption=pymupdf.PDF_ENCRYPT_AES_256, user_pw="secret", owner_pw="own")
+d.save(T / "Chiffré.pdf", encryption=pymupdf.PDF_ENCRYPT_AES_256, user_pw="secret", owner_pw="own"); d.close()
 DOCS["chiffré"] = T / "Chiffré.pdf"
 ro = text_pdf(T / "Lecture seule.pdf", 3); os.chmod(ro, stat.S_IREAD); DOCS["lecture seule"] = ro
 DOCS["chemin bizarre"] = text_pdf(WEIRD / "Rapport — final (v2) 'été' 🎉.pdf", 3)

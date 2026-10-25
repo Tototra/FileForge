@@ -97,7 +97,8 @@ def launch(pdf, how="direct"):
     t0 = time.time()
     if how == "action":       # comme depuis la roue : l'action « Modifier (éditeur) »
         code = ("import sys; sys.path.insert(0, r'%s'); import fileforge as ff; ff.pdf_edit([r'%s'])" % (D, pdf))
-        subprocess.Popen([str(D / "venv" / "Scripts" / "python.exe"), "-c", code], env=env).wait(30)
+        r = subprocess.run([str(D / "venv" / "Scripts" / "python.exe"), "-c", code], env=env, capture_output=True, text=True, timeout=60)
+        print("lancement par l'action :", r.returncode, r.stdout[-500:], r.stderr[-1500:], flush=True)
     else:
         subprocess.Popen([str(PYW), str(D / "editor.py"), str(pdf)], env=env, cwd=os.environ["TEMP"])
     while time.time() - t0 < 45:
@@ -147,6 +148,14 @@ h0 = md5(main)
 # 1. ouverture depuis l'action de la roue
 dt = launch(main, "action")
 expect("éditeur ouvert depuis l'action « Modifier »", dt is not None, f"{dt and round(dt, 1)} s")
+if dt is None:
+    print("processus :", subprocess.run(["powershell", "-NoProfile", "-Command", "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*editor*' } | Select-Object ProcessId, CommandLine | Format-List"], capture_output=True, text=True).stdout)
+    print("journal :", "\n".join((D / "FileForge.log").read_text(encoding="utf-8", errors="replace").splitlines()[-25:]))
+    dt = launch(main)
+    expect("éditeur ouvert directement", dt is not None, f"{dt and round(dt, 1)} s")
+    if dt is None:
+        print("journal :", "\n".join((D / "FileForge.log").read_text(encoding="utf-8", errors="replace").splitlines()[-25:]))
+        sys.exit(1)
 s = idle()
 expect("pages affichées", s.get("pages") == 3 and s.get("rendered", 0) >= 1, json.dumps(s))
 h = find_window("FileForge — Éditeur PDF")
