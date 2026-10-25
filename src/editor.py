@@ -219,13 +219,15 @@ class Editor:
 
 
 class Api:
+    # attributs « _ » : pywebview n'expose (et ne parcourt) que les noms publics — un document PyMuPDF
+    # ou la fenêtre exposés ici font planter WebView2 au démarrage
     def __init__(self, path):
-        self.ed = Editor(path)
-        self.win = None
-        self.lock = threading.Lock()
+        self._ed = Editor(path)
+        self._win = None
+        self._lock = threading.Lock()
 
     def _safe(self, f, *a):
-        with self.lock:
+        with self._lock:
             try:
                 return f(*a)
             except Exception as e:
@@ -233,29 +235,29 @@ class Api:
                 return {"error": str(e)}
 
     def info(self):
-        return self._safe(self.ed.info)
+        return self._safe(self._ed.info)
 
     def unlock(self, pw):
-        return self._safe(self.ed.unlock, pw)
+        return self._safe(self._ed.unlock, pw)
 
     def render(self, i, zoom):
-        return self._safe(self.ed.render, i, zoom)
+        return self._safe(self._ed.render, i, zoom)
 
     def do(self, op):
         def f():
-            op2 = self.ed.do(op)
-            return {"ok": True, "op": {k: v for k, v in op2.items() if k != "data"}, "info": self.ed.info()}
+            op2 = self._ed.do(op)
+            return {"ok": True, "op": {k: v for k, v in op2.items() if k != "data"}, "info": self._ed.info()}
         return self._safe(f)
 
     def undo(self):
-        return self._safe(lambda: {"ok": self.ed.undo(), "info": self.ed.info()})
+        return self._safe(lambda: {"ok": self._ed.undo(), "info": self._ed.info()})
 
     def save(self):
-        return self._safe(lambda: {"path": self.ed.save(), "n": len(self.ed.ops)})
+        return self._safe(lambda: {"path": self._ed.save(), "n": len(self._ed.ops)})
 
     def pick_image(self):
         kind = getattr(getattr(__import__("webview"), "FileDialog", None), "OPEN", None) or 10
-        r = self.win.create_file_dialog(kind, allow_multiple=False,
+        r = self._win.create_file_dialog(kind, allow_multiple=False,
                                         file_types=("Images (*.png;*.jpg;*.jpeg;*.webp;*.gif;*.bmp)", "Tous les fichiers (*.*)"))
         if not r:
             return None
@@ -305,7 +307,7 @@ def main():
     w, h = window_size()
     win = webview.create_window(f"{TITLE} — {Path(sys.argv[1]).name}", str(HERE / "editor.html"), js_api=api,
                                 width=w, height=h, min_size=(760, 520), background_color="#16171f")
-    api.win = win
+    api._win = win
 
     def started(window):
         if os.environ.get("FF_DEBUG"):     # tests : JavaScript déposé dans %TEMP%\ff_editor_cmd.js
