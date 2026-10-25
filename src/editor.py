@@ -63,7 +63,7 @@ class Editor:
 
     # ── lecture
     def info(self):
-        if self.doc.needs_pass:
+        if self.doc.is_encrypted:          # (needs_pass reste vrai après authenticate : on regarde is_encrypted)
             return {"name": self.path.name, "needs_pass": True}
         return {"name": self.path.name, "needs_pass": False, "can_undo": bool(self.ops),
                 "pages": [{"w": p.rect.width, "h": p.rect.height, "rot": p.rotation} for p in self.doc]}
