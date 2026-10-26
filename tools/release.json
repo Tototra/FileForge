@@ -1,10 +1,9 @@
 {
-  "version": "1.2.0",
+  "version": "1.2.1",
   "required": false,
   "notes": [
-    "Nouveau : éditeur PDF (modifier le texte, surligner, dessiner, images, pages)",
-    "Fichiers iCloud / OneDrive pas encore téléchargés : plus d'erreur « Failed to open file »",
-    "Windows : la roue tient toujours entièrement à l'écran",
-    "Mises à jour proposées automatiquement"
+    "Fichiers iCloud : plusieurs fichiers téléchargés en même temps (plus rapide)",
+    "Éditeur PDF : la fenêtre tient sur les petits écrans",
+    "Corrections de la mise à jour automatique"
   ]
 }

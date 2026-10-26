@@ -96,11 +96,14 @@ def check():
     """→ dict : current, latest, newer, required, notes, file (nom, sha256, url)."""
     m = json.loads(fetch(MANIFEST, timeout=20))
     f = (m.get("files") or {}).get(OS_KEY) or {}
-    base = MANIFEST.rsplit("/", 1)[0]
+    if MANIFEST.startswith(("http://", "https://")):
+        base = MANIFEST.rsplit("/", 1)[0]
+    else:                                       # chemin local (tests), y compris avec des « \ » sous Windows
+        base = os.path.dirname(MANIFEST[7:] if MANIFEST.startswith("file://") else MANIFEST)
     newer = vtuple(m.get("version", "0")) > vtuple(ff.__version__)
     return {"current": ff.__version__, "latest": m.get("version"), "newer": newer,
             "required": bool(m.get("required")) and newer, "notes": m.get("notes") or [],
-            "file": dict(f, url=f"{base}/{f['name']}") if f.get("name") else None}
+            "file": dict(f, url=(f"{base}/{f['name']}" if base.startswith("http") else os.path.join(base, f["name"]))) if f.get("name") else None}
 
 
 def download(info, progress=lambda p: None):
@@ -276,7 +279,7 @@ def main():
         return 1
     st["last_check"] = time.time(); st["latest_seen"] = info["latest"]; save_state(st)
     if mode == "--check":
-        print(json.dumps(info, ensure_ascii=False)); return 0
+        print(json.dumps(info)); return 0
     if mode == "--auto":
         if not info["newer"] or not info["file"]:
             return 0

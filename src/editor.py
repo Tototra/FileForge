@@ -330,8 +330,9 @@ def main():
     ff.log(f"éditeur : ouverture de {sys.argv[1]}")
     api = Api(sys.argv[1])
     w, h = window_size()
+    small = (w, h) != (1280, 880)        # petit écran : fenêtre agrandie (plein écran utile), rien ne dépasse
     win = webview.create_window(f"{TITLE} — {Path(sys.argv[1]).name}", str(HERE / "editor.html"), js_api=api,
-                                width=w, height=h, min_size=(760, 520), background_color="#16171f")
+                                width=w, height=h, min_size=(760, 520), background_color="#16171f", maximized=small)
     api._win = win
 
     def started(window):

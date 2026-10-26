@@ -8,7 +8,7 @@ import os, sys, re, io, json, math, shutil, subprocess, traceback, datetime, zip
 from pathlib import Path
 
 APP = "FileForge"
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 HOME_DIR = Path(__file__).resolve().parent
 IS_WIN = sys.platform == "win32"
 IS_MAC = sys.platform == "darwin"
@@ -75,6 +75,12 @@ def materialize(files, timeout=120):
     if not todo:
         return
     notify(f"Téléchargement depuis le cloud : {', '.join(p.name for p in todo[:3])}…")
+    if IS_MAC:          # tous les téléchargements demandés d'un coup (en parallèle), avant de lire
+        for p in todo:
+            try:
+                subprocess.Popen(["brctl", "download", str(p)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            except OSError:
+                pass
     for p in todo:
         try:      # une lecture complète déclenche le téléchargement
             with open(p, "rb") as fh:

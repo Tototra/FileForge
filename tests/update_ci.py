@@ -49,7 +49,7 @@ def site(version, bad_sha=False, required=False):
 
 
 def run(manifest, choice=None, wait=True, timeout=1500):
-    env = dict(os.environ, FF_UPDATE_URL=str(manifest))
+    env = dict(os.environ, FF_UPDATE_URL=str(manifest), PYTHONIOENCODING="utf-8")
     env.pop("FF_UPDATE_CHOICE", None)
     if choice:
         env["FF_UPDATE_CHOICE"] = choice
@@ -102,7 +102,7 @@ expect("à jour : rien ne s'affiche, arrêt immédiat", p.returncode is not None
 # 2. « Plus tard »
 m = site("9.9.9")
 p = run(m, choice="later", wait=False)
-time.sleep(1.0); shot("1-proposition")
+time.sleep(1.3); shot("1-proposition")
 p.wait(120)
 st = state()
 expect("Plus tard : version reportée", (st.get("snoozed") or {}).get("version") == "9.9.9", json.dumps(st))
@@ -110,6 +110,7 @@ t = time.time(); p = run(m, timeout=60)
 expect("Plus tard : pas reproposée tout de suite", time.time() - t < 30, f"{time.time() - t:.1f} s")
 
 # 3. empreinte fausse : refusée, rien d'installé
+STATE.unlink(missing_ok=True)          # sinon « Plus tard » ci-dessus empêcherait de reproposer 9.9.9
 before = (D / "fileforge.py").stat().st_mtime
 p = run(site("9.9.9", bad_sha=True), choice="install", wait=False)
 time.sleep(12); shot("2-empreinte-fausse")
