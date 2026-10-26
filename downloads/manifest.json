@@ -1,27 +1,25 @@
 {
-  "version": "1.2.1",
+  "version": "1.2.2",
   "notes": [
-    "Fichiers iCloud : plusieurs fichiers t\u00e9l\u00e9charg\u00e9s en m\u00eame temps (plus rapide)",
-    "\u00c9diteur PDF : la fen\u00eatre tient sur les petits \u00e9crans",
-    "\u00c9diteur PDF : le texte modifi\u00e9 se copie et se recherche normalement",
-    "Corrections de la mise \u00e0 jour automatique"
+    "Markdown \u2192 PDF : blocs de code en couleur, sur fond gris, sans lignes coup\u00e9es",
+    "Markdown \u2192 PDF : blocs de code dans les listes et les citations, texte barr\u00e9"
   ],
   "required": false,
   "files": {
     "macos": {
       "name": "FileForge-macOS.zip",
-      "bytes": 326023,
-      "sha256": "a2325ba37d5642a87b9c9ef2c032faf7c27fef1bdacee5f8974d4e926db39fc3"
+      "bytes": 327047,
+      "sha256": "3c1d522aef951447fb9d129d779e7c78c46cc9eb476615fec07d053e4d9da753"
     },
     "windows": {
       "name": "FileForge-Setup.exe",
-      "bytes": 336111,
-      "sha256": "547502315e57ea1fe274b28d86057378e0e472039b387029aa3b29abfe76990f"
+      "bytes": 336857,
+      "sha256": "25939e962fceb0c10f05282d999ebab8064fd158e47ccdc5ea93f0a9663328e8"
     },
     "linux": {
       "name": "FileForge-Linux.tar.gz",
-      "bytes": 188526,
-      "sha256": "66af744a8c70b930197e39a7cd0044bd52e2e1105381d12d6487637583ce1b83"
+      "bytes": 189257,
+      "sha256": "4b8502a7793f4fa0c74f998b1f930e828859dab98334a300ad45d286caa09504"
     }
   }
 }
