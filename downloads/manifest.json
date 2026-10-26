@@ -1,20 +1,27 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
+  "notes": [
+    "Nouveau : \u00e9diteur PDF (modifier le texte, surligner, dessiner, images, pages)",
+    "Fichiers iCloud / OneDrive pas encore t\u00e9l\u00e9charg\u00e9s : plus d'erreur \u00ab Failed to open file \u00bb",
+    "Windows : la roue tient toujours enti\u00e8rement \u00e0 l'\u00e9cran",
+    "Mises \u00e0 jour propos\u00e9es automatiquement"
+  ],
+  "required": false,
   "files": {
     "macos": {
       "name": "FileForge-macOS.zip",
-      "bytes": 318889,
-      "sha256": "8ec357c2eb1fdffe1dc3526d9fc9541987461fedf16ff64182e098ba8955262b"
+      "bytes": 325094,
+      "sha256": "d7571931fb1c8372b98f4f76d188272e859d937411b54ab707d433a4ec9a9f21"
     },
     "windows": {
       "name": "FileForge-Setup.exe",
-      "bytes": 331783,
-      "sha256": "f81207ada29cb9eb72efa3854ed3fb88a058deca4a65d762f74c73414a5304bf"
+      "bytes": 335359,
+      "sha256": "7db51e599c611c0e730332374cfb3286d0a3e103fcd2d837441be2cb3aa6ed55"
     },
     "linux": {
       "name": "FileForge-Linux.tar.gz",
-      "bytes": 183965,
-      "sha256": "2342a61f494b15cb7c323ba25f8932d5d53826e13dc36afca9a60028dee0d386"
+      "bytes": 188087,
+      "sha256": "cc1c234051840843932a802055911d6ef50eb973bcb7022200ba0a19274fc7ea"
     }
   }
 }
