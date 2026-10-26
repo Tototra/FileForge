@@ -350,7 +350,13 @@ def main():
                         r = window.evaluate_js(js)
                     except Exception as e:
                         r = "ERR " + str(e)
-                    (cmd.parent / "ff_editor_cmd.out").write_text(str(r), encoding="utf-8")
+                    tmp = cmd.with_name(f"ff_editor_cmd.{os.getpid()}.out")
+                    tmp.write_text(str(r), encoding="utf-8")
+                    for _ in range(20):           # écriture atomique ; le test peut être en train de lire l'ancien
+                        try:
+                            os.replace(tmp, cmd.parent / "ff_editor_cmd.out"); break
+                        except OSError:
+                            time.sleep(0.05)
                 time.sleep(0.1)
     webview.start(started, (win,), http_port=ff.safe_port())
 

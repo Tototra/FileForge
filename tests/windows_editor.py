@@ -39,14 +39,27 @@ def md5(p):
     return hashlib.md5(Path(p).read_bytes()).hexdigest()
 
 
+def _rm(p):
+    for _ in range(40):
+        try:
+            p.unlink(missing_ok=True); return
+        except PermissionError:
+            time.sleep(0.05)
+
+
 def js(code, timeout=10):
-    RES.unlink(missing_ok=True)
+    _rm(RES)
     CMD.write_text(code, encoding="utf-8")
     t = time.time()
     while time.time() - t < timeout:
         if RES.exists() and not CMD.exists():
             time.sleep(0.05)
-            return RES.read_text(encoding="utf-8")
+            for _ in range(40):
+                try:
+                    return RES.read_text(encoding="utf-8")
+                except PermissionError:
+                    time.sleep(0.05)
+            return ""
         time.sleep(0.05)
     CMD.unlink(missing_ok=True)
     return "TIMEOUT"
