@@ -1,27 +1,26 @@
 {
-  "version": "1.2.0",
+  "version": "1.2.1",
   "notes": [
-    "Nouveau : \u00e9diteur PDF (modifier le texte, surligner, dessiner, images, pages)",
-    "Fichiers iCloud / OneDrive pas encore t\u00e9l\u00e9charg\u00e9s : plus d'erreur \u00ab Failed to open file \u00bb",
-    "Windows : la roue tient toujours enti\u00e8rement \u00e0 l'\u00e9cran",
-    "Mises \u00e0 jour propos\u00e9es automatiquement"
+    "Fichiers iCloud : plusieurs fichiers t\u00e9l\u00e9charg\u00e9s en m\u00eame temps (plus rapide)",
+    "\u00c9diteur PDF : la fen\u00eatre tient sur les petits \u00e9crans",
+    "Corrections de la mise \u00e0 jour automatique"
   ],
   "required": false,
   "files": {
     "macos": {
       "name": "FileForge-macOS.zip",
-      "bytes": 325094,
-      "sha256": "d7571931fb1c8372b98f4f76d188272e859d937411b54ab707d433a4ec9a9f21"
+      "bytes": 325300,
+      "sha256": "fcbeb3026f5166381da7aeacc05b6cabeb9475e5ddb1bb65819043e87d52b1ec"
     },
     "windows": {
       "name": "FileForge-Setup.exe",
-      "bytes": 335359,
-      "sha256": "7db51e599c611c0e730332374cfb3286d0a3e103fcd2d837441be2cb3aa6ed55"
+      "bytes": 335484,
+      "sha256": "6ecd0f3497323340f5988bdd0994999956b123f50267abc8ad7397de904f576e"
     },
     "linux": {
       "name": "FileForge-Linux.tar.gz",
-      "bytes": 188087,
-      "sha256": "cc1c234051840843932a802055911d6ef50eb973bcb7022200ba0a19274fc7ea"
+      "bytes": 188221,
+      "sha256": "49a677e60e6c3cd37a73e6cb874464536e4b4c59dd224d6f38506d6ca0f20fd3"
     }
   }
 }
