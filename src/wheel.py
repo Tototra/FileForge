@@ -596,7 +596,12 @@ def run(window, files):
             SHOWN.wait()
             while True:
                 if cmd.exists():
-                    js = cmd.read_text(); cmd.unlink()
+                    mine = cmd.with_name(f"ff_cmd.{os.getpid()}.js")
+                    try:          # un seul processus prend la commande (une roue qui se ferme peut encore tourner)
+                        os.replace(cmd, mine)
+                        js = mine.read_text(encoding="utf-8"); mine.unlink()
+                    except OSError:
+                        time.sleep(0.2); continue
                     try:
                         r = window.evaluate_js(js)
                         (cmd.parent / "ff_cmd.out").write_text(str(r), encoding="utf-8")

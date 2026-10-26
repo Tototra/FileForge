@@ -339,7 +339,12 @@ def main():
             cmd = Path(tempfile.gettempdir()) / "ff_editor_cmd.js"
             while True:
                 if cmd.exists():
-                    js = cmd.read_text(encoding="utf-8"); cmd.unlink()
+                    mine = cmd.with_name(f"ff_editor_cmd.{os.getpid()}.js")
+                    try:
+                        os.replace(cmd, mine)
+                        js = mine.read_text(encoding="utf-8"); mine.unlink()
+                    except OSError:
+                        time.sleep(0.1); continue
                     try:
                         r = window.evaluate_js(js)
                     except Exception as e:
