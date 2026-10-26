@@ -279,8 +279,8 @@ class Agent:
             log("Ctrl+Alt+G : pas de réserve, ouverture directe")
 
     def update_loop(self):
-        """Toutes les 6 h (et 2 min après le démarrage) : updater.py --auto, qui vérifie au plus une fois par jour."""
-        time.sleep(120)
+        """Toutes les 6 h (et 10 min après le démarrage) : updater.py --auto, qui vérifie au plus une fois par jour."""
+        time.sleep(600)                       # 10 min après l'ouverture de session : rien ne ralentit le démarrage
         while True:
             try:
                 if (HERE / "updater.py").exists():

@@ -137,7 +137,11 @@ def install(path):
         # détaché : l'installateur arrête l'agent qui nous a lancés
         p = subprocess.Popen([str(path), "/S"], cwd=tempfile.gettempdir(),
                              creationflags=0x00000008 | 0x00000200 | 0x01000000)   # DETACHED, NEW_GROUP, BREAKAWAY
-        return p.wait(timeout=3600)
+        try:
+            return p.wait(timeout=1500)
+        except subprocess.TimeoutExpired:
+            raise RuntimeError("l'installation ne s'est pas terminée (une autre installation de FileForge est peut-être "
+                               "ouverte : ferme-la puis réessaie)")
     if IS_MAC:
         d = Path(tempfile.mkdtemp(prefix="FileForge-maj-"))
         subprocess.run(["ditto", "-x", "-k", str(path), str(d)], check=True)

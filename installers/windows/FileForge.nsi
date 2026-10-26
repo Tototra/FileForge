@@ -124,8 +124,27 @@ Function .onInit
   System::Call 'kernel32::CreateMutex(p 0, i 0, t "FileForgeSetup") p .r1 ?e'
   Pop $R0
   ${If} $R0 == 183
-    MessageBox MB_OK|MB_ICONINFORMATION "L'installation de FileForge est déjà en cours."
-    Abort
+    ${If} ${Silent}
+      ; mise à jour silencieuse : on attend la fin de l'autre installation (jusqu'à 10 min), sans fenêtre bloquante
+      StrCpy $R2 0
+      ${Do}
+        Sleep 2000
+        IntOp $R2 $R2 + 1
+        System::Call 'kernel32::CloseHandle(p r1)'
+        System::Call 'kernel32::CreateMutex(p 0, i 0, t "FileForgeSetup") p .r1 ?e'
+        Pop $R0
+        ${If} $R0 != 183
+          ${Break}
+        ${EndIf}
+        ${If} $R2 > 300
+          SetErrorLevel 3
+          Abort
+        ${EndIf}
+      ${Loop}
+    ${Else}
+      MessageBox MB_OK|MB_ICONINFORMATION "L'installation de FileForge est déjà en cours."
+      Abort
+    ${EndIf}
   ${EndIf}
 FunctionEnd
 

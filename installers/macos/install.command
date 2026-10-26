@@ -128,7 +128,15 @@ cat > "$AGENT" <<PLIST
 </dict></plist>
 PLIST
 launchctl bootout "gui/$(id -u)/fr.fileforge.hotkey" 2>/dev/null || true
-launchctl bootstrap "gui/$(id -u)" "$AGENT" 2>/dev/null && ok "Recherche de fichiers : ⌃⌥G partout"
+# bootout est asynchrone : on réessaie le temps que l'ancien agent soit bien arrêté (sinon « Bootstrap failed: 5 »)
+AG_OK=""
+for i in 1 2 3 4 5 6 7 8 9 10; do
+  if launchctl bootstrap "gui/$(id -u)" "$AGENT" 2>/dev/null; then AG_OK=1; break; fi
+  launchctl print "gui/$(id -u)/fr.fileforge.hotkey" >/dev/null 2>&1 && { AG_OK=1; break; }
+  sleep 1
+done
+if [[ -n "$AG_OK" ]]; then ok "Recherche de fichiers : ⌃⌥G partout"
+else warn "L'agent des raccourcis n'a pas pu démarrer : il démarrera à la prochaine ouverture de session."; fi
 
 step 6 "Options"
 if [[ -d "/Applications/LibreOffice.app" || -d "$DEST/LibreOffice.app" ]]; then ok "LibreOffice détecté"

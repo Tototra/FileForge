@@ -138,9 +138,9 @@ class Agent:
 
 
 def update_loop(agent):
-    """Toutes les 6 h (et 2 min après le démarrage) : updater.py --auto, qui vérifie au plus une fois par jour.
+    """Toutes les 6 h (et 10 min après le démarrage) : updater.py --auto, qui vérifie au plus une fois par jour.
     Nouvelle session : l'installation arrête cet agent, la fenêtre de mise à jour doit lui survivre."""
-    time.sleep(120)
+    time.sleep(600)                       # 10 min après l'ouverture de session : rien ne ralentit le démarrage
     while True:
         try:
             if (HERE / "updater.py").exists():

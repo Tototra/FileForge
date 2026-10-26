@@ -88,6 +88,8 @@ def tail_log(n=30):
         return ""
 
 
+if IS_WIN:      # l'installateur de l'étape d'installation peut être resté sur sa page de fin
+    subprocess.run(["taskkill", "/F", "/IM", "FileForge-Setup.exe"], capture_output=True)
 STATE.unlink(missing_ok=True)
 cur = subprocess.run([str(D / ("venv/Scripts/python.exe" if IS_WIN else "venv/bin/python")), str(D / "updater.py"), "--check"],
                      env=dict(os.environ, FF_UPDATE_URL=str(site("0.0.1"))), capture_output=True, text=True)
