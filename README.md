@@ -14,7 +14,7 @@ Tout se passe sur ton ordinateur : aucun fichier n'est envoyé sur Internet, et 
 | Catégorie | Exemples |
 | --- | --- |
 | Convertir | PDF ⇄ Word / Excel / PowerPoint / images / Markdown, photos (JPG, PNG, WebP, HEIC, AVIF…), vidéo → MP4 ou GIF, audio, Excel ⇄ CSV ⇄ JSON |
-| Éditer | Rogner visuellement, signer, filigrane, numérotation, redimensionner, pivoter, couper vidéo/audio, normaliser le volume |
+| Éditer | **Éditeur PDF** (modifier le texte, ajouter du texte, surligner, dessiner, images, pages), rogner visuellement, signer, filigrane, numérotation, redimensionner, pivoter, couper vidéo/audio, normaliser le volume |
 | Pages | Fusionner, diviser, extraire, supprimer, réorganiser, pivoter des pages |
 | Compresser | PDF, photos, vidéos, audio (3 niveaux), ZIP |
 | Extraire | Images d'un PDF, son d'une vidéo, image fixe, contenu d'une archive |
@@ -24,7 +24,9 @@ Tout se passe sur ton ordinateur : aucun fichier n'est envoyé sur Internet, et 
 
 ## Installer
 
-Télécharge le paquet de ton système depuis le site, ou construis-les toi-même (voir plus bas).
+Télécharge le paquet de ton système depuis [le site](https://filiforme.to-trahant.workers.dev), ou construis-les toi-même (voir plus bas).
+
+Une fois installé, FileForge propose lui-même les nouvelles versions (vérification une fois par jour, installation en un clic, empreinte SHA-256 vérifiée).
 
 | Système | Installation | Ouvrir la roue |
 | --- | --- | --- |
@@ -70,6 +72,12 @@ Après une modification :
 python3 tools/build.py      # régénère site/downloads/ (archives, FileForge-Setup.exe via makensis, manifest.json)
 python3 tools/site_data.py  # si les actions ou catégories ont changé (démo du site)
 ```
+
+## Publier une nouvelle version
+
+1. Changer `__version__` dans `src/fileforge.py`.
+2. Écrire les nouveautés dans `tools/release.json` (`"required": true` pour une mise à jour importante, installée sans demander).
+3. `python3 tools/build.py` puis `npx wrangler deploy` : chaque ordinateur se voit proposer la mise à jour dans la journée.
 
 ## Publier le site
 
