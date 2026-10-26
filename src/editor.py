@@ -131,15 +131,40 @@ class Editor:
         return pymupdf.Rect(min(a.x, b.x), min(a.y, b.y), max(a.x, b.x), max(a.y, b.y))
 
     def _font(self, page, text, bold=False, italic=False, serif=False, mono=False):
-        """Police standard PDF si possible (accents français compris), sinon une police du système."""
+        """Police standard PDF si possible (accents français compris), sinon une police du système qui a
+        tous les caractères du texte (€, œ, ✓…), la plus proche possible du style d'origine."""
         if all(ord(c) in LATIN1 for c in text):
             return {"fontname": BASE14[(serif and not mono, mono, bold, italic)]}
-        win = Path(os.environ.get("WINDIR", r"C:\Windows")) / "Fonts"
-        fam = (("consola", "consolab", "consolai", "consolaz") if mono else
-               ("times", "timesbd", "timesi", "timesbi") if serif else ("segoeui", "segoeuib", "segoeuii", "segoeuiz"))
-        f = win / (fam[(1 if bold else 0) + (2 if italic else 0)] + ".ttf")
-        ff_file = str(f) if IS_WIN and f.exists() else ff.font_file()
-        return {"fontname": "FF" + Path(ff_file).stem[:12], "fontfile": ff_file}
+        k = (1 if bold else 0) + (2 if italic else 0)
+        cands = []
+        if IS_WIN:
+            win = Path(os.environ.get("WINDIR", r"C:\Windows")) / "Fonts"
+            fams = ([("consola", "consolab", "consolai", "consolaz"), ("cour", "courbd", "couri", "courbi")] if mono else
+                    [("times", "timesbd", "timesi", "timesbi")] if serif else
+                    [("arial", "arialbd", "ariali", "arialbi"), ("segoeui", "segoeuib", "segoeuii", "segoeuiz")])
+            cands += [win / (f[k] + ".ttf") for f in fams] + [win / "seguisym.ttf", win / "arialuni.ttf"]
+        elif sys.platform == "darwin":
+            cands += [Path("/System/Library/Fonts/Supplemental") / n for n in
+                      (("Courier New.ttf",) if mono else ("Times New Roman.ttf",) if serif else ("Arial.ttf",))]
+            cands += [Path("/System/Library/Fonts/Supplemental/Arial Unicode.ttf")]
+        cands.append(Path(ff.font_file()))
+        need = {ord(c) for c in text if not c.isspace()}
+        for f in cands:
+            if f.exists() and self._covers(f, need):
+                return {"fontname": "FF" + f.stem.replace(" ", "")[:12], "fontfile": str(f)}
+        f = next((c for c in cands if c.exists()), Path(ff.font_file()))
+        return {"fontname": "FF" + f.stem.replace(" ", "")[:12], "fontfile": str(f)}
+
+    _cov = {}
+
+    def _covers(self, f, need):
+        font = self._cov.get(f)
+        if font is None:
+            try:
+                font = self._cov[f] = pymupdf.Font(fontfile=str(f))
+            except Exception:
+                return False
+        return all(font.has_glyph(c) for c in need)
 
     def _insert_text(self, page, origin, text, size, color, rotate=0, **style):
         kw = self._font(page, text, **style)
@@ -321,7 +346,7 @@ def main():
                         r = "ERR " + str(e)
                     (cmd.parent / "ff_editor_cmd.out").write_text(str(r), encoding="utf-8")
                 time.sleep(0.1)
-    webview.start(started, (win,))
+    webview.start(started, (win,), http_port=ff.safe_port())
 
 
 if __name__ == "__main__":

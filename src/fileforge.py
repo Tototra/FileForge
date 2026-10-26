@@ -47,6 +47,69 @@ if IS_WIN:
     subprocess.Popen = _HiddenPopen
 
 
+# ───────── fichiers dans le cloud (iCloud « optimiser le stockage », OneDrive « à la demande ») ─────────
+if IS_MAC:
+    try:   # autorise ce processus à faire télécharger les fichiers iCloud non présents (sinon lecture vide)
+        import ctypes as _ct
+        _ct.CDLL("/usr/lib/libSystem.B.dylib").setiopolicy_np(3, 0, 2)   # VFS_MATERIALIZE_DATALESS_FILES, PROCESS, ON
+    except Exception:
+        pass
+
+
+def _in_cloud(p):
+    try:
+        st = os.stat(p)
+    except OSError:
+        return False
+    if IS_MAC:
+        return bool(getattr(st, "st_flags", 0) & 0x40000000)                 # SF_DATALESS
+    if IS_WIN:
+        return bool(getattr(st, "st_file_attributes", 0) & 0x00440000)       # RECALL_ON_OPEN / ON_DATA_ACCESS
+    return False
+
+
+def materialize(files, timeout=120):
+    """S'assure que les fichiers sont vraiment sur le disque (téléchargés depuis iCloud / OneDrive)."""
+    import time as _t
+    todo = [Path(f) for f in files if Path(f).is_file() and _in_cloud(f)]
+    if not todo:
+        return
+    notify(f"Téléchargement depuis le cloud : {', '.join(p.name for p in todo[:3])}…")
+    for p in todo:
+        try:      # une lecture complète déclenche le téléchargement
+            with open(p, "rb") as fh:
+                while fh.read(1 << 20):
+                    pass
+        except OSError:
+            pass
+        if IS_MAC and _in_cloud(p):
+            subprocess.run(["brctl", "download", str(p)], capture_output=True)
+    t0 = _t.time()
+    while _t.time() - t0 < timeout:
+        left = [p for p in todo if _in_cloud(p)]
+        if not left:
+            log(f"cloud : {len(todo)} fichier(s) téléchargé(s) en {_t.time() - t0:.1f} s")
+            return
+        _t.sleep(0.3)
+    raise RuntimeError(f"« {left[0].name} » est dans le cloud et n'a pas pu être téléchargé "
+                       "(connexion Internet ?). Ouvre-le une fois dans le Finder / l'Explorateur puis réessaie.")
+
+
+def safe_port():
+    """Port libre pour le petit serveur local de pywebview, hors des ports que Chromium/WebView2 refuse
+    (ex. 6697 → « ERR_UNSAFE_PORT », page blanche). Les ports éphémères (≥ 49152) ne sont jamais bloqués."""
+    import random, socket
+    for _ in range(50):
+        p = random.randint(49200, 65000)
+        with socket.socket() as so:
+            try:
+                so.bind(("127.0.0.1", p))
+                return p
+            except OSError:
+                continue
+    return None
+
+
 def open_path(p):
     if IS_WIN:
         os.startfile(str(p))
@@ -535,7 +598,13 @@ def draw_signature():
 
 def open_pdf(path):
     import pymupdf
-    d = pymupdf.open(str(path))
+    materialize([path])
+    try:
+        d = pymupdf.open(str(path))
+    except Exception as e:
+        if not Path(path).exists():
+            raise RuntimeError(f"« {Path(path).name} » est introuvable.") from e
+        raise RuntimeError(f"« {Path(path).name} » n'est pas un PDF lisible (fichier abîmé, incomplet ou d'un autre format).") from e
     if d.needs_pass:
         pw = ask(f"« {Path(path).name} » est protégé par un mot de passe.\nMot de passe :", hidden=True)
         if not d.authenticate(pw):

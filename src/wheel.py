@@ -641,6 +641,7 @@ def run(window, files):
             ff.NOTES.clear()
             ff.log(f"{act['label']} ← {files}")
             try:
+                ff.materialize(files)
                 outs = act["fn"](list(files)) or []
             except ff.Cancel:
                 continue
@@ -807,7 +808,7 @@ def main():
                 os._exit(1)
             _alive.release()
     threading.Thread(target=watchdog, daemon=True).start()
-    webview.start(run, (win, files), gui="gtk" if IS_LINUX else None)
+    webview.start(run, (win, files), gui="gtk" if IS_LINUX else None, http_port=ff.safe_port())
     os._exit(0)
 
 
