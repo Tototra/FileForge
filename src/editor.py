@@ -169,6 +169,25 @@ class Editor:
     def _insert_text(self, page, origin, text, size, color, rotate=0, **style):
         kw = self._font(page, text, **style)
         page.insert_text(origin, text, fontsize=size, color=rgb(color), rotate=rotate, **kw)
+        if "fontfile" in kw:
+            self._fix_spaces(page, kw["fontname"])
+
+    def _fix_spaces(self, page, fontname):
+        """Arial & co. ont un seul dessin pour l'espace et l'espace insécable : la table de correspondance
+        générée dit « insécable », et un copier-coller ou une recherche dans le PDF donnerait des espaces
+        spéciales. On la corrige pour nos polices."""
+        import re
+        doc = page.parent
+        for xref, _e, _t, _b, name, _enc in page.get_fonts():
+            if name != fontname:
+                continue
+            t = doc.xref_get_key(xref, "ToUnicode")
+            if t[0] == "xref":
+                tx = int(t[1].split()[0])
+                st = doc.xref_stream(tx)
+                fixed = re.sub(rb"<00[aA]0>", b"<0020>", st)
+                if fixed != st:
+                    doc.update_stream(tx, fixed)
 
     def _apply(self, op):
         t = op["type"]

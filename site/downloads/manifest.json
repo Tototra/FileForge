@@ -3,24 +3,25 @@
   "notes": [
     "Fichiers iCloud : plusieurs fichiers t\u00e9l\u00e9charg\u00e9s en m\u00eame temps (plus rapide)",
     "\u00c9diteur PDF : la fen\u00eatre tient sur les petits \u00e9crans",
+    "\u00c9diteur PDF : le texte modifi\u00e9 se copie et se recherche normalement",
     "Corrections de la mise \u00e0 jour automatique"
   ],
   "required": false,
   "files": {
     "macos": {
       "name": "FileForge-macOS.zip",
-      "bytes": 325683,
-      "sha256": "251fe79c7857dabc01d2625241f2246a459ed5cb64385c27f135a633e1456187"
+      "bytes": 326023,
+      "sha256": "a2325ba37d5642a87b9c9ef2c032faf7c27fef1bdacee5f8974d4e926db39fc3"
     },
     "windows": {
       "name": "FileForge-Setup.exe",
-      "bytes": 335768,
-      "sha256": "6898b3527393aa9ea3a918e0db043aa40650d90811d9f9be640c316b05889998"
+      "bytes": 336111,
+      "sha256": "547502315e57ea1fe274b28d86057378e0e472039b387029aa3b29abfe76990f"
     },
     "linux": {
       "name": "FileForge-Linux.tar.gz",
-      "bytes": 188321,
-      "sha256": "3e1f16e21c8c0fc50a2fb36113d921c5518f1bedbf5a3fac364e68cae4577c56"
+      "bytes": 188526,
+      "sha256": "66af744a8c70b930197e39a7cd0044bd52e2e1105381d12d6487637583ce1b83"
     }
   }
 }
