@@ -7,7 +7,7 @@ Il ne fait qu'écouter le raccourci : à chaque ⌃⌥G il ouvre la roue en mode
 (`wheel.py --search`), ou la referme si elle est déjà ouverte.
 Aucune autorisation d'accessibilité n'est nécessaire (API Carbon RegisterEventHotKey).
 """
-import ctypes, ctypes.util, datetime, os, subprocess, sys, time, traceback
+import threading, ctypes, ctypes.util, datetime, os, subprocess, sys, time, traceback
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -137,6 +137,21 @@ class Agent:
         log(f"⌃⌥F : {len(files)} fichier(s), sélection lue en {int((time.time() - t) * 1000)} ms")
 
 
+def update_loop(agent):
+    """Toutes les 6 h (et 2 min après le démarrage) : updater.py --auto, qui vérifie au plus une fois par jour.
+    Nouvelle session : l'installation arrête cet agent, la fenêtre de mise à jour doit lui survivre."""
+    time.sleep(120)
+    while True:
+        try:
+            if (HERE / "updater.py").exists():
+                with open(LOG, "a") as out:
+                    subprocess.Popen([sys.executable, str(HERE / "updater.py"), "--auto"], cwd=str(HERE), env=agent.env(),
+                                     stdout=out, stderr=out, start_new_session=True)
+        except Exception as e:
+            log(f"mise à jour : {e}")
+        time.sleep(6 * 3600)
+
+
 def main():
     import AppKit
     from PyObjCTools import AppHelper
@@ -150,6 +165,7 @@ def main():
     # préchauffe le cache disque des modules de la roue : la première ouverture est plus rapide
     subprocess.Popen([sys.executable, "-c", "import webview, AppKit, WebKit, pymupdf"], stdout=subprocess.DEVNULL,
                      stderr=subprocess.DEVNULL)
+    threading.Thread(target=update_loop, args=(agent,), daemon=True).start()
     AppHelper.runEventLoop(installInterrupt=True)
 
 

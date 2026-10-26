@@ -161,4 +161,4 @@ echo
 echo "  Si le clic droit n'affiche pas FileForge : Réglages Système → Général →"
 echo "  Éléments de connexion et extensions → Finder → coche « FileForge… »."
 echo
-[[ -n "${FILEFORGE_TEST:-}" ]] || open -R "$APP" 2>/dev/null || true
+[[ -n "${FILEFORGE_TEST:-}${FILEFORGE_UPDATE:-}" ]] || open -R "$APP" 2>/dev/null || true

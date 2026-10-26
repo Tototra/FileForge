@@ -142,6 +142,13 @@ jobs:
           & "$env:LOCALAPPDATA\FileForge\venv\Scripts\python.exe" tests\windows_hotkey.py ci-out *>&1 | Tee-Object -FilePath ci-out\windows_hotkey.txt
           exit $LASTEXITCODE
 
+      - name: Mise à jour automatique (proposée, refusée, installée)
+        if: always()
+        run: |
+          $env:PYTHONIOENCODING = "utf-8"
+          & "$env:LOCALAPPDATA\FileForge\venv\Scripts\python.exe" tests\update_ci.py ci-out site\downloads *>&1 | Tee-Object -FilePath ci-out\update_ci.txt
+          exit $LASTEXITCODE
+
       - name: Désinstallation
         if: always()
         run: |
@@ -211,6 +218,12 @@ jobs:
         if: always()
         run: |
           "$HOME/Library/Application Support/FileForge/venv/bin/python" tests/mac_ci.py ci-out 2>&1 | tee ci-out/mac_ci.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Mise à jour automatique (proposée, refusée, installée)
+        if: always()
+        run: |
+          "$HOME/Library/Application Support/FileForge/venv/bin/python" tests/update_ci.py ci-out site/downloads 2>&1 | tee ci-out/update_ci.txt
           exit ${PIPESTATUS[0]}
 
       - name: Désinstallation

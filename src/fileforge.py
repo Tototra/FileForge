@@ -8,7 +8,7 @@ import os, sys, re, io, json, math, shutil, subprocess, traceback, datetime, zip
 from pathlib import Path
 
 APP = "FileForge"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 HOME_DIR = Path(__file__).resolve().parent
 IS_WIN = sys.platform == "win32"
 IS_MAC = sys.platform == "darwin"
@@ -2133,6 +2133,17 @@ def extract_archive(files):
             raise RuntimeError(f"Format d'archive non pris en charge : {Path(f).name}")
         outs.append(d)
     return outs
+
+
+@action("🔄 FileForge · Vérifier les mises à jour", None)
+def app_update(files):
+    exe = Path(sys.executable)
+    if IS_WIN and exe.name.lower() == "python.exe" and (exe.parent / "pythonw.exe").exists():
+        exe = exe.parent / "pythonw.exe"
+    kw = {"cwd": tempfile.gettempdir()}
+    kw.update(creationflags=0x08000000 | 0x00000200) if IS_WIN else kw.update(start_new_session=True)
+    subprocess.Popen([str(exe), str(Path(__file__).with_name("updater.py")), "--manual"], **kw)
+    return []
 
 
 @action("🏷️ Renommer en lot (numérotation)", None, minf=2)

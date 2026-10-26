@@ -10,7 +10,7 @@ chargées en réserve, cachées et inactives : la roue et le panneau de recherch
   transmet les fichiers à l'agent, qui affiche la roue en réserve.
 Sans agent, le lanceur ouvre la roue lui-même (plus lentement) : rien ne casse.
 """
-import ctypes, datetime, json, os, subprocess, sys, time, traceback
+import threading, ctypes, datetime, json, os, subprocess, sys, time, traceback
 from ctypes import wintypes
 from pathlib import Path
 
@@ -278,7 +278,20 @@ class Agent:
             bring_to_front(KINDS["search"][0], 6)
             log("Ctrl+Alt+G : pas de réserve, ouverture directe")
 
+    def update_loop(self):
+        """Toutes les 6 h (et 2 min après le démarrage) : updater.py --auto, qui vérifie au plus une fois par jour."""
+        time.sleep(120)
+        while True:
+            try:
+                if (HERE / "updater.py").exists():
+                    subprocess.Popen([pythonw(), str(HERE / "updater.py"), "--auto"], cwd=str(TMP),
+                                     creationflags=0x08000000 | 0x00000200)
+            except Exception:
+                log(traceback.format_exc())
+            time.sleep(6 * 3600)
+
     def run(self):
+        threading.Thread(target=self.update_loop, daemon=True).start()
         for hid, vk, name in ((1, VK_G, "Ctrl+Alt+G"), (2, VK_F, "Ctrl+Alt+F")):
             if user32.RegisterHotKey(None, hid, MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk):
                 log(f"{name} enregistré")

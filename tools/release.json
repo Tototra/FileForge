@@ -1,0 +1,10 @@
+{
+  "version": "1.2.0",
+  "required": false,
+  "notes": [
+    "Nouveau : éditeur PDF (modifier le texte, surligner, dessiner, images, pages)",
+    "Fichiers iCloud / OneDrive pas encore téléchargés : plus d'erreur « Failed to open file »",
+    "Windows : la roue tient toujours entièrement à l'écran",
+    "Mises à jour proposées automatiquement"
+  ]
+}

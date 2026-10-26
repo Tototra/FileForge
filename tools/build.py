@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC, ASSETS, INST = ROOT / "src", ROOT / "assets", ROOT / "installers"
 OUT = ROOT / "site" / "downloads"
 VERSION = re.search(r'__version__ = "([^"]+)"', (SRC / "fileforge.py").read_text(encoding="utf-8")).group(1)
-CORE = ["fileforge.py", "wheel.py", "wheel.html", "search.py", "editor.py", "editor.html", "lucide.min.js"]
+CORE = ["fileforge.py", "wheel.py", "wheel.html", "search.py", "editor.py", "editor.html", "updater.py", "lucide.min.js"]
 # horodatage fixe : archives reproductibles (même contenu → même empreinte)
 EPOCH = (2026, 1, 1, 0, 0, 0)
 
@@ -124,7 +124,11 @@ def build_linux():
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
-    manifest = {"version": VERSION, "files": {}}
+    # notes de version et « mise à jour importante » : tools/release.json (lu par updater.py sur chaque ordinateur)
+    rel = json.loads((ROOT / "tools" / "release.json").read_text(encoding="utf-8")) if (ROOT / "tools" / "release.json").exists() else {}
+    if rel.get("version") not in (None, VERSION):
+        rel = {}                     # notes d'une autre version : on ne les publie pas
+    manifest = {"version": VERSION, "notes": rel.get("notes", []), "required": bool(rel.get("required")), "files": {}}
     for os_name, fn in (("macos", build_macos), ("windows", build_windows), ("linux", build_linux)):
         p = fn()
         data = p.read_bytes()

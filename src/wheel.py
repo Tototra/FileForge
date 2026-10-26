@@ -106,6 +106,7 @@ META = {
     "tab_convert": ("convert", "Excel / CSV / JSON", "sheet"), "tab_merge": ("tools", "Fusionner", "combine"),
     "make_zip": ("compress", "ZIP", "archive"), "extract_archive": ("extract", "Décompresser", "package-open"),
     "batch_rename": ("tools", "Renommer", "text-cursor-input"),
+    "app_update": ("tools", "Mises à jour", "refresh-cw"),
 }
 
 TYPE_COLORS = [(ff.PDF, "#ef4444"), (ff.IMG, "#22c55e"), (ff.VID, "#a855f7"), (ff.AUD, "#f59e0b"),
