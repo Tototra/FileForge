@@ -90,7 +90,7 @@ function Step-Python {
 function Step-Libs {
   Get-Uv
   $pkgs = @("pymupdf", "pymupdf4llm", "pdf2docx", "pillow", "pillow-heif", "openpyxl", "pandas", "xlrd", "odfpy",
-            "mammoth", "markdown", "python-pptx", "pywebview", "pywin32", "imageio-ffmpeg", "rapidfuzz")
+            "mammoth", "markdown", "markdown-it-py", "pygments", "python-pptx", "pywebview", "pywin32", "imageio-ffmpeg", "rapidfuzz")
   for ($i = 1; $i -le 2; $i++) {
     & $Uv pip install --python $Py --quiet @pkgs
     if ($LASTEXITCODE -eq 0) { break }

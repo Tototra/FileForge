@@ -8,7 +8,7 @@ import os, sys, re, io, json, math, shutil, subprocess, traceback, datetime, zip
 from pathlib import Path
 
 APP = "FileForge"
-__version__ = "1.2.1"
+__version__ = "1.2.2"
 HOME_DIR = Path(__file__).resolve().parent
 IS_WIN = sys.platform == "win32"
 IS_MAC = sys.platform == "darwin"
@@ -1764,9 +1764,67 @@ def aud_merge(files):
 # ───────────────────────── DOCUMENTS ─────────────────────────
 
 CSS = ("body{font-family:sans-serif;font-size:11pt;line-height:1.45;color:#111}"
-       "h1{font-size:21pt}h2{font-size:16pt}h3{font-size:13pt}code,pre{font-family:monospace;font-size:9pt}"
+       "h1{font-size:21pt}h2{font-size:16pt}h3{font-size:13pt}"
+       "code{font-family:monospace;font-size:9pt;background-color:#eef0f3;color:#b4235a}"
+       # blocs de code : fond gris clair, bordure, retour à la ligne des lignes trop longues
+       "pre{font-family:monospace;font-size:8.6pt;line-height:1.38;white-space:pre-wrap;background-color:#f6f8fa;"
+       "border:1px solid #d6dbe1;padding:7pt 9pt;margin:6pt 0 10pt 0;color:#1f2328}"
+       "pre code{background-color:transparent;color:inherit;font-size:8.6pt}"
+       ".codehilite{margin:0}.lang{font-family:sans-serif;font-size:7pt;color:#8a8f98;margin:8pt 0 -4pt 0;"
+       "letter-spacing:0.5pt}"
        "table{border-collapse:collapse}td,th{border:1px solid #888;padding:3px 6px}th{background:#eee}"
        "blockquote{color:#555;margin-left:14pt}")
+
+
+def _code_html(code, lang):
+    """Bloc de code : couleurs (Pygments si présent), lignes trop longues coupées proprement, étiquette du langage."""
+    import html as H
+    import re
+    code = code.expandtabs(4).rstrip("\n")
+    # un « mot » très long (URL, hachage…) ne passe pas à la ligne tout seul : on lui donne des points de coupure
+    code = re.sub(r"\S{70,}", lambda m: "\u200b".join(m.group(0)[i:i + 60] for i in range(0, len(m.group(0)), 60)), code)
+    body = None
+    try:
+        from pygments import highlight
+        from pygments.formatters import HtmlFormatter
+        from pygments.lexers import get_lexer_by_name, guess_lexer
+        from pygments.util import ClassNotFound
+        try:
+            lexer = get_lexer_by_name(lang) if lang else None
+        except ClassNotFound:
+            lexer = None
+        if lexer is None and len(code) > 40:
+            try:
+                g = guess_lexer(code)
+                lexer = g if g.analyse_text(code) > 0.3 else None
+            except ClassNotFound:
+                lexer = None
+        if lexer is not None:
+            out = highlight(code, lexer, HtmlFormatter(noclasses=True, nowrap=True, style="friendly"))
+            body = out.rstrip("\n")
+    except ImportError:
+        pass
+    if body is None:
+        body = H.escape(code)
+    label = f"<div class='lang'>{H.escape(lang.upper())}</div>" if lang else ""
+    return f"{label}<pre><code>{body}</code></pre>"
+
+
+def md_to_html(raw):
+    import html as H
+    import re
+    try:      # CommonMark complet : blocs de code dans les listes et citations, tableaux, texte barré
+        from markdown_it import MarkdownIt
+        html = MarkdownIt("commonmark", {"html": True}).enable(["table", "strikethrough"]).render(raw)
+    except ImportError:
+        import markdown
+        html = markdown.markdown(raw, extensions=["tables", "fenced_code", "sane_lists"])
+
+    def repl(m):
+        lang = (m.group(1) or "").strip()
+        code = H.unescape(m.group(2))
+        return _code_html(code, lang)
+    return re.sub(r'<pre><code(?: class="language-([^"]+)")?>(.*?)</code></pre>', repl, html, flags=re.S)
 
 
 def read_any_text(f):
@@ -1793,8 +1851,7 @@ def to_html(f):
     e = ext(f)
     raw = read_any_text(f)
     if e in ("md", "markdown"):
-        import markdown
-        return markdown.markdown(raw, extensions=["tables", "fenced_code", "sane_lists"])
+        return md_to_html(raw)
     if e in ("html", "htm"):
         return raw
     return "<div style='font-family:monospace;font-size:10pt'>" + H.escape(raw).replace("\n", "<br/>") + "</div>"

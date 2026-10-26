@@ -52,7 +52,7 @@ if [[ -x "$DEST/uv/uv" ]]; then
   export UV_CACHE_DIR="$DEST/cache"
   PIP=("$DEST/uv/uv" pip install --python "$DEST/venv/bin/python" --quiet)
 fi
-"${PIP[@]}" pymupdf pymupdf4llm pdf2docx pillow pillow-heif openpyxl pandas xlrd odfpy mammoth markdown \
+"${PIP[@]}" pymupdf pymupdf4llm pdf2docx pillow pillow-heif openpyxl pandas xlrd odfpy mammoth markdown markdown-it-py pygments \
   python-pptx pywebview imageio-ffmpeg rapidfuzz
 rm -rf "$DEST/cache"
 "$DEST/venv/bin/python" -c "import webview, pymupdf, tkinter, imageio_ffmpeg; imageio_ffmpeg.get_ffmpeg_exe()" \

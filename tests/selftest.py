@@ -84,4 +84,22 @@ for lab, files in [("Word · Convertir", [docx]), ("Extraire l'archive", list(T.
         ok += 1
     except Exception as e:
         print("FAIL", lab, e); fail += 1
+# Markdown → PDF : blocs de code lisibles (fond, couleurs, lignes longues coupées, rien de perdu)
+try:
+    md = T / "code.md"
+    md.write_text("# Code\n\n```python\ndef f(x):\n    return x * 2  # " + "très " * 40 + "fin\n```\n\n"
+                  "```\nhttps://exemple.com/" + "a" * 150 + "\n```\n", encoding="utf-8")
+    a = next(x for x in ff.ACTIONS if "Document · Convertir en PDF" in x["label"])
+    pdf = a["fn"]([str(md)])[0]
+    pg = pymupdf.open(pdf)[0]
+    txt = pg.get_text().replace("\u200b", "")
+    assert "def f(x):" in txt and "fin" in txt, "code perdu"
+    assert "a" * 150 in txt.replace("\n", "").replace(" ", ""), "longue ligne perdue"
+    words = [w for w in pg.get_text("words")]
+    assert max(w[2] for w in words) <= pg.rect.width - 30, "le code dépasse de la page"
+    assert any(dr.get("fill") for dr in pg.get_drawings()), "pas de fond derrière le code"
+    print("OK   Markdown → PDF : blocs de code")
+    ok += 1
+except Exception as e:
+    print("FAIL Markdown → PDF : blocs de code :", e); fail += 1
 print(f"\n{ok} OK / {fail} échecs")
