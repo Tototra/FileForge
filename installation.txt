@@ -1,0 +1,36 @@
+[1;35m  =================================[0m
+[1;35m        Installation de FileForge[0m
+[1;35m  =================================[0m
+
+[1;36m[1/6] Copie des fichiers[0m
+[32m      Installé dans ~/Library/Application Support/FileForge[0m
+
+[1;36m[2/6] Python (privé à FileForge)[0m
+[32m      Python prêt[0m
+
+[1;36m[3/6] Bibliothèques (PDF, images, vidéo, interface) — quelques minutes la première fois[0m
+[32m      Bibliothèques installées (ffmpeg inclus)[0m
+
+[1;36m[4/6] Langues pour l'OCR (français, anglais)[0m
+[32m      Prêtes[0m
+
+[1;36m[5/6] Intégration au Finder[0m
+.: replacing existing signature
+[32m      Clic droit (Actions rapides) et FileForge.app dans ~/Applications (⌃⌥F : géré par l'agent FileForge)[0m
+[32m      Recherche de fichiers : ⌃⌥G partout[0m
+
+[1;36m[6/6] Options[0m
+      Téléchargement de LibreOffice (~350 Mo) pour convertir Word / PowerPoint / Excel en PDF…
+[32m      LibreOffice 26.8.1 prêt (privé à FileForge)[0m
+
+[1;32m  FileForge est installé ![0m
+
+  - Dans le Finder : sélectionne des fichiers puis ⌃⌥F (Ctrl + Option + F)
+  - ou clic droit → Actions rapides → FileForge…
+  - ou glisse des fichiers sur FileForge.app (dans ton dossier Applications)
+  - ⌃⌥G n'importe où : chercher un fichier par son nom
+
+  Si le clic droit n'affiche pas FileForge : Réglages Système → Général →
+  Éléments de connexion et extensions → Finder → coche « FileForge… ».
+
+durée : 35 s

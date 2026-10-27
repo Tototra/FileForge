@@ -1,0 +1,52 @@
+[2026-10-27 14:14:20] raccourci : ⌃⌥G enregistré
+[2026-10-27 14:14:20] raccourci : ⌃⌥F enregistré
+[2026-10-27 14:15:14] mise à jour : 9.9.9 disponible (installée : 1.2.3)
+[2026-10-27 14:15:17] mise à jour : 9.9.9 reportée
+[2026-10-27 14:15:18] mise à jour : 9.9.9 disponible (installée : 1.2.3)
+[2026-10-27 14:15:21] mise à jour : Traceback (most recent call last):
+  File "/Users/runner/Library/Application Support/FileForge/updater.py", line 239, in go
+    path = download(info, lambda p: self._win.evaluate_js(f"UP.progress({p:.3f})"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/runner/Library/Application Support/FileForge/updater.py", line 143, in download
+    raise RuntimeError("le fichier téléchargé ne correspond pas à l'empreinte publiée : installation refusée")
+RuntimeError: le fichier téléchargé ne correspond pas à l'empreinte publiée : installation refusée
+
+[2026-10-27 14:15:30] mise à jour : 9.9.9 disponible (installée : 1.2.3)
+[2026-10-27 14:15:33] mise à jour : installation de 9.9.9 (FileForge-9.9.9-FileForge-macOS.zip)
+[1;35m  =================================[0m
+[1;35m        Installation de FileForge[0m
+[1;35m  =================================[0m
+
+[1;36m[1/6] Copie des fichiers[0m
+[32m      Installé dans ~/Library/Application Support/FileForge[0m
+
+[1;36m[2/6] Python (privé à FileForge)[0m
+[32m      Environnement existant conservé[0m
+
+[1;36m[3/6] Bibliothèques (PDF, images, vidéo, interface) — quelques minutes la première fois[0m
+[32m      Bibliothèques installées (ffmpeg inclus)[0m
+
+[1;36m[4/6] Langues pour l'OCR (français, anglais)[0m
+[32m      Prêtes[0m
+
+[1;36m[5/6] Intégration au Finder[0m
+.: replacing existing signature
+[32m      Clic droit (Actions rapides) et FileForge.app dans ~/Applications (⌃⌥F : géré par l'agent FileForge)[0m
+[32m      Recherche de fichiers : ⌃⌥G partout[0m
+
+[1;36m[6/6] Options[0m
+[32m      LibreOffice détecté[0m
+
+[1;32m  FileForge est installé ![0m
+
+  - Dans le Finder : sélectionne des fichiers puis ⌃⌥F (Ctrl + Option + F)
+  - ou clic droit → Actions rapides → FileForge…
+  - ou glisse des fichiers sur FileForge.app (dans ton dossier Applications)
+  - ⌃⌥G n'importe où : chercher un fichier par son nom
+
+  Si le clic droit n'affiche pas FileForge : Réglages Système → Général →
+  Éléments de connexion et extensions → Finder → coche « FileForge… ».
+
+[2026-10-27 14:15:34] mise à jour : 9.9.9 installée
+[2026-10-27 14:15:34] raccourci : ⌃⌥G enregistré
+[2026-10-27 14:15:34] raccourci : ⌃⌥F enregistré
