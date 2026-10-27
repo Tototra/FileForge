@@ -1,25 +1,24 @@
 {
-  "version": "1.2.2",
+  "version": "1.2.3",
   "notes": [
-    "Markdown \u2192 PDF : blocs de code en couleur, sur fond gris, sans lignes coup\u00e9es",
-    "Markdown \u2192 PDF : blocs de code dans les listes et les citations, texte barr\u00e9"
+    "Mises \u00e0 jour : v\u00e9rification fiable m\u00eame si l'ordinateur est souvent en veille"
   ],
   "required": false,
   "files": {
     "macos": {
       "name": "FileForge-macOS.zip",
-      "bytes": 327047,
-      "sha256": "3c1d522aef951447fb9d129d779e7c78c46cc9eb476615fec07d053e4d9da753"
+      "bytes": 327319,
+      "sha256": "7e21968991ffc47efd4d5f68fa296bfc3a0a5b36c1da2d54f37b84a4fcac2ffb"
     },
     "windows": {
       "name": "FileForge-Setup.exe",
-      "bytes": 336857,
-      "sha256": "25939e962fceb0c10f05282d999ebab8064fd158e47ccdc5ea93f0a9663328e8"
+      "bytes": 337109,
+      "sha256": "56e49bdbb67ca45a62df24b9fa17104892dc2106bc04555b94ee7e3346f5a82e"
     },
     "linux": {
       "name": "FileForge-Linux.tar.gz",
-      "bytes": 189257,
-      "sha256": "4b8502a7793f4fa0c74f998b1f930e828859dab98334a300ad45d286caa09504"
+      "bytes": 189296,
+      "sha256": "85afb0a2327042f3ae4a36c82b9a6872acbe5448768b192e299672b5377b853d"
     }
   }
 }
