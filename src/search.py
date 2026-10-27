@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# FileForge — Copyright © 2026 Thomas Trahant — SPDX-License-Identifier: GPL-3.0-or-later
 """FileForge — recherche de fichiers par nom, en local.
 
 Un index des fichiers du dossier personnel est gardé en cache (une ligne par fichier) et

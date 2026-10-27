@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# FileForge — Copyright © 2026 Thomas Trahant — SPDX-License-Identifier: GPL-3.0-or-later
 """FileForge — agent macOS du raccourci global ⌃⌥G (panneau de recherche de fichiers).
 
 Lancé à l'ouverture de session par un LaunchAgent (fr.fileforge.hotkey), sans icône dans le Dock.

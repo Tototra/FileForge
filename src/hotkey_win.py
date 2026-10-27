@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# FileForge — Copyright © 2026 Thomas Trahant — SPDX-License-Identifier: GPL-3.0-or-later
 """FileForge — agent Windows : ouvre la roue et la recherche instantanément.
 
 Lancé à l'ouverture de session (clé Run de l'utilisateur), sans fenêtre. Il garde deux fenêtres déjà

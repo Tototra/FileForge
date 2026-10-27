@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# FileForge — Copyright © 2026 Thomas Trahant — SPDX-License-Identifier: GPL-3.0-or-later
 """FileForge — interface « roue » qui s'ouvre sous la souris."""
 import os, sys, json, threading, subprocess, tempfile, time, traceback, importlib.util
 from pathlib import Path

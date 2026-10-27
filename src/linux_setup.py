@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# FileForge — Copyright © 2026 Thomas Trahant — SPDX-License-Identifier: GPL-3.0-or-later
 """Intégration de FileForge au bureau Linux (Hyprland, Thunar).
 
   linux_setup.py hypr-info              -> affiche : <type> <version>   (lua | conf-new | conf-old | none)

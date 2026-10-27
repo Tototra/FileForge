@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# FileForge — Copyright © 2026 Thomas Trahant — SPDX-License-Identifier: GPL-3.0-or-later
 """FileForge — mises à jour.
 
     updater.py --auto      lancé par l'agent toutes les quelques heures : vérifie au plus une fois par jour,

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# FileForge — Copyright © 2026 Thomas Trahant — SPDX-License-Identifier: GPL-3.0-or-later
 """FileForge — boîte à outils fichiers pour macOS.
 PDF, images, vidéo, audio, documents, tableurs, archives.
 Usage : fileforge.py fichier1 [fichier2 ...]  (affiche un menu natif)

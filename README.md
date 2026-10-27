@@ -92,6 +92,15 @@ npx wrangler deploy        # miroir : https://filiforme.to-trahant.workers.dev
 Le site détecte le système du visiteur et met en avant le bon téléchargement ; les tailles et empreintes
 SHA-256 sont lues dans `site/downloads/manifest.json`.
 
+## Licence
+
+Copyright © 2026 Thomas Trahant ([Tototra](https://github.com/Tototra)).
+
+FileForge est un logiciel libre distribué sous licence **GNU GPL v3** (voir [LICENSE](LICENSE)) : tu peux
+l'utiliser, l'étudier, le modifier et le partager, à condition que toute copie ou version modifiée reste sous
+la même licence, avec son code source et la mention de l'auteur d'origine. Il est interdit d'en faire un
+logiciel fermé.
+
 ## Crédits
 
 PyMuPDF, pdf2docx, Pillow, pandas, pywebview, ffmpeg, Tesseract, LibreOffice (facultatif), icônes Lucide (ISC),
