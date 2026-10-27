@@ -2,6 +2,8 @@
 
 **Clic droit. Une roue. C'est fait.**
 
+[![Site](https://img.shields.io/badge/site-tototra.github.io%2FFileForge-7c5cff)](https://tototra.github.io/FileForge/) [![Licence GPL v3](https://img.shields.io/badge/licence-GPL%20v3-blue)](LICENSE) ![Windows · macOS · Linux](https://img.shields.io/badge/Windows%20%C2%B7%20macOS%20%C2%B7%20Linux-lightgrey)
+
 FileForge est une boîte à outils pour tes fichiers qui s'ouvre sous forme de roue, directement depuis ton
 gestionnaire de fichiers : convertir un PDF en Word, compresser une vidéo, rogner une photo, signer un contrat,
 rendre un scan cherchable… Près de soixante actions, pour macOS, Windows et Linux.
