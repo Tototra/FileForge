@@ -3,12 +3,12 @@
 @font-face {
   font-family: "Bricolage Grotesque"; font-style: normal; font-display: swap;
   font-weight: 200 800; font-stretch: 75% 100%;
-  src: url(/assets/fonts/bricolage-grotesque.woff2) format("woff2-variations"), url(/assets/fonts/bricolage-grotesque.woff2) format("woff2");
+  src: url(fonts/bricolage-grotesque.woff2) format("woff2-variations"), url(fonts/bricolage-grotesque.woff2) format("woff2");
 }
 @font-face {
   font-family: "Atkinson Hyperlegible Next"; font-style: normal; font-display: swap;
   font-weight: 200 800;
-  src: url(/assets/fonts/atkinson-hyperlegible-next.woff2) format("woff2-variations"), url(/assets/fonts/atkinson-hyperlegible-next.woff2) format("woff2");
+  src: url(fonts/atkinson-hyperlegible-next.woff2) format("woff2-variations"), url(fonts/atkinson-hyperlegible-next.woff2) format("woff2");
 }
 :root {
   --fog: #E6E9EF;        /* fond : brume froide, calme autour de la roue */

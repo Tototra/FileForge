@@ -1,24 +1,25 @@
 {
   "version": "1.2.3",
   "notes": [
-    "Mises \u00e0 jour : v\u00e9rification fiable m\u00eame si l'ordinateur est souvent en veille"
+    "Mises \u00e0 jour : v\u00e9rification fiable m\u00eame si l'ordinateur est souvent en veille",
+    "Nouveau site : tototra.github.io/FileForge"
   ],
   "required": false,
   "files": {
     "macos": {
       "name": "FileForge-macOS.zip",
-      "bytes": 327319,
-      "sha256": "7e21968991ffc47efd4d5f68fa296bfc3a0a5b36c1da2d54f37b84a4fcac2ffb"
+      "bytes": 327436,
+      "sha256": "ca93a352fe5ce3944b15cc4f4b850fabeebfa07502b5e76a4c1274197d2ba496"
     },
     "windows": {
       "name": "FileForge-Setup.exe",
-      "bytes": 337109,
-      "sha256": "56e49bdbb67ca45a62df24b9fa17104892dc2106bc04555b94ee7e3346f5a82e"
+      "bytes": 337252,
+      "sha256": "4eff4dd3ac2d574cc4d45aa47064240609758a552f8bf6e9983f6a72cb547bfd"
     },
     "linux": {
       "name": "FileForge-Linux.tar.gz",
-      "bytes": 189296,
-      "sha256": "85afb0a2327042f3ae4a36c82b9a6872acbe5448768b192e299672b5377b853d"
+      "bytes": 189382,
+      "sha256": "0d02da7c4d5f42dd6d9e43dd7e3da9f5b6dd1f9a205a2d8558e6047540a7ef11"
     }
   }
 }
