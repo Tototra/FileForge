@@ -173,6 +173,14 @@ def queue_take():
     return list(dict.fromkeys(l.strip() for l in lines if l.strip() and os.path.exists(l.strip())))
 
 
+
+def update_due(state, every=20 * 3600):
+    """Vérification du jour déjà faite ? (lecture d'un petit fichier : on ne lance Python que si c'est utile)"""
+    try:
+        return time.time() - json.loads(Path(state).read_text(encoding="utf-8")).get("last_check", 0) >= every
+    except (OSError, ValueError):
+        return True
+
 class Agent:
     def __init__(self):
         self.events = {k: kernel32.CreateEventW(None, False, False, ev) for k, (_, ev, _) in KINDS.items()}
@@ -279,16 +287,16 @@ class Agent:
             log("Ctrl+Alt+G : pas de réserve, ouverture directe")
 
     def update_loop(self):
-        """Toutes les 6 h (et 10 min après le démarrage) : updater.py --auto, qui vérifie au plus une fois par jour."""
+        """Toutes les 30 min (et 10 min après le démarrage) : updater.py --auto, qui vérifie au plus une fois par jour."""
         time.sleep(600)                       # 10 min après l'ouverture de session : rien ne ralentit le démarrage
         while True:
             try:
-                if (HERE / "updater.py").exists():
+                if (HERE / "updater.py").exists() and update_due(DATA / "update.json"):
                     subprocess.Popen([pythonw(), str(HERE / "updater.py"), "--auto"], cwd=str(TMP),
                                      creationflags=0x08000000 | 0x00000200)
             except Exception:
                 log(traceback.format_exc())
-            time.sleep(6 * 3600)
+            time.sleep(1800)                     # toutes les 30 min (le Mac en veille met time.sleep en pause) : updater.py décide selon l'heure réelle
 
     def run(self):
         threading.Thread(target=self.update_loop, daemon=True).start()

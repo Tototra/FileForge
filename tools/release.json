@@ -1,8 +1,7 @@
 {
-  "version": "1.2.2",
+  "version": "1.2.3",
   "required": false,
   "notes": [
-    "Markdown → PDF : blocs de code en couleur, sur fond gris, sans lignes coupées",
-    "Markdown → PDF : blocs de code dans les listes et les citations, texte barré"
+    "Mises à jour : vérification fiable même si l'ordinateur est souvent en veille"
   ]
 }

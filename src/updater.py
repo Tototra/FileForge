@@ -281,6 +281,8 @@ def main():
         if mode == "--manual":
             error_window(f"Impossible de joindre le site de FileForge ({e}). Vérifie ta connexion Internet.")
         return 1
+    if mode == "--check":            # simple consultation (tests, diagnostic) : ne décale pas la vérification du jour
+        print(json.dumps(info)); return 0
     st["last_check"] = time.time(); st["latest_seen"] = info["latest"]; save_state(st)
     if mode == "--check":
         print(json.dumps(info)); return 0

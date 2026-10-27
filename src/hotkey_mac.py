@@ -7,7 +7,7 @@ Il ne fait qu'écouter le raccourci : à chaque ⌃⌥G il ouvre la roue en mode
 (`wheel.py --search`), ou la referme si elle est déjà ouverte.
 Aucune autorisation d'accessibilité n'est nécessaire (API Carbon RegisterEventHotKey).
 """
-import threading, ctypes, ctypes.util, datetime, os, subprocess, sys, time, traceback
+import threading, json, ctypes, ctypes.util, datetime, os, subprocess, sys, time, traceback
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -86,6 +86,14 @@ return out
 """
 
 
+
+def update_due(state, every=20 * 3600):
+    """Vérification du jour déjà faite ? (lecture d'un petit fichier : on ne lance Python que si c'est utile)"""
+    try:
+        return time.time() - json.loads(Path(state).read_text(encoding="utf-8")).get("last_check", 0) >= every
+    except (OSError, ValueError):
+        return True
+
 class Agent:
     def __init__(self):
         self.proc = None
@@ -138,18 +146,18 @@ class Agent:
 
 
 def update_loop(agent):
-    """Toutes les 6 h (et 10 min après le démarrage) : updater.py --auto, qui vérifie au plus une fois par jour.
+    """Toutes les 30 min (et 10 min après le démarrage) : updater.py --auto, qui vérifie au plus une fois par jour.
     Nouvelle session : l'installation arrête cet agent, la fenêtre de mise à jour doit lui survivre."""
     time.sleep(600)                       # 10 min après l'ouverture de session : rien ne ralentit le démarrage
     while True:
         try:
-            if (HERE / "updater.py").exists():
+            if (HERE / "updater.py").exists() and update_due(Path(LOG).parent / "update.json"):
                 with open(LOG, "a") as out:
                     subprocess.Popen([sys.executable, str(HERE / "updater.py"), "--auto"], cwd=str(HERE), env=agent.env(),
                                      stdout=out, stderr=out, start_new_session=True)
         except Exception as e:
             log(f"mise à jour : {e}")
-        time.sleep(6 * 3600)
+        time.sleep(1800)                     # toutes les 30 min (le Mac en veille met time.sleep en pause) : updater.py décide selon l'heure réelle
 
 
 def main():
