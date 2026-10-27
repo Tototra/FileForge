@@ -1,0 +1,33 @@
+OK   version installée lisible {"current": "1.2.3", "latest": "0.0.1", "newer": false, "required": false, "notes": ["Test : nouvelle version factice", "Accents : \u00e9t\u00e9, \u0153uvre"], "file": {"name": "FileForge-Setup.exe", 
+OK   déjà à jour → pas de nouvelle version 
+OK   à jour : rien ne s'affiche, arrêt immédiat 0.2 s
+OK   Plus tard : version reportée {"last_check": 1793111402.3394334, "latest_seen": "9.9.9", "snoozed": {"version": "9.9.9", "at": 1793111404.844086}}
+OK   Plus tard : pas reproposée tout de suite 0.2 s
+OK   empreinte fausse : refusée     path = download(info, lambda p: self._win.evaluate_js(f"UP.progress({p:.3f})"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\runneradmin\AppData\Local\FileForge\updater.py", line 143, in download
+    raise RuntimeError("le fichier téléchargé ne correspond pas à l'empreinte publiée : installation refusée")
+RuntimeError: le fichier téléchargé ne correspond pas à l'empreinte publiée : installation refusée
+
+OK   empreinte fausse : rien n'a été installé 
+OK   mise à jour installée 18 s · {"last_check": 1793111418.0068934, "latest_seen": "9.9.9", "installed": {"version": "9.9.9", "at": 1793111434.257882}}
+  File "C:\Users\runneradmin\AppData\Local\FileForge\updater.py", line 239, in go
+    path = download(info, lambda p: self._win.evaluate_js(f"UP.progress({p:.3f})"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\runneradmin\AppData\Local\FileForge\updater.py", line 143, in download
+    raise RuntimeError("le fichier téléchargé ne correspond pas à l'empreinte publiée : installation refusée")
+RuntimeError: le fichier téléchargé ne correspond pas à l'empreinte publiée : installation refusée
+
+[2026-10-27 14:30:18] mise à jour : 9.9.9 disponible (installée : 1.2.3)
+[2026-10-27 14:30:20] mise à jour : installation de 9.9.9 (FileForge-9.9.9-FileForge-Setup.exe)
+[2026-10-27 14:30:27] agent : Ctrl+Alt+G enregistré
+[2026-10-27 14:30:27] agent : Ctrl+Alt+F enregistré
+[2026-10-27 14:30:34] mise à jour : 9.9.9 installée
+OK   installée en moins de 10 min 18 s
+OK   agent des raccourcis relancé après la mise à jour 
+OK   FileForge fonctionne après la mise à jour 1.2.3
+OK   après la mise à jour : updater.py présent 
+OK   après la mise à jour : editor.py présent 
+OK   après la mise à jour : wheel.py présent 
+
+0 échec(s) : []

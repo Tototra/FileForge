@@ -1,0 +1,13 @@
+editor.py      True
+menu Démarrer  True
+wheel.py       True
+venv           True
+tessdata       True
+désinstalleur  True
+clic droit     True
+LibreOffice pas installé dans Windows True
+Bureau         True
+LibreOffice privé (pas d'Office) True
+clic droit PDF : Modifier True
+Envoyer vers   True
+editor.html    True

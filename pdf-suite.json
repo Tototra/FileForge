@@ -1,0 +1,1710 @@
+[
+ {
+  "action": "pdf_edit",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.0,
+  "info": ""
+ },
+ {
+  "action": "pdf_edit",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.0,
+  "info": ""
+ },
+ {
+  "action": "pdf_edit",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.0,
+  "info": ""
+ },
+ {
+  "action": "pdf_edit",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.0,
+  "info": ""
+ },
+ {
+  "action": "pdf_edit",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.0,
+  "info": ""
+ },
+ {
+  "action": "pdf_edit",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.0,
+  "info": ""
+ },
+ {
+  "action": "pdf_edit",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.0,
+  "info": ""
+ },
+ {
+  "action": "pdf_edit",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.0,
+  "info": ""
+ },
+ {
+  "action": "pdf_edit",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.0,
+  "info": ""
+ },
+ {
+  "action": "pdf_edit",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.0,
+  "info": "réparé"
+ },
+ {
+  "action": "pdf_merge",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Fusion.pdf"
+ },
+ {
+  "action": "pdf_merge",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Fusion (2).pdf"
+ },
+ {
+  "action": "pdf_merge",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Fusion.pdf"
+ },
+ {
+  "action": "pdf_split",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Texte accentué_divisé"
+ },
+ {
+  "action": "pdf_split",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.22,
+  "info": "Long 60 pages_divisé"
+ },
+ {
+  "action": "pdf_split",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Scan_divisé"
+ },
+ {
+  "action": "pdf_split",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formats mélangés_divisé"
+ },
+ {
+  "action": "pdf_split",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formulaire_divisé"
+ },
+ {
+  "action": "pdf_split",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Annoté_divisé"
+ },
+ {
+  "action": "pdf_split",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.06,
+  "info": "Chiffré_divisé"
+ },
+ {
+  "action": "pdf_split",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Lecture seule_divisé"
+ },
+ {
+  "action": "pdf_split",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.02,
+  "info": "Rapport — final (v2) 'été' 🎉_divisé"
+ },
+ {
+  "action": "pdf_split",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.01,
+  "info": "erreur claire : code=4: source object number out of range"
+ },
+ {
+  "action": "pdf_extract",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Texte accentué_extrait.pdf"
+ },
+ {
+  "action": "pdf_extract",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Long 60 pages_extrait.pdf"
+ },
+ {
+  "action": "pdf_extract",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Scan_extrait.pdf"
+ },
+ {
+  "action": "pdf_extract",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formats mélangés_extrait.pdf"
+ },
+ {
+  "action": "pdf_extract",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formulaire_extrait.pdf"
+ },
+ {
+  "action": "pdf_extract",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Annoté_extrait.pdf"
+ },
+ {
+  "action": "pdf_extract",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.04,
+  "info": "Chiffré_extrait.pdf"
+ },
+ {
+  "action": "pdf_extract",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Lecture seule_extrait.pdf"
+ },
+ {
+  "action": "pdf_extract",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Rapport — final (v2) 'été' 🎉_extrait.pdf"
+ },
+ {
+  "action": "pdf_extract",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.0,
+  "info": "erreur claire : code=4: not a dict (null)"
+ },
+ {
+  "action": "pdf_delete",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Texte accentué_modifié.pdf"
+ },
+ {
+  "action": "pdf_delete",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.04,
+  "info": "Long 60 pages_modifié.pdf"
+ },
+ {
+  "action": "pdf_delete",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Scan_modifié.pdf"
+ },
+ {
+  "action": "pdf_delete",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formats mélangés_modifié.pdf"
+ },
+ {
+  "action": "pdf_delete",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formulaire_modifié.pdf"
+ },
+ {
+  "action": "pdf_delete",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Annoté_modifié.pdf"
+ },
+ {
+  "action": "pdf_delete",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.05,
+  "info": "Chiffré_modifié.pdf"
+ },
+ {
+  "action": "pdf_delete",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Lecture seule_modifié.pdf"
+ },
+ {
+  "action": "pdf_delete",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Rapport — final (v2) 'été' 🎉_modifié.pdf"
+ },
+ {
+  "action": "pdf_delete",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.0,
+  "info": "erreur claire : code=4: not a dict (null)"
+ },
+ {
+  "action": "pdf_reorder",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Texte accentué_réorganisé.pdf"
+ },
+ {
+  "action": "pdf_reorder",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.04,
+  "info": "Long 60 pages_réorganisé.pdf"
+ },
+ {
+  "action": "pdf_reorder",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Scan_réorganisé.pdf"
+ },
+ {
+  "action": "pdf_reorder",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formats mélangés_réorganisé.pdf"
+ },
+ {
+  "action": "pdf_reorder",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formulaire_réorganisé.pdf"
+ },
+ {
+  "action": "pdf_reorder",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Annoté_réorganisé.pdf"
+ },
+ {
+  "action": "pdf_reorder",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.04,
+  "info": "Chiffré_réorganisé.pdf"
+ },
+ {
+  "action": "pdf_reorder",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Lecture seule_réorganisé.pdf"
+ },
+ {
+  "action": "pdf_reorder",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Rapport — final (v2) 'été' 🎉_réorganisé.pdf"
+ },
+ {
+  "action": "pdf_reorder",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.0,
+  "info": "erreur claire : code=4: not a dict (null)"
+ },
+ {
+  "action": "pdf_rotate",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Texte accentué_pivoté.pdf"
+ },
+ {
+  "action": "pdf_rotate",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.04,
+  "info": "Long 60 pages_pivoté.pdf"
+ },
+ {
+  "action": "pdf_rotate",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Scan_pivoté.pdf"
+ },
+ {
+  "action": "pdf_rotate",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formats mélangés_pivoté.pdf"
+ },
+ {
+  "action": "pdf_rotate",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formulaire_pivoté.pdf"
+ },
+ {
+  "action": "pdf_rotate",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Annoté_pivoté.pdf"
+ },
+ {
+  "action": "pdf_rotate",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.04,
+  "info": "Chiffré_pivoté.pdf"
+ },
+ {
+  "action": "pdf_rotate",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Lecture seule_pivoté.pdf"
+ },
+ {
+  "action": "pdf_rotate",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Rapport — final (v2) 'été' 🎉_pivoté.pdf"
+ },
+ {
+  "action": "pdf_rotate",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.0,
+  "info": "erreur claire : code=4: not a dict (null)"
+ },
+ {
+  "action": "pdf_compress",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.02,
+  "info": "Texte accentué_compressé.pdf"
+ },
+ {
+  "action": "pdf_compress",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.17,
+  "info": "Long 60 pages_compressé.pdf"
+ },
+ {
+  "action": "pdf_compress",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.27,
+  "info": "Scan_compressé.pdf"
+ },
+ {
+  "action": "pdf_compress",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formats mélangés_compressé.pdf"
+ },
+ {
+  "action": "pdf_compress",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formulaire_compressé.pdf"
+ },
+ {
+  "action": "pdf_compress",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Annoté_compressé.pdf"
+ },
+ {
+  "action": "pdf_compress",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.05,
+  "info": "Chiffré_compressé.pdf"
+ },
+ {
+  "action": "pdf_compress",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Lecture seule_compressé.pdf"
+ },
+ {
+  "action": "pdf_compress",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Rapport — final (v2) 'été' 🎉_compressé.pdf"
+ },
+ {
+  "action": "pdf_compress",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.0,
+  "info": "erreur claire : code=4: not a dict (null)"
+ },
+ {
+  "action": "pdf_crop",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Texte accentué_rogné.pdf"
+ },
+ {
+  "action": "pdf_crop",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.05,
+  "info": "Long 60 pages_rogné.pdf"
+ },
+ {
+  "action": "pdf_crop",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Scan_rogné.pdf"
+ },
+ {
+  "action": "pdf_crop",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formats mélangés_rogné.pdf"
+ },
+ {
+  "action": "pdf_crop",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formulaire_rogné.pdf"
+ },
+ {
+  "action": "pdf_crop",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Annoté_rogné.pdf"
+ },
+ {
+  "action": "pdf_crop",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.04,
+  "info": "Chiffré_rogné.pdf"
+ },
+ {
+  "action": "pdf_crop",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Lecture seule_rogné.pdf"
+ },
+ {
+  "action": "pdf_crop",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Rapport — final (v2) 'été' 🎉_rogné.pdf"
+ },
+ {
+  "action": "pdf_crop",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.0,
+  "info": "erreur claire : bad xref"
+ },
+ {
+  "action": "pdf_to_images",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.35,
+  "info": "Texte accentué_images"
+ },
+ {
+  "action": "pdf_to_images",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 4.25,
+  "info": "Long 60 pages_images"
+ },
+ {
+  "action": "pdf_to_images",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.29,
+  "info": "Scan_images"
+ },
+ {
+  "action": "pdf_to_images",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.25,
+  "info": "Formats mélangés_images"
+ },
+ {
+  "action": "pdf_to_images",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.14,
+  "info": "Formulaire_images"
+ },
+ {
+  "action": "pdf_to_images",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.22,
+  "info": "Annoté_images"
+ },
+ {
+  "action": "pdf_to_images",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.25,
+  "info": "Chiffré_images"
+ },
+ {
+  "action": "pdf_to_images",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.21,
+  "info": "Lecture seule_images"
+ },
+ {
+  "action": "pdf_to_images",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.22,
+  "info": "Rapport — final (v2) 'été' 🎉_images"
+ },
+ {
+  "action": "pdf_to_images",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.33,
+  "info": "réparé"
+ },
+ {
+  "action": "pdf_to_word",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.35,
+  "info": "Texte accentué.docx"
+ },
+ {
+  "action": "pdf_to_word",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 3.02,
+  "info": "Long 60 pages.docx"
+ },
+ {
+  "action": "pdf_to_word",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.39,
+  "info": "Scan.docx"
+ },
+ {
+  "action": "pdf_to_word",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.04,
+  "info": "Formats mélangés.docx"
+ },
+ {
+  "action": "pdf_to_word",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.03,
+  "info": "Formulaire.docx"
+ },
+ {
+  "action": "pdf_to_word",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.21,
+  "info": "Annoté.docx"
+ },
+ {
+  "action": "pdf_to_word",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.23,
+  "info": "Chiffré.docx"
+ },
+ {
+  "action": "pdf_to_word",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.16,
+  "info": "Lecture seule.docx"
+ },
+ {
+  "action": "pdf_to_word",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.16,
+  "info": "Rapport — final (v2) 'été' 🎉.docx"
+ },
+ {
+  "action": "pdf_to_word",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.01,
+  "info": "erreur claire : code=8: could not parse color space (24 0 R)"
+ },
+ {
+  "action": "pdf_to_pptx",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.3,
+  "info": "Texte accentué.pptx"
+ },
+ {
+  "action": "pdf_to_pptx",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 2.78,
+  "info": "Long 60 pages.pptx"
+ },
+ {
+  "action": "pdf_to_pptx",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.45,
+  "info": "Scan.pptx"
+ },
+ {
+  "action": "pdf_to_pptx",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.16,
+  "info": "Formats mélangés.pptx"
+ },
+ {
+  "action": "pdf_to_pptx",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.16,
+  "info": "Formulaire.pptx"
+ },
+ {
+  "action": "pdf_to_pptx",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.16,
+  "info": "Annoté.pptx"
+ },
+ {
+  "action": "pdf_to_pptx",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.19,
+  "info": "Chiffré.pptx"
+ },
+ {
+  "action": "pdf_to_pptx",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.16,
+  "info": "Lecture seule.pptx"
+ },
+ {
+  "action": "pdf_to_pptx",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.16,
+  "info": "Rapport — final (v2) 'été' 🎉.pptx"
+ },
+ {
+  "action": "pdf_to_pptx",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.21,
+  "info": "réparé"
+ },
+ {
+  "action": "pdf_to_excel",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.67,
+  "info": "Texte accentué.xlsx"
+ },
+ {
+  "action": "pdf_to_excel",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 6.2,
+  "info": "Long 60 pages.xlsx"
+ },
+ {
+  "action": "pdf_to_excel",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.31,
+  "info": "Scan.xlsx"
+ },
+ {
+  "action": "pdf_to_excel",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.39,
+  "info": "Formats mélangés.xlsx"
+ },
+ {
+  "action": "pdf_to_excel",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.21,
+  "info": "Formulaire.xlsx"
+ },
+ {
+  "action": "pdf_to_excel",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.34,
+  "info": "Annoté.xlsx"
+ },
+ {
+  "action": "pdf_to_excel",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.36,
+  "info": "Chiffré.xlsx"
+ },
+ {
+  "action": "pdf_to_excel",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.32,
+  "info": "Lecture seule.xlsx"
+ },
+ {
+  "action": "pdf_to_excel",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.35,
+  "info": "Rapport — final (v2) 'été' 🎉.xlsx"
+ },
+ {
+  "action": "pdf_to_excel",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.46,
+  "info": "réparé"
+ },
+ {
+  "action": "pdf_to_text",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.89,
+  "info": "Texte accentué.md"
+ },
+ {
+  "action": "pdf_to_text",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 10.34,
+  "info": "Long 60 pages.md"
+ },
+ {
+  "action": "pdf_to_text",
+  "doc": "scan",
+  "status": "OK",
+  "s": 1.33,
+  "info": "Scan.md"
+ },
+ {
+  "action": "pdf_to_text",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.38,
+  "info": "Formats mélangés.md"
+ },
+ {
+  "action": "pdf_to_text",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.19,
+  "info": "Formulaire.md"
+ },
+ {
+  "action": "pdf_to_text",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.52,
+  "info": "Annoté.md"
+ },
+ {
+  "action": "pdf_to_text",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.58,
+  "info": "Chiffré.md"
+ },
+ {
+  "action": "pdf_to_text",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.51,
+  "info": "Lecture seule.md"
+ },
+ {
+  "action": "pdf_to_text",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.51,
+  "info": "Rapport — final (v2) 'été' 🎉.md"
+ },
+ {
+  "action": "pdf_to_text",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.44,
+  "info": "réparé"
+ },
+ {
+  "action": "pdf_extract_images",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Texte accentué_images_extraites"
+ },
+ {
+  "action": "pdf_extract_images",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Long 60 pages_images_extraites"
+ },
+ {
+  "action": "pdf_extract_images",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Scan_images_extraites"
+ },
+ {
+  "action": "pdf_extract_images",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formats mélangés_images_extraites"
+ },
+ {
+  "action": "pdf_extract_images",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formulaire_images_extraites"
+ },
+ {
+  "action": "pdf_extract_images",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Annoté_images_extraites"
+ },
+ {
+  "action": "pdf_extract_images",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.04,
+  "info": "Chiffré_images_extraites"
+ },
+ {
+  "action": "pdf_extract_images",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Lecture seule_images_extraites"
+ },
+ {
+  "action": "pdf_extract_images",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Rapport — final (v2) 'été' 🎉_images_extraites"
+ },
+ {
+  "action": "pdf_extract_images",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.0,
+  "info": "erreur claire : code=8: could not parse color space (24 0 R)"
+ },
+ {
+  "action": "pdf_protect",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.02,
+  "info": "Texte accentué_protégé.pdf"
+ },
+ {
+  "action": "pdf_protect",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.05,
+  "info": "Long 60 pages_protégé.pdf"
+ },
+ {
+  "action": "pdf_protect",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Scan_protégé.pdf"
+ },
+ {
+  "action": "pdf_protect",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Formats mélangés_protégé.pdf"
+ },
+ {
+  "action": "pdf_protect",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Formulaire_protégé.pdf"
+ },
+ {
+  "action": "pdf_protect",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Annoté_protégé.pdf"
+ },
+ {
+  "action": "pdf_protect",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.05,
+  "info": "Chiffré_protégé.pdf"
+ },
+ {
+  "action": "pdf_protect",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Lecture seule_protégé.pdf"
+ },
+ {
+  "action": "pdf_protect",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.02,
+  "info": "Rapport — final (v2) 'été' 🎉_protégé.pdf"
+ },
+ {
+  "action": "pdf_protect",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.01,
+  "info": "réparé"
+ },
+ {
+  "action": "pdf_unlock",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.06,
+  "info": "Chiffré_déverrouillé.pdf"
+ },
+ {
+  "action": "pdf_watermark",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Texte accentué_filigrane.pdf"
+ },
+ {
+  "action": "pdf_watermark",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.08,
+  "info": "Long 60 pages_filigrane.pdf"
+ },
+ {
+  "action": "pdf_watermark",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Scan_filigrane.pdf"
+ },
+ {
+  "action": "pdf_watermark",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Formats mélangés_filigrane.pdf"
+ },
+ {
+  "action": "pdf_watermark",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formulaire_filigrane.pdf"
+ },
+ {
+  "action": "pdf_watermark",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Annoté_filigrane.pdf"
+ },
+ {
+  "action": "pdf_watermark",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.05,
+  "info": "Chiffré_filigrane.pdf"
+ },
+ {
+  "action": "pdf_watermark",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Lecture seule_filigrane.pdf"
+ },
+ {
+  "action": "pdf_watermark",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Rapport — final (v2) 'été' 🎉_filigrane.pdf"
+ },
+ {
+  "action": "pdf_watermark",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.0,
+  "info": "erreur claire : code=4: not a dict (null)"
+ },
+ {
+  "action": "pdf_numbers",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Texte accentué_numéroté.pdf"
+ },
+ {
+  "action": "pdf_numbers",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.07,
+  "info": "Long 60 pages_numéroté.pdf"
+ },
+ {
+  "action": "pdf_numbers",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Scan_numéroté.pdf"
+ },
+ {
+  "action": "pdf_numbers",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formats mélangés_numéroté.pdf"
+ },
+ {
+  "action": "pdf_numbers",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formulaire_numéroté.pdf"
+ },
+ {
+  "action": "pdf_numbers",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Annoté_numéroté.pdf"
+ },
+ {
+  "action": "pdf_numbers",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.05,
+  "info": "Chiffré_numéroté.pdf"
+ },
+ {
+  "action": "pdf_numbers",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Lecture seule_numéroté.pdf"
+ },
+ {
+  "action": "pdf_numbers",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Rapport — final (v2) 'été' 🎉_numéroté.pdf"
+ },
+ {
+  "action": "pdf_numbers",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.0,
+  "info": "erreur claire : code=4: not a dict (null)"
+ },
+ {
+  "action": "pdf_sign",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Texte accentué_signé.pdf"
+ },
+ {
+  "action": "pdf_sign",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.04,
+  "info": "Long 60 pages_signé.pdf"
+ },
+ {
+  "action": "pdf_sign",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Scan_signé.pdf"
+ },
+ {
+  "action": "pdf_sign",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formats mélangés_signé.pdf"
+ },
+ {
+  "action": "pdf_sign",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formulaire_signé.pdf"
+ },
+ {
+  "action": "pdf_sign",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Annoté_signé.pdf"
+ },
+ {
+  "action": "pdf_sign",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.05,
+  "info": "Chiffré_signé.pdf"
+ },
+ {
+  "action": "pdf_sign",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Lecture seule_signé.pdf"
+ },
+ {
+  "action": "pdf_sign",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Rapport — final (v2) 'été' 🎉_signé.pdf"
+ },
+ {
+  "action": "pdf_sign",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.01,
+  "info": "réparé"
+ },
+ {
+  "action": "pdf_redact",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Texte accentué_caviardé.pdf"
+ },
+ {
+  "action": "pdf_redact",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.02,
+  "info": "Long 60 pages_caviardé.pdf"
+ },
+ {
+  "action": "pdf_redact",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.09,
+  "info": "Scan_caviardé.pdf"
+ },
+ {
+  "action": "pdf_redact",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formats mélangés_caviardé.pdf"
+ },
+ {
+  "action": "pdf_redact",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formulaire_caviardé.pdf"
+ },
+ {
+  "action": "pdf_redact",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Annoté_caviardé.pdf"
+ },
+ {
+  "action": "pdf_redact",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.05,
+  "info": "Chiffré_caviardé.pdf"
+ },
+ {
+  "action": "pdf_redact",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Lecture seule_caviardé.pdf"
+ },
+ {
+  "action": "pdf_redact",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Rapport — final (v2) 'été' 🎉_caviardé.pdf"
+ },
+ {
+  "action": "pdf_redact",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.0,
+  "info": "réparé"
+ },
+ {
+  "action": "pdf_ocr",
+  "doc": "texte",
+  "status": "OK",
+  "s": 1.34,
+  "info": "Texte accentué_ocr.pdf"
+ },
+ {
+  "action": "pdf_ocr",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 16.49,
+  "info": "Long 60 pages_ocr.pdf"
+ },
+ {
+  "action": "pdf_ocr",
+  "doc": "scan",
+  "status": "OK",
+  "s": 1.8,
+  "info": "Scan_ocr.pdf"
+ },
+ {
+  "action": "pdf_ocr",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.71,
+  "info": "Formats mélangés_ocr.pdf"
+ },
+ {
+  "action": "pdf_ocr",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.39,
+  "info": "Formulaire_ocr.pdf"
+ },
+ {
+  "action": "pdf_ocr",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.83,
+  "info": "Annoté_ocr.pdf"
+ },
+ {
+  "action": "pdf_ocr",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.85,
+  "info": "Chiffré_ocr.pdf"
+ },
+ {
+  "action": "pdf_ocr",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.81,
+  "info": "Lecture seule_ocr.pdf"
+ },
+ {
+  "action": "pdf_ocr",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.81,
+  "info": "Rapport — final (v2) 'été' 🎉_ocr.pdf"
+ },
+ {
+  "action": "pdf_ocr",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.98,
+  "info": "réparé"
+ },
+ {
+  "action": "pdf_flatten",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Texte accentué_aplati.pdf"
+ },
+ {
+  "action": "pdf_flatten",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.04,
+  "info": "Long 60 pages_aplati.pdf"
+ },
+ {
+  "action": "pdf_flatten",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Scan_aplati.pdf"
+ },
+ {
+  "action": "pdf_flatten",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formats mélangés_aplati.pdf"
+ },
+ {
+  "action": "pdf_flatten",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formulaire_aplati.pdf"
+ },
+ {
+  "action": "pdf_flatten",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Annoté_aplati.pdf"
+ },
+ {
+  "action": "pdf_flatten",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.04,
+  "info": "Chiffré_aplati.pdf"
+ },
+ {
+  "action": "pdf_flatten",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Lecture seule_aplati.pdf"
+ },
+ {
+  "action": "pdf_flatten",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Rapport — final (v2) 'été' 🎉_aplati.pdf"
+ },
+ {
+  "action": "pdf_flatten",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.0,
+  "info": "réparé"
+ },
+ {
+  "action": "pdf_gray",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.12,
+  "info": "Texte accentué_gris.pdf"
+ },
+ {
+  "action": "pdf_gray",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 1.34,
+  "info": "Long 60 pages_gris.pdf"
+ },
+ {
+  "action": "pdf_gray",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.16,
+  "info": "Scan_gris.pdf"
+ },
+ {
+  "action": "pdf_gray",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.07,
+  "info": "Formats mélangés_gris.pdf"
+ },
+ {
+  "action": "pdf_gray",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.04,
+  "info": "Formulaire_gris.pdf"
+ },
+ {
+  "action": "pdf_gray",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.07,
+  "info": "Annoté_gris.pdf"
+ },
+ {
+  "action": "pdf_gray",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.11,
+  "info": "Chiffré_gris.pdf"
+ },
+ {
+  "action": "pdf_gray",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.07,
+  "info": "Lecture seule_gris.pdf"
+ },
+ {
+  "action": "pdf_gray",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.07,
+  "info": "Rapport — final (v2) 'été' 🎉_gris.pdf"
+ },
+ {
+  "action": "pdf_gray",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.05,
+  "info": "réparé"
+ },
+ {
+  "action": "pdf_meta",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Texte accentué_meta.pdf"
+ },
+ {
+  "action": "pdf_meta",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.04,
+  "info": "Long 60 pages_meta.pdf"
+ },
+ {
+  "action": "pdf_meta",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Scan_meta.pdf"
+ },
+ {
+  "action": "pdf_meta",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formats mélangés_meta.pdf"
+ },
+ {
+  "action": "pdf_meta",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formulaire_meta.pdf"
+ },
+ {
+  "action": "pdf_meta",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Annoté_meta.pdf"
+ },
+ {
+  "action": "pdf_meta",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.04,
+  "info": "Chiffré_meta.pdf"
+ },
+ {
+  "action": "pdf_meta",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Lecture seule_meta.pdf"
+ },
+ {
+  "action": "pdf_meta",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Rapport — final (v2) 'été' 🎉_meta.pdf"
+ },
+ {
+  "action": "pdf_meta",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.0,
+  "info": "réparé"
+ },
+ {
+  "action": "pdf_repair",
+  "doc": "texte",
+  "status": "OK",
+  "s": 0.01,
+  "info": "Texte accentué_réparé.pdf"
+ },
+ {
+  "action": "pdf_repair",
+  "doc": "60 pages",
+  "status": "OK",
+  "s": 0.02,
+  "info": "Long 60 pages_réparé.pdf"
+ },
+ {
+  "action": "pdf_repair",
+  "doc": "scan",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Scan_réparé.pdf"
+ },
+ {
+  "action": "pdf_repair",
+  "doc": "formats + pivotée",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formats mélangés_réparé.pdf"
+ },
+ {
+  "action": "pdf_repair",
+  "doc": "formulaire",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Formulaire_réparé.pdf"
+ },
+ {
+  "action": "pdf_repair",
+  "doc": "annotations",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Annoté_réparé.pdf"
+ },
+ {
+  "action": "pdf_repair",
+  "doc": "chiffré",
+  "status": "OK",
+  "s": 0.05,
+  "info": "Chiffré_réparé.pdf"
+ },
+ {
+  "action": "pdf_repair",
+  "doc": "lecture seule",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Lecture seule_réparé.pdf"
+ },
+ {
+  "action": "pdf_repair",
+  "doc": "chemin bizarre",
+  "status": "OK",
+  "s": 0.0,
+  "info": "Rapport — final (v2) 'été' 🎉_réparé.pdf"
+ },
+ {
+  "action": "pdf_repair",
+  "doc": "abîmé",
+  "status": "OK",
+  "s": 0.0,
+  "info": "erreur claire : code=4: not a dict (null)"
+ }
+]

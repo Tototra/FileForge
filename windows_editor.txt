@@ -1,0 +1,42 @@
+lancement par l'action : 0  
+OK   éditeur ouvert depuis l'action « Modifier » 2.3 s
+OK   pages affichées {"ready": true, "pages": 3, "rendered": 2, "ops": 0, "busy": 0, "tool": "edit", "zoom": 1.25, "saved": null, "lines": [5, 1, 0]}
+OK   fenêtre de l'éditeur dans l'écran (-8, -8, 1032, 728) écran 1024x768
+OK   lignes de texte détectées ['Facture n° 2026-118', 'Montant total : 1 250,00 EUR', 'Texte à surligner dans le document', 'Ligne à effacer complètement', 'Texte sur fond coloré']
+OK   zone de saisie ouverte sur la ligne 
+OK   texte modifié {"ready": true, "pages": 3, "rendered": 2, "ops": 1, "busy": 0, "tool": "edit", "zoom": 1.25, "saved": null, "lines": [5, 1, 0]}
+OK   texte ajouté {"ready": true, "pages": 3, "rendered": 2, "ops": 2, "busy": 0, "tool": "addtext", "zoom": 1.25, "saved": null, "lines": [6, 1, 0]}
+OK   surlignage {"ready": true, "pages": 3, "rendered": 2, "ops": 3, "busy": 0, "tool": "highlight", "zoom": 1.25, "saved": null, "lines": [6, 1, 0]}
+OK   soulignement 
+OK   dessin 
+OK   cadre 
+OK   zone effacée 
+OK   texte sur fond modifié 
+OK   image insérée 
+OK   annuler {"ready": true, "pages": 3, "rendered": 3, "ops": 8, "busy": 0, "tool": "image", "zoom": 1.25, "saved": null, "lines": [5, 1, 1]}
+OK   image remise 
+OK   page pivotée 
+OK   page supprimée {"ready": true, "pages": 2, "rendered": 2, "ops": 11, "busy": 0, "tool": "image", "zoom": 1.25, "saved": null, "lines": [5, 1]}
+OK   copie enregistrée à côté de l'original [WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/Éditeur — dossier test/Facture été – client_modifié.pdf')]
+OK   original intact 
+OK   PDF : 2 pages 2
+OK   PDF : € et œ présents 'Facture n° 2026-118\nTexte à surligner dans le document\nMontant total : 1 250,00 € (cœur)\nAjouté par FileForge ✓ – merci\nFond conservé\n'
+OK   PDF : ancien montant parti 
+OK   PDF : texte ajouté 
+OK   PDF : ligne effacée supprimée du fichier 
+OK   PDF : texte sur fond modifié 
+OK   PDF : annotations ['Highlight', 'Ink', 'Square', 'Underline']
+OK   PDF : image [(30, 0, 240, 120, 8, 'ICCBased', '', 'fzImg0', 'FlateDecode')]
+OK   PDF : fond coloré conservé (229, 242, 255)
+OK   PDF : page 2 pivotée 90
+OK   page pivotée : enregistrée 
+OK   page pivotée : texte au bon endroit Rect(100.0, 296.3999938964844, 136.4639892578125, 318.3840026855469)
+OK   page pivotée : texte droit à l'écran [(0.0, -1.0)]
+OK   protégé : fenêtre du mot de passe 
+OK   protégé : mauvais mot de passe refusé 
+OK   protégé : ouvert avec le bon mot de passe {"ready": true, "pages": 1, "rendered": 1, "ops": 0, "busy": 0, "tool": "edit", "zoom": 1.25, "saved": null, "lines": [1]}
+OK   150 pages : ouverture 2.1 s, {"ready": true, "pages": 150, "rendered": 2, "ops": 0, "busy": 0, "tool": "edit", "zoom": 1.25, "saved": null, "lines": [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
+OK   150 pages : rendu paresseux (pas tout d'un coup) 2
+OK   journal : aucune erreur de l'éditeur 
+
+0 échec(s) : []

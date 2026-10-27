@@ -1,0 +1,31 @@
+réel 1024x768 centre                   fenêtre 714×714 à (155,6) · zone (0, 0, 1024, 720) · zoom 0.9395 · débord -67.6
+réel 1024x768 coin haut-gauche         fenêtre 714×714 à (0,0) · zone (0, 0, 1024, 720) · zoom 0.9395 · débord -67.6
+réel 1024x768 coin bas-droit           fenêtre 714×714 à (310,6) · zone (0, 0, 1024, 720) · zoom 0.9395 · débord -67.6
+réel 1024x768 bord droit               fenêtre 714×714 à (310,6) · zone (0, 0, 1024, 720) · zoom 0.9395 · débord -67.6
+réel 1024x768 bord bas                 fenêtre 714×714 à (155,6) · zone (0, 0, 1024, 720) · zoom 0.9395 · débord -67.6
+1024x700 centre                        fenêtre 694×694 à (165,6) · zone (0, 0, 1024, 720) · zoom 0.9132 · débord -65.7
+1024x700 coin haut-gauche              fenêtre 694×694 à (0,0) · zone (0, 0, 1024, 720) · zoom 0.9132 · débord -65.7
+1024x700 coin bas-droit                fenêtre 694×694 à (330,6) · zone (0, 0, 1024, 720) · zoom 0.9132 · débord -65.7
+800x560 centre                         fenêtre 554×554 à (235,6) · zone (0, 0, 1024, 720) · zoom 0.7289 · débord -52.5
+800x560 coin haut-gauche               fenêtre 554×554 à (0,0) · zone (0, 0, 1024, 720) · zoom 0.7289 · débord -52.5
+800x560 coin bas-droit                 fenêtre 554×554 à (246,6) · zone (0, 0, 1024, 720) · zoom 0.7289 · débord -52.5
+écran 1280x720 centre                  fenêtre 666×666 à (307,6) · zone (0, 0, 1280, 672) · zoom 0.8763 · débord -63.1
+écran 1280x720 coin haut-gauche        fenêtre 666×666 à (0,0) · zone (0, 0, 1280, 672) · zoom 0.8763 · débord -63.1
+écran 1280x720 coin bas-droit          fenêtre 666×666 à (614,6) · zone (0, 0, 1280, 672) · zoom 0.8763 · débord -63.1
+écran 1280x720 bord droit              fenêtre 666×666 à (614,6) · zone (0, 0, 1280, 672) · zoom 0.8763 · débord -63.1
+écran 1280x720 bord bas                fenêtre 666×666 à (307,6) · zone (0, 0, 1280, 672) · zoom 0.8763 · débord -63.1
+écran 1366x768 centre                  fenêtre 714×714 à (326,6) · zone (0, 0, 1366, 720) · zoom 0.9395 · débord -67.6
+écran 1366x768 coin haut-gauche        fenêtre 714×714 à (0,0) · zone (0, 0, 1366, 720) · zoom 0.9395 · débord -67.6
+écran 1366x768 coin bas-droit          fenêtre 714×714 à (652,6) · zone (0, 0, 1366, 720) · zoom 0.9395 · débord -67.6
+écran 1366x768 bord droit              fenêtre 714×714 à (652,6) · zone (0, 0, 1366, 720) · zoom 0.9395 · débord -67.6
+écran 1366x768 bord bas                fenêtre 714×714 à (326,6) · zone (0, 0, 1366, 720) · zoom 0.9395 · débord -67.6
+écran 800x600 centre                   fenêtre 546×546 à (127,6) · zone (0, 0, 800, 552) · zoom 0.7184 · débord -51.7
+écran 800x600 coin haut-gauche         fenêtre 546×546 à (0,0) · zone (0, 0, 800, 552) · zoom 0.7184 · débord -51.7
+écran 800x600 coin bas-droit           fenêtre 546×546 à (254,6) · zone (0, 0, 800, 552) · zoom 0.7184 · débord -51.7
+écran 800x600 bord droit               fenêtre 546×546 à (254,6) · zone (0, 0, 800, 552) · zoom 0.7184 · débord -51.7
+écran 800x600 bord bas                 fenêtre 546×546 à (127,6) · zone (0, 0, 800, 552) · zoom 0.7184 · débord -51.7
+écran 1920x1080 centre                 fenêtre 760×760 à (580,160) · zone (0, 0, 1920, 1032) · zoom 1 · débord -72.0
+écran 1920x1080 coin haut-gauche       fenêtre 760×760 à (0,0) · zone (0, 0, 1920, 1032) · zoom 1 · débord -72.0
+écran 1920x1080 coin bas-droit         fenêtre 760×760 à (1160,272) · zone (0, 0, 1920, 1032) · zoom 1 · débord -72.0
+écran 1920x1080 bord droit             fenêtre 760×760 à (1160,160) · zone (0, 0, 1920, 1032) · zoom 1 · débord -72.0
+écran 1920x1080 bord bas               fenêtre 760×760 à (580,272) · zone (0, 0, 1920, 1032) · zoom 1 · débord -72.0

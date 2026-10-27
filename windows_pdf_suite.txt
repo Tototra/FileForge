@@ -1,0 +1,666 @@
+26 actions PDF × 10 documents  (fileforge : C:\Users\runneradmin\AppData\Local\FileForge)
+OK     0.00s  📄 PDF · Modifier (éditeur)                   [texte] 
+OK     0.00s  📄 PDF · Modifier (éditeur)                   [60 pages] 
+OK     0.00s  📄 PDF · Modifier (éditeur)                   [scan] 
+OK     0.00s  📄 PDF · Modifier (éditeur)                   [formats + pivotée] 
+OK     0.00s  📄 PDF · Modifier (éditeur)                   [formulaire] 
+OK     0.00s  📄 PDF · Modifier (éditeur)                   [annotations] 
+OK     0.00s  📄 PDF · Modifier (éditeur)                   [chiffré] 
+OK     0.00s  📄 PDF · Modifier (éditeur)                   [lecture seule] 
+OK     0.00s  📄 PDF · Modifier (éditeur)                   [chemin bizarre] 
+OK     0.00s  📄 PDF · Modifier (éditeur)                   [abîmé] réparé
+OK     0.01s  📄 PDF · Fusionner en un seul PDF             [texte] Fusion.pdf
+OK     0.01s  📄 PDF · Fusionner en un seul PDF             [scan] Fusion (2).pdf
+OK     0.01s  📄 PDF · Fusionner en un seul PDF             [chemin bizarre] Fusion.pdf
+OK     0.01s  📄 PDF · Diviser                              [texte] Texte accentué_divisé
+OK     0.22s  📄 PDF · Diviser                              [60 pages] Long 60 pages_divisé
+OK     0.01s  📄 PDF · Diviser                              [scan] Scan_divisé
+OK     0.00s  📄 PDF · Diviser                              [formats + pivotée] Formats mélangés_divisé
+OK     0.00s  📄 PDF · Diviser                              [formulaire] Formulaire_divisé
+OK     0.01s  📄 PDF · Diviser                              [annotations] Annoté_divisé
+OK     0.06s  📄 PDF · Diviser                              [chiffré] Chiffré_divisé
+OK     0.01s  📄 PDF · Diviser                              [lecture seule] Lecture seule_divisé
+OK     0.02s  📄 PDF · Diviser                              [chemin bizarre] Rapport — final (v2) 'été' 🎉_divisé
+OK     0.01s  📄 PDF · Diviser                              [abîmé] erreur claire : code=4: source object number out of range
+OK     0.00s  📄 PDF · Extraire des pages                   [texte] Texte accentué_extrait.pdf
+OK     0.01s  📄 PDF · Extraire des pages                   [60 pages] Long 60 pages_extrait.pdf
+OK     0.00s  📄 PDF · Extraire des pages                   [scan] Scan_extrait.pdf
+OK     0.00s  📄 PDF · Extraire des pages                   [formats + pivotée] Formats mélangés_extrait.pdf
+OK     0.00s  📄 PDF · Extraire des pages                   [formulaire] Formulaire_extrait.pdf
+OK     0.00s  📄 PDF · Extraire des pages                   [annotations] Annoté_extrait.pdf
+OK     0.04s  📄 PDF · Extraire des pages                   [chiffré] Chiffré_extrait.pdf
+OK     0.00s  📄 PDF · Extraire des pages                   [lecture seule] Lecture seule_extrait.pdf
+OK     0.00s  📄 PDF · Extraire des pages                   [chemin bizarre] Rapport — final (v2) 'été' 🎉_extrait.pdf
+OK     0.00s  📄 PDF · Extraire des pages                   [abîmé] erreur claire : code=4: not a dict (null)
+OK     0.01s  📄 PDF · Supprimer des pages                  [texte] Texte accentué_modifié.pdf
+OK     0.04s  📄 PDF · Supprimer des pages                  [60 pages] Long 60 pages_modifié.pdf
+OK     0.00s  📄 PDF · Supprimer des pages                  [scan] Scan_modifié.pdf
+OK     0.00s  📄 PDF · Supprimer des pages                  [formats + pivotée] Formats mélangés_modifié.pdf
+OK     0.00s  📄 PDF · Supprimer des pages                  [formulaire] Formulaire_modifié.pdf
+OK     0.00s  📄 PDF · Supprimer des pages                  [annotations] Annoté_modifié.pdf
+OK     0.05s  📄 PDF · Supprimer des pages                  [chiffré] Chiffré_modifié.pdf
+OK     0.00s  📄 PDF · Supprimer des pages                  [lecture seule] Lecture seule_modifié.pdf
+OK     0.00s  📄 PDF · Supprimer des pages                  [chemin bizarre] Rapport — final (v2) 'été' 🎉_modifié.pdf
+OK     0.00s  📄 PDF · Supprimer des pages                  [abîmé] erreur claire : code=4: not a dict (null)
+OK     0.00s  📄 PDF · Réorganiser / inverser les pages     [texte] Texte accentué_réorganisé.pdf
+OK     0.04s  📄 PDF · Réorganiser / inverser les pages     [60 pages] Long 60 pages_réorganisé.pdf
+OK     0.00s  📄 PDF · Réorganiser / inverser les pages     [scan] Scan_réorganisé.pdf
+OK     0.00s  📄 PDF · Réorganiser / inverser les pages     [formats + pivotée] Formats mélangés_réorganisé.pdf
+OK     0.00s  📄 PDF · Réorganiser / inverser les pages     [formulaire] Formulaire_réorganisé.pdf
+OK     0.00s  📄 PDF · Réorganiser / inverser les pages     [annotations] Annoté_réorganisé.pdf
+OK     0.04s  📄 PDF · Réorganiser / inverser les pages     [chiffré] Chiffré_réorganisé.pdf
+OK     0.00s  📄 PDF · Réorganiser / inverser les pages     [lecture seule] Lecture seule_réorganisé.pdf
+OK     0.00s  📄 PDF · Réorganiser / inverser les pages     [chemin bizarre] Rapport — final (v2) 'été' 🎉_réorganisé.pdf
+OK     0.00s  📄 PDF · Réorganiser / inverser les pages     [abîmé] erreur claire : code=4: not a dict (null)
+OK     0.00s  📄 PDF · Pivoter des pages                    [texte] Texte accentué_pivoté.pdf
+OK     0.04s  📄 PDF · Pivoter des pages                    [60 pages] Long 60 pages_pivoté.pdf
+OK     0.00s  📄 PDF · Pivoter des pages                    [scan] Scan_pivoté.pdf
+OK     0.00s  📄 PDF · Pivoter des pages                    [formats + pivotée] Formats mélangés_pivoté.pdf
+OK     0.00s  📄 PDF · Pivoter des pages                    [formulaire] Formulaire_pivoté.pdf
+OK     0.01s  📄 PDF · Pivoter des pages                    [annotations] Annoté_pivoté.pdf
+OK     0.04s  📄 PDF · Pivoter des pages                    [chiffré] Chiffré_pivoté.pdf
+OK     0.00s  📄 PDF · Pivoter des pages                    [lecture seule] Lecture seule_pivoté.pdf
+OK     0.00s  📄 PDF · Pivoter des pages                    [chemin bizarre] Rapport — final (v2) 'été' 🎉_pivoté.pdf
+OK     0.00s  📄 PDF · Pivoter des pages                    [abîmé] erreur claire : code=4: not a dict (null)
+OK     0.02s  📄 PDF · Compresser                           [texte] Texte accentué_compressé.pdf
+OK     0.17s  📄 PDF · Compresser                           [60 pages] Long 60 pages_compressé.pdf
+OK     0.27s  📄 PDF · Compresser                           [scan] Scan_compressé.pdf
+OK     0.00s  📄 PDF · Compresser                           [formats + pivotée] Formats mélangés_compressé.pdf
+OK     0.00s  📄 PDF · Compresser                           [formulaire] Formulaire_compressé.pdf
+OK     0.01s  📄 PDF · Compresser                           [annotations] Annoté_compressé.pdf
+OK     0.05s  📄 PDF · Compresser                           [chiffré] Chiffré_compressé.pdf
+OK     0.01s  📄 PDF · Compresser                           [lecture seule] Lecture seule_compressé.pdf
+OK     0.01s  📄 PDF · Compresser                           [chemin bizarre] Rapport — final (v2) 'été' 🎉_compressé.pdf
+OK     0.00s  📄 PDF · Compresser                           [abîmé] erreur claire : code=4: not a dict (null)
+OK     0.01s  📄 PDF · Rogner                               [texte] Texte accentué_rogné.pdf
+OK     0.05s  📄 PDF · Rogner                               [60 pages] Long 60 pages_rogné.pdf
+OK     0.00s  📄 PDF · Rogner                               [scan] Scan_rogné.pdf
+OK     0.00s  📄 PDF · Rogner                               [formats + pivotée] Formats mélangés_rogné.pdf
+OK     0.00s  📄 PDF · Rogner                               [formulaire] Formulaire_rogné.pdf
+OK     0.00s  📄 PDF · Rogner                               [annotations] Annoté_rogné.pdf
+OK     0.04s  📄 PDF · Rogner                               [chiffré] Chiffré_rogné.pdf
+OK     0.00s  📄 PDF · Rogner                               [lecture seule] Lecture seule_rogné.pdf
+OK     0.00s  📄 PDF · Rogner                               [chemin bizarre] Rapport — final (v2) 'été' 🎉_rogné.pdf
+OK     0.00s  📄 PDF · Rogner                               [abîmé] erreur claire : bad xref
+OK     0.35s  📄 PDF · Convertir en images (JPG / PNG)      [texte] Texte accentué_images
+OK     4.25s  📄 PDF · Convertir en images (JPG / PNG)      [60 pages] Long 60 pages_images
+OK     0.29s  📄 PDF · Convertir en images (JPG / PNG)      [scan] Scan_images
+OK     0.25s  📄 PDF · Convertir en images (JPG / PNG)      [formats + pivotée] Formats mélangés_images
+OK     0.14s  📄 PDF · Convertir en images (JPG / PNG)      [formulaire] Formulaire_images
+OK     0.22s  📄 PDF · Convertir en images (JPG / PNG)      [annotations] Annoté_images
+OK     0.25s  📄 PDF · Convertir en images (JPG / PNG)      [chiffré] Chiffré_images
+OK     0.21s  📄 PDF · Convertir en images (JPG / PNG)      [lecture seule] Lecture seule_images
+OK     0.22s  📄 PDF · Convertir en images (JPG / PNG)      [chemin bizarre] Rapport — final (v2) 'été' 🎉_images
+OK     0.33s  📄 PDF · Convertir en images (JPG / PNG)      [abîmé] réparé
+C:\Users\runneradmin\AppData\Local\FileForge\venv\Lib\site-packages\fitz\__init__.py:17: FutureWarning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.
+  warnings.warn(
+[INFO] Start to convert C:\Users\RUNNER~1\AppData\Local\Temp\ff_pdf_suite\Texte accentué.pdf
+[INFO] [1/4] Opening document...
+[INFO] [2/4] Analyzing document...
+[INFO] [3/4] Parsing pages...
+[INFO] (1/5) Page 1
+[INFO] (2/5) Page 2
+[INFO] (3/5) Page 3
+[INFO] (4/5) Page 4
+[INFO] (5/5) Page 5
+[INFO] [4/4] Creating pages...
+[INFO] (1/5) Page 1
+[INFO] (2/5) Page 2
+[INFO] (3/5) Page 3
+[INFO] (4/5) Page 4
+[INFO] (5/5) Page 5
+[INFO] Terminated in 0.26s.
+OK     0.35s  📄 PDF · Convertir en Word (.docx)            [texte] Texte accentué.docx
+[INFO] Start to convert C:\Users\RUNNER~1\AppData\Local\Temp\ff_pdf_suite\Long 60 pages.pdf
+[INFO] [1/4] Opening document...
+[INFO] [2/4] Analyzing document...
+[INFO] [3/4] Parsing pages...
+[INFO] (1/60) Page 1
+[INFO] (2/60) Page 2
+[INFO] (3/60) Page 3
+[INFO] (4/60) Page 4
+[INFO] (5/60) Page 5
+[INFO] (6/60) Page 6
+[INFO] (7/60) Page 7
+[INFO] (8/60) Page 8
+[INFO] (9/60) Page 9
+[INFO] (10/60) Page 10
+[INFO] (11/60) Page 11
+[INFO] (12/60) Page 12
+[INFO] (13/60) Page 13
+[INFO] (14/60) Page 14
+[INFO] (15/60) Page 15
+[INFO] (16/60) Page 16
+[INFO] (17/60) Page 17
+[INFO] (18/60) Page 18
+[INFO] (19/60) Page 19
+[INFO] (20/60) Page 20
+[INFO] (21/60) Page 21
+[INFO] (22/60) Page 22
+[INFO] (23/60) Page 23
+[INFO] (24/60) Page 24
+[INFO] (25/60) Page 25
+[INFO] (26/60) Page 26
+[INFO] (27/60) Page 27
+[INFO] (28/60) Page 28
+[INFO] (29/60) Page 29
+[INFO] (30/60) Page 30
+[INFO] (31/60) Page 31
+[INFO] (32/60) Page 32
+[INFO] (33/60) Page 33
+[INFO] (34/60) Page 34
+[INFO] (35/60) Page 35
+[INFO] (36/60) Page 36
+[INFO] (37/60) Page 37
+[INFO] (38/60) Page 38
+[INFO] (39/60) Page 39
+[INFO] (40/60) Page 40
+[INFO] (41/60) Page 41
+[INFO] (42/60) Page 42
+[INFO] (43/60) Page 43
+[INFO] (44/60) Page 44
+[INFO] (45/60) Page 45
+[INFO] (46/60) Page 46
+[INFO] (47/60) Page 47
+[INFO] (48/60) Page 48
+[INFO] (49/60) Page 49
+[INFO] (50/60) Page 50
+[INFO] (51/60) Page 51
+[INFO] (52/60) Page 52
+[INFO] (53/60) Page 53
+[INFO] (54/60) Page 54
+[INFO] (55/60) Page 55
+[INFO] (56/60) Page 56
+[INFO] (57/60) Page 57
+[INFO] (58/60) Page 58
+[INFO] (59/60) Page 59
+[INFO] (60/60) Page 60
+[INFO] [4/4] Creating pages...
+[INFO] (1/60) Page 1
+[INFO] (2/60) Page 2
+[INFO] (3/60) Page 3
+[INFO] (4/60) Page 4
+[INFO] (5/60) Page 5
+[INFO] (6/60) Page 6
+[INFO] (7/60) Page 7
+[INFO] (8/60) Page 8
+[INFO] (9/60) Page 9
+[INFO] (10/60) Page 10
+[INFO] (11/60) Page 11
+[INFO] (12/60) Page 12
+[INFO] (13/60) Page 13
+[INFO] (14/60) Page 14
+[INFO] (15/60) Page 15
+[INFO] (16/60) Page 16
+[INFO] (17/60) Page 17
+[INFO] (18/60) Page 18
+[INFO] (19/60) Page 19
+[INFO] (20/60) Page 20
+[INFO] (21/60) Page 21
+[INFO] (22/60) Page 22
+[INFO] (23/60) Page 23
+[INFO] (24/60) Page 24
+[INFO] (25/60) Page 25
+[INFO] (26/60) Page 26
+[INFO] (27/60) Page 27
+[INFO] (28/60) Page 28
+[INFO] (29/60) Page 29
+[INFO] (30/60) Page 30
+[INFO] (31/60) Page 31
+[INFO] (32/60) Page 32
+[INFO] (33/60) Page 33
+[INFO] (34/60) Page 34
+[INFO] (35/60) Page 35
+[INFO] (36/60) Page 36
+[INFO] (37/60) Page 37
+[INFO] (38/60) Page 38
+[INFO] (39/60) Page 39
+[INFO] (40/60) Page 40
+[INFO] (41/60) Page 41
+[INFO] (42/60) Page 42
+[INFO] (43/60) Page 43
+[INFO] (44/60) Page 44
+[INFO] (45/60) Page 45
+[INFO] (46/60) Page 46
+[INFO] (47/60) Page 47
+[INFO] (48/60) Page 48
+[INFO] (49/60) Page 49
+[INFO] (50/60) Page 50
+[INFO] (51/60) Page 51
+[INFO] (52/60) Page 52
+[INFO] (53/60) Page 53
+[INFO] (54/60) Page 54
+[INFO] (55/60) Page 55
+[INFO] (56/60) Page 56
+[INFO] (57/60) Page 57
+[INFO] (58/60) Page 58
+[INFO] (59/60) Page 59
+[INFO] (60/60) Page 60
+[INFO] Terminated in 3.02s.
+OK     3.02s  📄 PDF · Convertir en Word (.docx)            [60 pages] Long 60 pages.docx
+[INFO] Start to convert C:\Users\RUNNER~1\AppData\Local\Temp\ff_pdf_suite\Scan.pdf
+[INFO] [1/4] Opening document...
+[INFO] [2/4] Analyzing document...
+[WARNING] Words count: 0. It might be a scanned pdf, which is not supported yet.
+[INFO] [3/4] Parsing pages...
+[INFO] (1/3) Page 1
+[INFO] (2/3) Page 2
+[INFO] (3/3) Page 3
+[INFO] [4/4] Creating pages...
+[INFO] (1/3) Page 1
+[INFO] (2/3) Page 2
+[INFO] (3/3) Page 3
+[INFO] Terminated in 0.39s.
+OK     0.39s  📄 PDF · Convertir en Word (.docx)            [scan] Scan.docx
+[INFO] Start to convert C:\Users\RUNNER~1\AppData\Local\Temp\ff_pdf_suite\Formats mélangés.pdf
+[INFO] [1/4] Opening document...
+[INFO] [2/4] Analyzing document...
+[INFO] [3/4] Parsing pages...
+[INFO] (1/4) Page 1
+[INFO] (2/4) Page 2
+[INFO] (3/4) Page 3
+[INFO] (4/4) Page 4
+[INFO] [4/4] Creating pages...
+[INFO] (1/4) Page 1
+[INFO] (2/4) Page 2
+[INFO] (3/4) Page 3
+[INFO] (4/4) Page 4
+[INFO] Terminated in 0.03s.
+OK     0.04s  📄 PDF · Convertir en Word (.docx)            [formats + pivotée] Formats mélangés.docx
+[INFO] Start to convert C:\Users\RUNNER~1\AppData\Local\Temp\ff_pdf_suite\Formulaire.pdf
+[INFO] [1/4] Opening document...
+[INFO] [2/4] Analyzing document...
+[INFO] [3/4] Parsing pages...
+[INFO] (1/2) Page 1
+[INFO] (2/2) Page 2
+[INFO] [4/4] Creating pages...
+[INFO] (1/2) Page 1
+[INFO] (2/2) Page 2
+[INFO] Terminated in 0.03s.
+OK     0.03s  📄 PDF · Convertir en Word (.docx)            [formulaire] Formulaire.docx
+[INFO] Start to convert C:\Users\RUNNER~1\AppData\Local\Temp\ff_pdf_suite\Annoté.pdf
+[INFO] [1/4] Opening document...
+[INFO] [2/4] Analyzing document...
+[INFO] [3/4] Parsing pages...
+[INFO] (1/3) Page 1
+[INFO] (2/3) Page 2
+[INFO] (3/3) Page 3
+[INFO] [4/4] Creating pages...
+[INFO] (1/3) Page 1
+[INFO] (2/3) Page 2
+[INFO] (3/3) Page 3
+[INFO] Terminated in 0.21s.
+OK     0.21s  📄 PDF · Convertir en Word (.docx)            [annotations] Annoté.docx
+[INFO] Start to convert C:\Users\RUNNER~1\AppData\Local\Temp\ff_pdf_suite\Chiffré.pdf
+[INFO] [1/4] Opening document...
+[INFO] [2/4] Analyzing document...
+[INFO] [3/4] Parsing pages...
+[INFO] (1/3) Page 1
+[INFO] (2/3) Page 2
+[INFO] (3/3) Page 3
+[INFO] [4/4] Creating pages...
+[INFO] (1/3) Page 1
+[INFO] (2/3) Page 2
+[INFO] (3/3) Page 3
+[INFO] Terminated in 0.19s.
+OK     0.23s  📄 PDF · Convertir en Word (.docx)            [chiffré] Chiffré.docx
+[INFO] Start to convert C:\Users\RUNNER~1\AppData\Local\Temp\ff_pdf_suite\Lecture seule.pdf
+[INFO] [1/4] Opening document...
+[INFO] [2/4] Analyzing document...
+[INFO] [3/4] Parsing pages...
+[INFO] (1/3) Page 1
+[INFO] (2/3) Page 2
+[INFO] (3/3) Page 3
+[INFO] [4/4] Creating pages...
+[INFO] (1/3) Page 1
+[INFO] (2/3) Page 2
+[INFO] (3/3) Page 3
+[INFO] Terminated in 0.16s.
+OK     0.16s  📄 PDF · Convertir en Word (.docx)            [lecture seule] Lecture seule.docx
+[INFO] Start to convert C:\Users\RUNNER~1\AppData\Local\Temp\ff_pdf_suite\Dossier spécial ü 🎉 (copie)\Rapport — final (v2) 'été' 🎉.pdf
+[INFO] [1/4] Opening document...
+[INFO] [2/4] Analyzing document...
+[INFO] [3/4] Parsing pages...
+[INFO] (1/3) Page 1
+[INFO] (2/3) Page 2
+[INFO] (3/3) Page 3
+[INFO] [4/4] Creating pages...
+[INFO] (1/3) Page 1
+[INFO] (2/3) Page 2
+[INFO] (3/3) Page 3
+[INFO] Terminated in 0.16s.
+OK     0.16s  📄 PDF · Convertir en Word (.docx)            [chemin bizarre] Rapport — final (v2) 'été' 🎉.docx
+[INFO] Start to convert C:\Users\RUNNER~1\AppData\Local\Temp\ff_pdf_suite\Abîmé.pdf
+[INFO] [1/4] Opening document...
+[INFO] [2/4] Analyzing document...
+OK     0.01s  📄 PDF · Convertir en Word (.docx)            [abîmé] erreur claire : code=8: could not parse color space (24 0 R)
+OK     0.30s  📄 PDF · Convertir en PowerPoint (.pptx)      [texte] Texte accentué.pptx
+OK     2.78s  📄 PDF · Convertir en PowerPoint (.pptx)      [60 pages] Long 60 pages.pptx
+OK     0.45s  📄 PDF · Convertir en PowerPoint (.pptx)      [scan] Scan.pptx
+OK     0.16s  📄 PDF · Convertir en PowerPoint (.pptx)      [formats + pivotée] Formats mélangés.pptx
+OK     0.16s  📄 PDF · Convertir en PowerPoint (.pptx)      [formulaire] Formulaire.pptx
+OK     0.16s  📄 PDF · Convertir en PowerPoint (.pptx)      [annotations] Annoté.pptx
+OK     0.19s  📄 PDF · Convertir en PowerPoint (.pptx)      [chiffré] Chiffré.pptx
+OK     0.16s  📄 PDF · Convertir en PowerPoint (.pptx)      [lecture seule] Lecture seule.pptx
+OK     0.16s  📄 PDF · Convertir en PowerPoint (.pptx)      [chemin bizarre] Rapport — final (v2) 'été' 🎉.pptx
+OK     0.21s  📄 PDF · Convertir en PowerPoint (.pptx)      [abîmé] réparé
+OK     0.67s  📄 PDF · Convertir en Excel (tableaux)        [texte] Texte accentué.xlsx
+OK     6.20s  📄 PDF · Convertir en Excel (tableaux)        [60 pages] Long 60 pages.xlsx
+OK     0.31s  📄 PDF · Convertir en Excel (tableaux)        [scan] Scan.xlsx
+OK     0.39s  📄 PDF · Convertir en Excel (tableaux)        [formats + pivotée] Formats mélangés.xlsx
+OK     0.21s  📄 PDF · Convertir en Excel (tableaux)        [formulaire] Formulaire.xlsx
+OK     0.34s  📄 PDF · Convertir en Excel (tableaux)        [annotations] Annoté.xlsx
+OK     0.36s  📄 PDF · Convertir en Excel (tableaux)        [chiffré] Chiffré.xlsx
+OK     0.32s  📄 PDF · Convertir en Excel (tableaux)        [lecture seule] Lecture seule.xlsx
+OK     0.35s  📄 PDF · Convertir en Excel (tableaux)        [chemin bizarre] Rapport — final (v2) 'été' 🎉.xlsx
+OK     0.46s  📄 PDF · Convertir en Excel (tableaux)        [abîmé] réparé
+
+=== Document parser messages ===
+Warning: RapidOCR is missing. Install for much improved OCR results.
+Using Tesseract for OCR processing.
+OCR on page.number=0/1.
+OCR on page.number=1/2.
+OCR on page.number=2/3.
+OCR on page.number=3/4.
+OCR on page.number=4/5.
+OK     0.89s  📄 PDF · Convertir en texte / Markdown        [texte] Texte accentué.md
+
+=== Document parser messages ===
+Warning: RapidOCR is missing. Install for much improved OCR results.
+Using Tesseract for OCR processing.
+OCR on page.number=0/1.
+OCR on page.number=1/2.
+OCR on page.number=2/3.
+OCR on page.number=3/4.
+OCR on page.number=4/5.
+OCR on page.number=5/6.
+OCR on page.number=6/7.
+OCR on page.number=7/8.
+OCR on page.number=8/9.
+OCR on page.number=9/10.
+OCR on page.number=10/11.
+OCR on page.number=11/12.
+OCR on page.number=12/13.
+OCR on page.number=13/14.
+OCR on page.number=14/15.
+OCR on page.number=15/16.
+OCR on page.number=16/17.
+OCR on page.number=17/18.
+OCR on page.number=18/19.
+OCR on page.number=19/20.
+OCR on page.number=20/21.
+OCR on page.number=21/22.
+OCR on page.number=22/23.
+OCR on page.number=23/24.
+OCR on page.number=24/25.
+OCR on page.number=25/26.
+OCR on page.number=26/27.
+OCR on page.number=27/28.
+OCR on page.number=28/29.
+OCR on page.number=29/30.
+OCR on page.number=30/31.
+OCR on page.number=31/32.
+OCR on page.number=32/33.
+OCR on page.number=33/34.
+OCR on page.number=34/35.
+OCR on page.number=35/36.
+OCR on page.number=36/37.
+OCR on page.number=37/38.
+OCR on page.number=38/39.
+OCR on page.number=39/40.
+OCR on page.number=40/41.
+OCR on page.number=41/42.
+OCR on page.number=42/43.
+OCR on page.number=43/44.
+OCR on page.number=44/45.
+OCR on page.number=45/46.
+OCR on page.number=46/47.
+OCR on page.number=47/48.
+OCR on page.number=48/49.
+OCR on page.number=49/50.
+OCR on page.number=50/51.
+OCR on page.number=51/52.
+OCR on page.number=52/53.
+OCR on page.number=53/54.
+OCR on page.number=54/55.
+OCR on page.number=55/56.
+OCR on page.number=56/57.
+OCR on page.number=57/58.
+OCR on page.number=58/59.
+OCR on page.number=59/60.
+OK    10.34s  📄 PDF · Convertir en texte / Markdown        [60 pages] Long 60 pages.md
+
+=== Document parser messages ===
+Warning: RapidOCR is missing. Install for much improved OCR results.
+Using Tesseract for OCR processing.
+OCR on page.number=0/1.
+OCR on page.number=1/2.
+OCR on page.number=2/3.
+OCR on page.number=3/4.
+OCR on page.number=4/5.
+OCR on page.number=5/6.
+OCR on page.number=6/7.
+OCR on page.number=7/8.
+OCR on page.number=8/9.
+OCR on page.number=9/10.
+OCR on page.number=10/11.
+OCR on page.number=11/12.
+OCR on page.number=12/13.
+OCR on page.number=13/14.
+OCR on page.number=14/15.
+OCR on page.number=15/16.
+OCR on page.number=16/17.
+OCR on page.number=17/18.
+OCR on page.number=18/19.
+OCR on page.number=19/20.
+OCR on page.number=20/21.
+OCR on page.number=21/22.
+OCR on page.number=22/23.
+OCR on page.number=23/24.
+OCR on page.number=24/25.
+OCR on page.number=25/26.
+OCR on page.number=26/27.
+OCR on page.number=27/28.
+OCR on page.number=28/29.
+OCR on page.number=29/30.
+OCR on page.number=30/31.
+OCR on page.number=31/32.
+OCR on page.number=32/33.
+OCR on page.number=33/34.
+OCR on page.number=34/35.
+OCR on page.number=35/36.
+OCR on page.number=36/37.
+OCR on page.number=37/38.
+OCR on page.number=38/39.
+OCR on page.number=39/40.
+OCR on page.number=40/41.
+OCR on page.number=41/42.
+OCR on page.number=42/43.
+OCR on page.number=43/44.
+OCR on page.number=44/45.
+OCR on page.number=45/46.
+OCR on page.number=46/47.
+OCR on page.number=47/48.
+OCR on page.number=48/49.
+OCR on page.number=49/50.
+OCR on page.number=50/51.
+OCR on page.number=51/52.
+OCR on page.number=52/53.
+OCR on page.number=53/54.
+OCR on page.number=54/55.
+OCR on page.number=55/56.
+OCR on page.number=56/57.
+OCR on page.number=57/58.
+OCR on page.number=58/59.
+OCR on page.number=59/60.
+OK     1.33s  📄 PDF · Convertir en texte / Markdown        [scan] Scan.md
+
+=== Document parser messages ===
+Warning: RapidOCR is missing. Install for much improved OCR results.
+Using Tesseract for OCR processing.
+OCR on page.number=0/1.
+OCR on page.number=1/2.
+OCR on page.number=2/3.
+OK     0.38s  📄 PDF · Convertir en texte / Markdown        [formats + pivotée] Formats mélangés.md
+
+=== Document parser messages ===
+Warning: RapidOCR is missing. Install for much improved OCR results.
+Using Tesseract for OCR processing.
+OK     0.19s  📄 PDF · Convertir en texte / Markdown        [formulaire] Formulaire.md
+
+=== Document parser messages ===
+Warning: RapidOCR is missing. Install for much improved OCR results.
+Using Tesseract for OCR processing.
+OCR on page.number=0/1.
+OCR on page.number=1/2.
+OCR on page.number=2/3.
+OK     0.52s  📄 PDF · Convertir en texte / Markdown        [annotations] Annoté.md
+
+=== Document parser messages ===
+Warning: RapidOCR is missing. Install for much improved OCR results.
+Using Tesseract for OCR processing.
+OCR on page.number=0/1.
+OCR on page.number=1/2.
+OCR on page.number=2/3.
+OK     0.58s  📄 PDF · Convertir en texte / Markdown        [chiffré] Chiffré.md
+
+=== Document parser messages ===
+Warning: RapidOCR is missing. Install for much improved OCR results.
+Using Tesseract for OCR processing.
+OCR on page.number=0/1.
+OCR on page.number=1/2.
+OCR on page.number=2/3.
+OK     0.51s  📄 PDF · Convertir en texte / Markdown        [lecture seule] Lecture seule.md
+
+=== Document parser messages ===
+Warning: RapidOCR is missing. Install for much improved OCR results.
+Using Tesseract for OCR processing.
+OCR on page.number=0/1.
+OCR on page.number=1/2.
+OCR on page.number=2/3.
+OK     0.51s  📄 PDF · Convertir en texte / Markdown        [chemin bizarre] Rapport — final (v2) 'été' 🎉.md
+
+=== Document parser messages ===
+Warning: RapidOCR is missing. Install for much improved OCR results.
+Using Tesseract for OCR processing.
+OCR on page.number=0/1.
+OCR on page.number=1/2.
+OCR on page.number=2/3.
+OK     0.44s  📄 PDF · Convertir en texte / Markdown        [abîmé] réparé
+OK     0.00s  📄 PDF · Extraire les images                  [texte] Texte accentué_images_extraites
+OK     0.01s  📄 PDF · Extraire les images                  [60 pages] Long 60 pages_images_extraites
+OK     0.01s  📄 PDF · Extraire les images                  [scan] Scan_images_extraites
+OK     0.00s  📄 PDF · Extraire les images                  [formats + pivotée] Formats mélangés_images_extraites
+OK     0.00s  📄 PDF · Extraire les images                  [formulaire] Formulaire_images_extraites
+OK     0.00s  📄 PDF · Extraire les images                  [annotations] Annoté_images_extraites
+OK     0.04s  📄 PDF · Extraire les images                  [chiffré] Chiffré_images_extraites
+OK     0.00s  📄 PDF · Extraire les images                  [lecture seule] Lecture seule_images_extraites
+OK     0.00s  📄 PDF · Extraire les images                  [chemin bizarre] Rapport — final (v2) 'été' 🎉_images_extraites
+OK     0.00s  📄 PDF · Extraire les images                  [abîmé] erreur claire : code=8: could not parse color space (24 0 R)
+OK     0.02s  🔒 PDF · Protéger par mot de passe            [texte] Texte accentué_protégé.pdf
+OK     0.05s  🔒 PDF · Protéger par mot de passe            [60 pages] Long 60 pages_protégé.pdf
+OK     0.01s  🔒 PDF · Protéger par mot de passe            [scan] Scan_protégé.pdf
+OK     0.01s  🔒 PDF · Protéger par mot de passe            [formats + pivotée] Formats mélangés_protégé.pdf
+OK     0.01s  🔒 PDF · Protéger par mot de passe            [formulaire] Formulaire_protégé.pdf
+OK     0.01s  🔒 PDF · Protéger par mot de passe            [annotations] Annoté_protégé.pdf
+OK     0.05s  🔒 PDF · Protéger par mot de passe            [chiffré] Chiffré_protégé.pdf
+OK     0.01s  🔒 PDF · Protéger par mot de passe            [lecture seule] Lecture seule_protégé.pdf
+OK     0.02s  🔒 PDF · Protéger par mot de passe            [chemin bizarre] Rapport — final (v2) 'été' 🎉_protégé.pdf
+OK     0.01s  🔒 PDF · Protéger par mot de passe            [abîmé] réparé
+OK     0.06s  🔓 PDF · Retirer le mot de passe / les restri [chiffré] Chiffré_déverrouillé.pdf
+OK     0.01s  💧 PDF · Ajouter un filigrane                 [texte] Texte accentué_filigrane.pdf
+OK     0.08s  💧 PDF · Ajouter un filigrane                 [60 pages] Long 60 pages_filigrane.pdf
+OK     0.01s  💧 PDF · Ajouter un filigrane                 [scan] Scan_filigrane.pdf
+OK     0.01s  💧 PDF · Ajouter un filigrane                 [formats + pivotée] Formats mélangés_filigrane.pdf
+OK     0.00s  💧 PDF · Ajouter un filigrane                 [formulaire] Formulaire_filigrane.pdf
+OK     0.01s  💧 PDF · Ajouter un filigrane                 [annotations] Annoté_filigrane.pdf
+OK     0.05s  💧 PDF · Ajouter un filigrane                 [chiffré] Chiffré_filigrane.pdf
+OK     0.01s  💧 PDF · Ajouter un filigrane                 [lecture seule] Lecture seule_filigrane.pdf
+OK     0.01s  💧 PDF · Ajouter un filigrane                 [chemin bizarre] Rapport — final (v2) 'été' 🎉_filigrane.pdf
+OK     0.00s  💧 PDF · Ajouter un filigrane                 [abîmé] erreur claire : code=4: not a dict (null)
+OK     0.01s  🔢 PDF · Numéroter les pages                  [texte] Texte accentué_numéroté.pdf
+OK     0.07s  🔢 PDF · Numéroter les pages                  [60 pages] Long 60 pages_numéroté.pdf
+OK     0.01s  🔢 PDF · Numéroter les pages                  [scan] Scan_numéroté.pdf
+OK     0.00s  🔢 PDF · Numéroter les pages                  [formats + pivotée] Formats mélangés_numéroté.pdf
+OK     0.00s  🔢 PDF · Numéroter les pages                  [formulaire] Formulaire_numéroté.pdf
+OK     0.01s  🔢 PDF · Numéroter les pages                  [annotations] Annoté_numéroté.pdf
+OK     0.05s  🔢 PDF · Numéroter les pages                  [chiffré] Chiffré_numéroté.pdf
+OK     0.01s  🔢 PDF · Numéroter les pages                  [lecture seule] Lecture seule_numéroté.pdf
+OK     0.01s  🔢 PDF · Numéroter les pages                  [chemin bizarre] Rapport — final (v2) 'été' 🎉_numéroté.pdf
+OK     0.00s  🔢 PDF · Numéroter les pages                  [abîmé] erreur claire : code=4: not a dict (null)
+OK     0.01s  ✍️ PDF · Signer (dessiner ou insérer une sig [texte] Texte accentué_signé.pdf
+OK     0.04s  ✍️ PDF · Signer (dessiner ou insérer une sig [60 pages] Long 60 pages_signé.pdf
+OK     0.01s  ✍️ PDF · Signer (dessiner ou insérer une sig [scan] Scan_signé.pdf
+OK     0.00s  ✍️ PDF · Signer (dessiner ou insérer une sig [formats + pivotée] Formats mélangés_signé.pdf
+OK     0.00s  ✍️ PDF · Signer (dessiner ou insérer une sig [formulaire] Formulaire_signé.pdf
+OK     0.01s  ✍️ PDF · Signer (dessiner ou insérer une sig [annotations] Annoté_signé.pdf
+OK     0.05s  ✍️ PDF · Signer (dessiner ou insérer une sig [chiffré] Chiffré_signé.pdf
+OK     0.01s  ✍️ PDF · Signer (dessiner ou insérer une sig [lecture seule] Lecture seule_signé.pdf
+OK     0.01s  ✍️ PDF · Signer (dessiner ou insérer une sig [chemin bizarre] Rapport — final (v2) 'été' 🎉_signé.pdf
+OK     0.01s  ✍️ PDF · Signer (dessiner ou insérer une sig [abîmé] réparé
+OK     0.01s  ⬛ PDF · Caviarder (masquer définitivement)   [texte] Texte accentué_caviardé.pdf
+OK     0.02s  ⬛ PDF · Caviarder (masquer définitivement)   [60 pages] Long 60 pages_caviardé.pdf
+OK     0.09s  ⬛ PDF · Caviarder (masquer définitivement)   [scan] Scan_caviardé.pdf
+OK     0.00s  ⬛ PDF · Caviarder (masquer définitivement)   [formats + pivotée] Formats mélangés_caviardé.pdf
+OK     0.00s  ⬛ PDF · Caviarder (masquer définitivement)   [formulaire] Formulaire_caviardé.pdf
+OK     0.01s  ⬛ PDF · Caviarder (masquer définitivement)   [annotations] Annoté_caviardé.pdf
+OK     0.05s  ⬛ PDF · Caviarder (masquer définitivement)   [chiffré] Chiffré_caviardé.pdf
+OK     0.00s  ⬛ PDF · Caviarder (masquer définitivement)   [lecture seule] Lecture seule_caviardé.pdf
+OK     0.01s  ⬛ PDF · Caviarder (masquer définitivement)   [chemin bizarre] Rapport — final (v2) 'été' 🎉_caviardé.pdf
+OK     0.00s  ⬛ PDF · Caviarder (masquer définitivement)   [abîmé] réparé
+OK     1.34s  🔍 PDF · OCR — rendre un scan cherchable      [texte] Texte accentué_ocr.pdf
+OK    16.49s  🔍 PDF · OCR — rendre un scan cherchable      [60 pages] Long 60 pages_ocr.pdf
+OK     1.80s  🔍 PDF · OCR — rendre un scan cherchable      [scan] Scan_ocr.pdf
+OK     0.71s  🔍 PDF · OCR — rendre un scan cherchable      [formats + pivotée] Formats mélangés_ocr.pdf
+OK     0.39s  🔍 PDF · OCR — rendre un scan cherchable      [formulaire] Formulaire_ocr.pdf
+OK     0.83s  🔍 PDF · OCR — rendre un scan cherchable      [annotations] Annoté_ocr.pdf
+OK     0.85s  🔍 PDF · OCR — rendre un scan cherchable      [chiffré] Chiffré_ocr.pdf
+OK     0.81s  🔍 PDF · OCR — rendre un scan cherchable      [lecture seule] Lecture seule_ocr.pdf
+OK     0.81s  🔍 PDF · OCR — rendre un scan cherchable      [chemin bizarre] Rapport — final (v2) 'été' 🎉_ocr.pdf
+OK     0.98s  🔍 PDF · OCR — rendre un scan cherchable      [abîmé] réparé
+OK     0.00s  📄 PDF · Aplatir (formulaires et annotations) [texte] Texte accentué_aplati.pdf
+OK     0.04s  📄 PDF · Aplatir (formulaires et annotations) [60 pages] Long 60 pages_aplati.pdf
+OK     0.00s  📄 PDF · Aplatir (formulaires et annotations) [scan] Scan_aplati.pdf
+OK     0.00s  📄 PDF · Aplatir (formulaires et annotations) [formats + pivotée] Formats mélangés_aplati.pdf
+OK     0.00s  📄 PDF · Aplatir (formulaires et annotations) [formulaire] Formulaire_aplati.pdf
+OK     0.00s  📄 PDF · Aplatir (formulaires et annotations) [annotations] Annoté_aplati.pdf
+OK     0.04s  📄 PDF · Aplatir (formulaires et annotations) [chiffré] Chiffré_aplati.pdf
+OK     0.00s  📄 PDF · Aplatir (formulaires et annotations) [lecture seule] Lecture seule_aplati.pdf
+OK     0.00s  📄 PDF · Aplatir (formulaires et annotations) [chemin bizarre] Rapport — final (v2) 'été' 🎉_aplati.pdf
+OK     0.00s  📄 PDF · Aplatir (formulaires et annotations) [abîmé] réparé
+OK     0.12s  📄 PDF · Noir et blanc (niveaux de gris)      [texte] Texte accentué_gris.pdf
+OK     1.34s  📄 PDF · Noir et blanc (niveaux de gris)      [60 pages] Long 60 pages_gris.pdf
+OK     0.16s  📄 PDF · Noir et blanc (niveaux de gris)      [scan] Scan_gris.pdf
+OK     0.07s  📄 PDF · Noir et blanc (niveaux de gris)      [formats + pivotée] Formats mélangés_gris.pdf
+OK     0.04s  📄 PDF · Noir et blanc (niveaux de gris)      [formulaire] Formulaire_gris.pdf
+OK     0.07s  📄 PDF · Noir et blanc (niveaux de gris)      [annotations] Annoté_gris.pdf
+OK     0.11s  📄 PDF · Noir et blanc (niveaux de gris)      [chiffré] Chiffré_gris.pdf
+OK     0.07s  📄 PDF · Noir et blanc (niveaux de gris)      [lecture seule] Lecture seule_gris.pdf
+OK     0.07s  📄 PDF · Noir et blanc (niveaux de gris)      [chemin bizarre] Rapport — final (v2) 'été' 🎉_gris.pdf
+OK     0.05s  📄 PDF · Noir et blanc (niveaux de gris)      [abîmé] réparé
+OK     0.00s  🏷️ PDF · Métadonnées (titre, auteur, nettoya [texte] Texte accentué_meta.pdf
+OK     0.04s  🏷️ PDF · Métadonnées (titre, auteur, nettoya [60 pages] Long 60 pages_meta.pdf
+OK     0.00s  🏷️ PDF · Métadonnées (titre, auteur, nettoya [scan] Scan_meta.pdf
+OK     0.00s  🏷️ PDF · Métadonnées (titre, auteur, nettoya [formats + pivotée] Formats mélangés_meta.pdf
+OK     0.00s  🏷️ PDF · Métadonnées (titre, auteur, nettoya [formulaire] Formulaire_meta.pdf
+OK     0.00s  🏷️ PDF · Métadonnées (titre, auteur, nettoya [annotations] Annoté_meta.pdf
+OK     0.04s  🏷️ PDF · Métadonnées (titre, auteur, nettoya [chiffré] Chiffré_meta.pdf
+OK     0.00s  🏷️ PDF · Métadonnées (titre, auteur, nettoya [lecture seule] Lecture seule_meta.pdf
+OK     0.01s  🏷️ PDF · Métadonnées (titre, auteur, nettoya [chemin bizarre] Rapport — final (v2) 'été' 🎉_meta.pdf
+OK     0.00s  🏷️ PDF · Métadonnées (titre, auteur, nettoya [abîmé] réparé
+OK     0.01s  🛠️ PDF · Réparer un PDF endommagé            [texte] Texte accentué_réparé.pdf
+OK     0.02s  🛠️ PDF · Réparer un PDF endommagé            [60 pages] Long 60 pages_réparé.pdf
+OK     0.00s  🛠️ PDF · Réparer un PDF endommagé            [scan] Scan_réparé.pdf
+OK     0.00s  🛠️ PDF · Réparer un PDF endommagé            [formats + pivotée] Formats mélangés_réparé.pdf
+OK     0.00s  🛠️ PDF · Réparer un PDF endommagé            [formulaire] Formulaire_réparé.pdf
+OK     0.00s  🛠️ PDF · Réparer un PDF endommagé            [annotations] Annoté_réparé.pdf
+OK     0.05s  🛠️ PDF · Réparer un PDF endommagé            [chiffré] Chiffré_réparé.pdf
+OK     0.00s  🛠️ PDF · Réparer un PDF endommagé            [lecture seule] Lecture seule_réparé.pdf
+OK     0.00s  🛠️ PDF · Réparer un PDF endommagé            [chemin bizarre] Rapport — final (v2) 'été' 🎉_réparé.pdf
+OK     0.00s  🛠️ PDF · Réparer un PDF endommagé            [abîmé] erreur claire : code=4: not a dict (null)
+
+244 OK / 0 échecs sur 244 essais
+
+LENTS :
+
+ÉCHECS :

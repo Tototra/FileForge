@@ -1,0 +1,15 @@
+OK   agent démarré, roue et recherche en réserve 
+OK   clic droit 1 : roue sur le fichier 0.41 s, 'Devis cuisine.pdf'
+OK   clic droit 2 : roue sur le fichier 0.39 s, 'Devis cuisine.pdf'
+OK   clic droit 3 : roue sur le fichier 0.39 s, 'Devis cuisine.pdf'
+OK   clic droit 4 : roue sur le fichier 0.42 s, 'Devis cuisine.pdf'
+OK   clic droit 5 : roue sur le fichier 0.42 s, 'Devis cuisine.pdf'
+OK   clic droit 6 : roue sur le fichier 0.4 s, 'Devis cuisine.pdf'
+OK   deux fichiers → une seule roue avec les deux 0.41 s, '2 éléments'
+OK   sans fichier → zone de dépôt 0.19 s
+OK   sans agent → la roue s'ouvre quand même 2.76 s
+mémoire des deux réserves (Python) : 282 Mo
+clic droit → roue prête : médiane 0.41 s, max 0.42 s
+sans agent (secours) : 2.76 s
+
+0 échec(s) : []

@@ -1,0 +1,73 @@
+[2026-10-27 14:15:25] agent : Ctrl+Alt+G enregistré
+[2026-10-27 14:15:25] agent : Ctrl+Alt+F enregistré
+[2026-10-27 14:17:56] test journal → 📄 é « »
+[2026-10-27 14:18:11] 📄 PDF · Extraire des pages ← ['C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\Mes documents FileForge\\Rapport annuel été.pdf']
+[2026-10-27 14:18:16]   → ['C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\Mes documents FileForge\\Rapport annuel été_extrait.pdf']
+[2026-10-27 14:18:52] recherche → wheel C:\Users\runneradmin\Documents\Factures\Facture Orange mars.pdf
+[2026-10-27 14:19:02] agent : Ctrl+Alt+G enregistré
+[2026-10-27 14:19:02] agent : Ctrl+Alt+F enregistré
+[2026-10-27 14:19:12] agent : clic droit : roue en réserve, 1 fichier(s), premier plan 48 ms
+[2026-10-27 14:19:19] agent : clic droit : roue en réserve, 1 fichier(s), premier plan 47 ms
+[2026-10-27 14:19:25] agent : clic droit : roue en réserve, 1 fichier(s), premier plan 48 ms
+[2026-10-27 14:19:31] agent : clic droit : roue en réserve, 1 fichier(s), premier plan 63 ms
+[2026-10-27 14:19:38] agent : clic droit : roue en réserve, 1 fichier(s), premier plan 66 ms
+[2026-10-27 14:19:44] agent : clic droit : roue en réserve, 1 fichier(s), premier plan 47 ms
+[2026-10-27 14:19:53] agent : clic droit : roue en réserve, 2 fichier(s), premier plan 47 ms
+[2026-10-27 14:20:01] agent : clic droit : roue en réserve, 0 fichier(s), premier plan 48 ms
+[2026-10-27 14:20:13] rewrite_images: code=4: not a dict (null)
+[2026-10-27 14:27:03] éditeur : ouverture de C:\Users\RUNNER~1\AppData\Local\Temp\Éditeur — dossier test\Facture été – client.pdf
+[2026-10-27 14:27:21] éditeur : 11 modification(s) → C:\Users\RUNNER~1\AppData\Local\Temp\Éditeur — dossier test\Facture été – client_modifié.pdf
+[2026-10-27 14:27:24] éditeur : ouverture de C:\Users\RUNNER~1\AppData\Local\Temp\Éditeur — dossier test\pivotée.pdf
+[2026-10-27 14:27:27] éditeur : 1 modification(s) → C:\Users\RUNNER~1\AppData\Local\Temp\Éditeur — dossier test\pivotée_modifié.pdf
+[2026-10-27 14:27:32] éditeur : ouverture de C:\Users\RUNNER~1\AppData\Local\Temp\Éditeur — dossier test\protégé.pdf
+[2026-10-27 14:27:41] éditeur : ouverture de C:\Users\RUNNER~1\AppData\Local\Temp\Éditeur — dossier test\gros document.pdf
+[2026-10-27 14:27:49] agent : Ctrl+Alt+F : pas de réserve, roue lancée (1281 ms)
+[2026-10-27 14:27:55] agent : Ctrl+Alt+G enregistré
+[2026-10-27 14:27:55] agent : Ctrl+Alt+F enregistré
+[2026-10-27 14:28:02] agent : Ctrl+Alt+G : panneau en réserve, premier plan 92 ms
+[2026-10-27 14:28:02] recherche : clavier prêt 170 ms après l'appui
+[2026-10-27 14:28:08] agent : Ctrl+Alt+G : panneau en réserve, premier plan 63 ms
+[2026-10-27 14:28:08] recherche : clavier prêt 141 ms après l'appui
+[2026-10-27 14:28:12] agent : Ctrl+Alt+G : panneau en réserve, premier plan 62 ms
+[2026-10-27 14:28:12] recherche : clavier prêt 145 ms après l'appui
+[2026-10-27 14:28:16] agent : Ctrl+Alt+G : panneau en réserve, premier plan 62 ms
+[2026-10-27 14:28:16] recherche : clavier prêt 124 ms après l'appui
+[2026-10-27 14:28:21] agent : Ctrl+Alt+G : panneau en réserve, premier plan 63 ms
+[2026-10-27 14:28:21] recherche : clavier prêt 136 ms après l'appui
+[2026-10-27 14:28:25] agent : Ctrl+Alt+G : panneau en réserve, premier plan 62 ms
+[2026-10-27 14:28:25] recherche : clavier prêt 143 ms après l'appui
+[2026-10-27 14:28:30] agent : Ctrl+Alt+G : panneau en réserve, premier plan 62 ms
+[2026-10-27 14:28:30] recherche : clavier prêt 142 ms après l'appui
+[2026-10-27 14:28:40] agent : Ctrl+Alt+G : fermeture du panneau
+[2026-10-27 14:28:49] agent : Ctrl+Alt+G : panneau en réserve, premier plan 83 ms
+[2026-10-27 14:28:49] recherche : clavier prêt 154 ms après l'appui
+[2026-10-27 14:28:55] agent : Ctrl+Alt+G : panneau en réserve, premier plan 65 ms
+[2026-10-27 14:28:55] recherche : clavier prêt 147 ms après l'appui
+[2026-10-27 14:29:07] agent : Ctrl+Alt+G : panneau en réserve, premier plan 99 ms
+[2026-10-27 14:29:08] recherche : clavier prêt 178 ms après l'appui
+[2026-10-27 14:29:20] agent : Ctrl+Alt+G : panneau en réserve, premier plan 83 ms
+[2026-10-27 14:29:20] recherche : clavier prêt 166 ms après l'appui
+[2026-10-27 14:29:33] agent : Ctrl+Alt+G : panneau en réserve, premier plan 127 ms
+[2026-10-27 14:29:33] recherche : clavier prêt 205 ms après l'appui
+[2026-10-27 14:29:44] agent : Ctrl+Alt+G : fermeture du panneau
+[2026-10-27 14:29:46] agent : Ctrl+Alt+G : panneau en réserve, premier plan 1278 ms
+[2026-10-27 14:29:46] agent : Ctrl+Alt+G : fermeture du panneau
+[2026-10-27 14:29:52] agent : Ctrl+Alt+G : panneau en réserve, premier plan 63 ms
+[2026-10-27 14:29:52] recherche : clavier prêt 142 ms après l'appui
+[2026-10-27 14:29:58] agent : Ctrl+Alt+G : pas de réserve, ouverture directe
+[2026-10-27 14:30:02] mise à jour : 9.9.9 disponible (installée : 1.2.3)
+[2026-10-27 14:30:04] mise à jour : 9.9.9 reportée
+[2026-10-27 14:30:05] mise à jour : 9.9.9 disponible (installée : 1.2.3)
+[2026-10-27 14:30:08] mise à jour : Traceback (most recent call last):
+  File "C:\Users\runneradmin\AppData\Local\FileForge\updater.py", line 239, in go
+    path = download(info, lambda p: self._win.evaluate_js(f"UP.progress({p:.3f})"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\runneradmin\AppData\Local\FileForge\updater.py", line 143, in download
+    raise RuntimeError("le fichier téléchargé ne correspond pas à l'empreinte publiée : installation refusée")
+RuntimeError: le fichier téléchargé ne correspond pas à l'empreinte publiée : installation refusée
+
+[2026-10-27 14:30:18] mise à jour : 9.9.9 disponible (installée : 1.2.3)
+[2026-10-27 14:30:20] mise à jour : installation de 9.9.9 (FileForge-9.9.9-FileForge-Setup.exe)
+[2026-10-27 14:30:27] agent : Ctrl+Alt+G enregistré
+[2026-10-27 14:30:27] agent : Ctrl+Alt+F enregistré
+[2026-10-27 14:30:34] mise à jour : 9.9.9 installée

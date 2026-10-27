@@ -1,0 +1,129 @@
+écran (1024, 768) · résolutions possibles : [(640, 480), (800, 600), (1024, 768), (1152, 864), (1280, 720), (1280, 800), (1280, 1024), (1366, 768), (1440, 900), (1600, 900), (1600, 1200), (1680, 1050), (1920, 1080)]
+OK   réel 1024x768 centre : roue affichée 
+OK   réel 1024x768 centre : fenêtre dans la zone utile fenêtre (155, 6, 869, 720) zone (0, 0, 1024, 720)
+OK   réel 1024x768 centre : tout le dessin est visible (catégories ouvertes une à une) débord max -67.6 px (catégorie 0) {'x0': 67.64360046386719, 'y0': 67.64354705810547, 'x1': 646.3720092773438, 'y1': 524.2214965820312, 'w': 714, 'h': 714, 'zoom': '0.9395'}
+OK   réel 1024x768 coin haut-gauche : roue affichée 
+OK   réel 1024x768 coin haut-gauche : fenêtre dans la zone utile fenêtre (0, 0, 714, 714) zone (0, 0, 1024, 720)
+OK   réel 1024x768 coin haut-gauche : tout le dessin est visible (catégories ouvertes une à une) débord max -67.6 px (catégorie 0) {'x0': 67.64360046386719, 'y0': 67.64354705810547, 'x1': 646.3720092773438, 'y1': 524.2214965820312, 'w': 714, 'h': 714, 'zoom': '0.9395'}
+OK   réel 1024x768 coin bas-droit : roue affichée 
+OK   réel 1024x768 coin bas-droit : fenêtre dans la zone utile fenêtre (310, 6, 1024, 720) zone (0, 0, 1024, 720)
+OK   réel 1024x768 coin bas-droit : tout le dessin est visible (catégories ouvertes une à une) débord max -67.6 px (catégorie 0) {'x0': 67.64360046386719, 'y0': 67.64354705810547, 'x1': 646.3720092773438, 'y1': 524.2214965820312, 'w': 714, 'h': 714, 'zoom': '0.9395'}
+OK   réel 1024x768 bord droit : roue affichée 
+OK   réel 1024x768 bord droit : fenêtre dans la zone utile fenêtre (310, 6, 1024, 720) zone (0, 0, 1024, 720)
+OK   réel 1024x768 bord droit : tout le dessin est visible (catégories ouvertes une à une) débord max -67.6 px (catégorie 0) {'x0': 67.64360046386719, 'y0': 67.64354705810547, 'x1': 646.3720092773438, 'y1': 524.2214965820312, 'w': 714, 'h': 714, 'zoom': '0.9395'}
+OK   réel 1024x768 bord bas : roue affichée 
+OK   réel 1024x768 bord bas : fenêtre dans la zone utile fenêtre (155, 6, 869, 720) zone (0, 0, 1024, 720)
+OK   réel 1024x768 bord bas : tout le dessin est visible (catégories ouvertes une à une) débord max -67.6 px (catégorie 0) {'x0': 67.64360046386719, 'y0': 67.64354705810547, 'x1': 646.3720092773438, 'y1': 524.2214965820312, 'w': 714, 'h': 714, 'zoom': '0.9395'}
+OK   1024x700 centre : roue affichée 
+OK   1024x700 centre : fenêtre dans la zone utile fenêtre (165, 6, 859, 700) zone (0, 0, 1024, 720)
+OK   1024x700 centre : tout le dessin est visible (catégories ouvertes une à une) débord max -65.7 px (catégorie 0) {'x0': 65.7503433227539, 'y0': 65.75028991699219, 'x1': 628.2808837890625, 'y1': 509.5491943359375, 'w': 694, 'h': 694, 'zoom': '0.9132'}
+OK   1024x700 coin haut-gauche : roue affichée 
+OK   1024x700 coin haut-gauche : fenêtre dans la zone utile fenêtre (0, 0, 694, 694) zone (0, 0, 1024, 720)
+OK   1024x700 coin haut-gauche : tout le dessin est visible (catégories ouvertes une à une) débord max -65.7 px (catégorie 0) {'x0': 65.7503433227539, 'y0': 65.75028991699219, 'x1': 628.2808837890625, 'y1': 509.5491943359375, 'w': 694, 'h': 694, 'zoom': '0.9132'}
+OK   1024x700 coin bas-droit : roue affichée 
+OK   1024x700 coin bas-droit : fenêtre dans la zone utile fenêtre (330, 6, 1024, 700) zone (0, 0, 1024, 720)
+OK   1024x700 coin bas-droit : tout le dessin est visible (catégories ouvertes une à une) débord max -65.7 px (catégorie 0) {'x0': 65.7503433227539, 'y0': 65.75028991699219, 'x1': 628.2808837890625, 'y1': 509.5491943359375, 'w': 694, 'h': 694, 'zoom': '0.9132'}
+OK   800x560 centre : roue affichée 
+OK   800x560 centre : fenêtre dans la zone utile fenêtre (235, 6, 789, 560) zone (0, 0, 1024, 720)
+OK   800x560 centre : tout le dessin est visible (catégories ouvertes une à une) débord max -52.5 px (catégorie 0) {'x0': 52.47977828979492, 'y0': 52.479740142822266, 'x1': 501.4733581542969, 'y1': 406.70556640625, 'w': 554, 'h': 554, 'zoom': '0.7289'}
+OK   800x560 coin haut-gauche : roue affichée 
+OK   800x560 coin haut-gauche : fenêtre dans la zone utile fenêtre (0, 0, 554, 554) zone (0, 0, 1024, 720)
+OK   800x560 coin haut-gauche : tout le dessin est visible (catégories ouvertes une à une) débord max -52.5 px (catégorie 0) {'x0': 52.47977828979492, 'y0': 52.479740142822266, 'x1': 501.4733581542969, 'y1': 406.70556640625, 'w': 554, 'h': 554, 'zoom': '0.7289'}
+OK   800x560 coin bas-droit : roue affichée 
+OK   800x560 coin bas-droit : fenêtre dans la zone utile fenêtre (246, 6, 800, 560) zone (0, 0, 1024, 720)
+OK   800x560 coin bas-droit : tout le dessin est visible (catégories ouvertes une à une) débord max -52.5 px (catégorie 0) {'x0': 52.47977828979492, 'y0': 52.479740142822266, 'x1': 501.4733581542969, 'y1': 406.70556640625, 'w': 554, 'h': 554, 'zoom': '0.7289'}
+OK   écran 1280x720 centre : roue affichée 
+OK   écran 1280x720 centre : fenêtre dans la zone utile fenêtre (307, 6, 973, 672) zone (0, 0, 1280, 672)
+OK   écran 1280x720 centre : tout le dessin est visible (catégories ouvertes une à une) débord max -63.1 px (catégorie 0) {'x0': 63.0932731628418, 'y0': 63.093223571777344, 'x1': 602.89111328125, 'y1': 488.95758056640625, 'w': 666, 'h': 666, 'zoom': '0.8763'}
+OK   écran 1280x720 coin haut-gauche : roue affichée 
+OK   écran 1280x720 coin haut-gauche : fenêtre dans la zone utile fenêtre (0, 0, 666, 666) zone (0, 0, 1280, 672)
+OK   écran 1280x720 coin haut-gauche : tout le dessin est visible (catégories ouvertes une à une) débord max -63.1 px (catégorie 0) {'x0': 63.0932731628418, 'y0': 63.093223571777344, 'x1': 602.89111328125, 'y1': 488.95758056640625, 'w': 666, 'h': 666, 'zoom': '0.8763'}
+OK   écran 1280x720 coin bas-droit : roue affichée 
+OK   écran 1280x720 coin bas-droit : fenêtre dans la zone utile fenêtre (614, 6, 1280, 672) zone (0, 0, 1280, 672)
+OK   écran 1280x720 coin bas-droit : tout le dessin est visible (catégories ouvertes une à une) débord max -63.1 px (catégorie 0) {'x0': 63.0932731628418, 'y0': 63.093223571777344, 'x1': 602.89111328125, 'y1': 488.95758056640625, 'w': 666, 'h': 666, 'zoom': '0.8763'}
+OK   écran 1280x720 bord droit : roue affichée 
+OK   écran 1280x720 bord droit : fenêtre dans la zone utile fenêtre (614, 6, 1280, 672) zone (0, 0, 1280, 672)
+OK   écran 1280x720 bord droit : tout le dessin est visible (catégories ouvertes une à une) débord max -63.1 px (catégorie 0) {'x0': 63.0932731628418, 'y0': 63.093223571777344, 'x1': 602.89111328125, 'y1': 488.95758056640625, 'w': 666, 'h': 666, 'zoom': '0.8763'}
+OK   écran 1280x720 bord bas : roue affichée 
+OK   écran 1280x720 bord bas : fenêtre dans la zone utile fenêtre (307, 6, 973, 672) zone (0, 0, 1280, 672)
+OK   écran 1280x720 bord bas : tout le dessin est visible (catégories ouvertes une à une) débord max -63.1 px (catégorie 0) {'x0': 63.0932731628418, 'y0': 63.093223571777344, 'x1': 602.89111328125, 'y1': 488.95758056640625, 'w': 666, 'h': 666, 'zoom': '0.8763'}
+OK   écran 1366x768 centre : roue affichée 
+OK   écran 1366x768 centre : fenêtre dans la zone utile fenêtre (326, 6, 1040, 720) zone (0, 0, 1366, 720)
+OK   écran 1366x768 centre : tout le dessin est visible (catégories ouvertes une à une) débord max -67.6 px (catégorie 0) {'x0': 67.64360046386719, 'y0': 67.64354705810547, 'x1': 646.3720092773438, 'y1': 524.2214965820312, 'w': 714, 'h': 714, 'zoom': '0.9395'}
+OK   écran 1366x768 coin haut-gauche : roue affichée 
+OK   écran 1366x768 coin haut-gauche : fenêtre dans la zone utile fenêtre (0, 0, 714, 714) zone (0, 0, 1366, 720)
+OK   écran 1366x768 coin haut-gauche : tout le dessin est visible (catégories ouvertes une à une) débord max -67.6 px (catégorie 0) {'x0': 67.64360046386719, 'y0': 67.64354705810547, 'x1': 646.3720092773438, 'y1': 524.2214965820312, 'w': 714, 'h': 714, 'zoom': '0.9395'}
+OK   écran 1366x768 coin bas-droit : roue affichée 
+OK   écran 1366x768 coin bas-droit : fenêtre dans la zone utile fenêtre (652, 6, 1366, 720) zone (0, 0, 1366, 720)
+OK   écran 1366x768 coin bas-droit : tout le dessin est visible (catégories ouvertes une à une) débord max -67.6 px (catégorie 0) {'x0': 67.64360046386719, 'y0': 67.64354705810547, 'x1': 646.3720092773438, 'y1': 524.2214965820312, 'w': 714, 'h': 714, 'zoom': '0.9395'}
+OK   écran 1366x768 bord droit : roue affichée 
+OK   écran 1366x768 bord droit : fenêtre dans la zone utile fenêtre (652, 6, 1366, 720) zone (0, 0, 1366, 720)
+OK   écran 1366x768 bord droit : tout le dessin est visible (catégories ouvertes une à une) débord max -67.6 px (catégorie 0) {'x0': 67.64360046386719, 'y0': 67.64354705810547, 'x1': 646.3720092773438, 'y1': 524.2214965820312, 'w': 714, 'h': 714, 'zoom': '0.9395'}
+OK   écran 1366x768 bord bas : roue affichée 
+OK   écran 1366x768 bord bas : fenêtre dans la zone utile fenêtre (326, 6, 1040, 720) zone (0, 0, 1366, 720)
+OK   écran 1366x768 bord bas : tout le dessin est visible (catégories ouvertes une à une) débord max -67.6 px (catégorie 0) {'x0': 67.64360046386719, 'y0': 67.64354705810547, 'x1': 646.3720092773438, 'y1': 524.2214965820312, 'w': 714, 'h': 714, 'zoom': '0.9395'}
+OK   écran 800x600 centre : roue affichée 
+OK   écran 800x600 centre : fenêtre dans la zone utile fenêtre (127, 6, 673, 552) zone (0, 0, 800, 552)
+OK   écran 800x600 centre : tout le dessin est visible (catégories ouvertes une à une) débord max -51.7 px (catégorie 0) {'x0': 51.723365783691406, 'y0': 51.72332763671875, 'x1': 494.2453918457031, 'y1': 400.8435363769531, 'w': 546, 'h': 546, 'zoom': '0.7184'}
+OK   écran 800x600 coin haut-gauche : roue affichée 
+OK   écran 800x600 coin haut-gauche : fenêtre dans la zone utile fenêtre (0, 0, 546, 546) zone (0, 0, 800, 552)
+OK   écran 800x600 coin haut-gauche : tout le dessin est visible (catégories ouvertes une à une) débord max -51.7 px (catégorie 0) {'x0': 51.723365783691406, 'y0': 51.72332763671875, 'x1': 494.2453918457031, 'y1': 400.8435363769531, 'w': 546, 'h': 546, 'zoom': '0.7184'}
+OK   écran 800x600 coin bas-droit : roue affichée 
+OK   écran 800x600 coin bas-droit : fenêtre dans la zone utile fenêtre (254, 6, 800, 552) zone (0, 0, 800, 552)
+OK   écran 800x600 coin bas-droit : tout le dessin est visible (catégories ouvertes une à une) débord max -51.7 px (catégorie 0) {'x0': 51.723365783691406, 'y0': 51.72332763671875, 'x1': 494.2453918457031, 'y1': 400.8435363769531, 'w': 546, 'h': 546, 'zoom': '0.7184'}
+OK   écran 800x600 bord droit : roue affichée 
+OK   écran 800x600 bord droit : fenêtre dans la zone utile fenêtre (254, 6, 800, 552) zone (0, 0, 800, 552)
+OK   écran 800x600 bord droit : tout le dessin est visible (catégories ouvertes une à une) débord max -51.7 px (catégorie 0) {'x0': 51.723365783691406, 'y0': 51.72332763671875, 'x1': 494.2453918457031, 'y1': 400.8435363769531, 'w': 546, 'h': 546, 'zoom': '0.7184'}
+OK   écran 800x600 bord bas : roue affichée 
+OK   écran 800x600 bord bas : fenêtre dans la zone utile fenêtre (127, 6, 673, 552) zone (0, 0, 800, 552)
+OK   écran 800x600 bord bas : tout le dessin est visible (catégories ouvertes une à une) débord max -51.7 px (catégorie 0) {'x0': 51.723365783691406, 'y0': 51.72332763671875, 'x1': 494.2453918457031, 'y1': 400.8435363769531, 'w': 546, 'h': 546, 'zoom': '0.7184'}
+OK   écran 1920x1080 centre : roue affichée 
+OK   écran 1920x1080 centre : fenêtre dans la zone utile fenêtre (580, 160, 1340, 920) zone (0, 0, 1920, 1032)
+OK   écran 1920x1080 centre : tout le dessin est visible (catégories ouvertes une à une) débord max -72.0 px (catégorie 0) {'x0': 72.00001525878906, 'y0': 71.99996185302734, 'x1': 688, 'y1': 557.982666015625, 'w': 760, 'h': 760, 'zoom': 1}
+OK   écran 1920x1080 coin haut-gauche : roue affichée 
+OK   écran 1920x1080 coin haut-gauche : fenêtre dans la zone utile fenêtre (0, 0, 760, 760) zone (0, 0, 1920, 1032)
+OK   écran 1920x1080 coin haut-gauche : tout le dessin est visible (catégories ouvertes une à une) débord max -72.0 px (catégorie 0) {'x0': 72.00001525878906, 'y0': 71.99996185302734, 'x1': 688, 'y1': 557.982666015625, 'w': 760, 'h': 760, 'zoom': 1}
+OK   écran 1920x1080 coin bas-droit : roue affichée 
+OK   écran 1920x1080 coin bas-droit : fenêtre dans la zone utile fenêtre (1160, 272, 1920, 1032) zone (0, 0, 1920, 1032)
+OK   écran 1920x1080 coin bas-droit : tout le dessin est visible (catégories ouvertes une à une) débord max -72.0 px (catégorie 0) {'x0': 72.00001525878906, 'y0': 71.99996185302734, 'x1': 688, 'y1': 557.982666015625, 'w': 760, 'h': 760, 'zoom': 1}
+OK   écran 1920x1080 bord droit : roue affichée 
+OK   écran 1920x1080 bord droit : fenêtre dans la zone utile fenêtre (1160, 160, 1920, 920) zone (0, 0, 1920, 1032)
+OK   écran 1920x1080 bord droit : tout le dessin est visible (catégories ouvertes une à une) débord max -72.0 px (catégorie 0) {'x0': 72.00001525878906, 'y0': 71.99996185302734, 'x1': 688, 'y1': 557.982666015625, 'w': 760, 'h': 760, 'zoom': 1}
+OK   écran 1920x1080 bord bas : roue affichée 
+OK   écran 1920x1080 bord bas : fenêtre dans la zone utile fenêtre (580, 272, 1340, 1032) zone (0, 0, 1920, 1032)
+OK   écran 1920x1080 bord bas : tout le dessin est visible (catégories ouvertes une à une) débord max -72.0 px (catégorie 0) {'x0': 72.00001525878906, 'y0': 71.99996185302734, 'x1': 688, 'y1': 557.982666015625, 'w': 760, 'h': 760, 'zoom': 1}
+OK   recherche affichée 
+OK   recherche dans la zone utile (155, 0, 869, 714) zone (0, 0, 1024, 720)
+réel 1024x768 centre                   fenêtre 714×714 à (155,6) · zone (0, 0, 1024, 720) · zoom 0.9395 · débord -67.6
+réel 1024x768 coin haut-gauche         fenêtre 714×714 à (0,0) · zone (0, 0, 1024, 720) · zoom 0.9395 · débord -67.6
+réel 1024x768 coin bas-droit           fenêtre 714×714 à (310,6) · zone (0, 0, 1024, 720) · zoom 0.9395 · débord -67.6
+réel 1024x768 bord droit               fenêtre 714×714 à (310,6) · zone (0, 0, 1024, 720) · zoom 0.9395 · débord -67.6
+réel 1024x768 bord bas                 fenêtre 714×714 à (155,6) · zone (0, 0, 1024, 720) · zoom 0.9395 · débord -67.6
+1024x700 centre                        fenêtre 694×694 à (165,6) · zone (0, 0, 1024, 720) · zoom 0.9132 · débord -65.7
+1024x700 coin haut-gauche              fenêtre 694×694 à (0,0) · zone (0, 0, 1024, 720) · zoom 0.9132 · débord -65.7
+1024x700 coin bas-droit                fenêtre 694×694 à (330,6) · zone (0, 0, 1024, 720) · zoom 0.9132 · débord -65.7
+800x560 centre                         fenêtre 554×554 à (235,6) · zone (0, 0, 1024, 720) · zoom 0.7289 · débord -52.5
+800x560 coin haut-gauche               fenêtre 554×554 à (0,0) · zone (0, 0, 1024, 720) · zoom 0.7289 · débord -52.5
+800x560 coin bas-droit                 fenêtre 554×554 à (246,6) · zone (0, 0, 1024, 720) · zoom 0.7289 · débord -52.5
+écran 1280x720 centre                  fenêtre 666×666 à (307,6) · zone (0, 0, 1280, 672) · zoom 0.8763 · débord -63.1
+écran 1280x720 coin haut-gauche        fenêtre 666×666 à (0,0) · zone (0, 0, 1280, 672) · zoom 0.8763 · débord -63.1
+écran 1280x720 coin bas-droit          fenêtre 666×666 à (614,6) · zone (0, 0, 1280, 672) · zoom 0.8763 · débord -63.1
+écran 1280x720 bord droit              fenêtre 666×666 à (614,6) · zone (0, 0, 1280, 672) · zoom 0.8763 · débord -63.1
+écran 1280x720 bord bas                fenêtre 666×666 à (307,6) · zone (0, 0, 1280, 672) · zoom 0.8763 · débord -63.1
+écran 1366x768 centre                  fenêtre 714×714 à (326,6) · zone (0, 0, 1366, 720) · zoom 0.9395 · débord -67.6
+écran 1366x768 coin haut-gauche        fenêtre 714×714 à (0,0) · zone (0, 0, 1366, 720) · zoom 0.9395 · débord -67.6
+écran 1366x768 coin bas-droit          fenêtre 714×714 à (652,6) · zone (0, 0, 1366, 720) · zoom 0.9395 · débord -67.6
+écran 1366x768 bord droit              fenêtre 714×714 à (652,6) · zone (0, 0, 1366, 720) · zoom 0.9395 · débord -67.6
+écran 1366x768 bord bas                fenêtre 714×714 à (326,6) · zone (0, 0, 1366, 720) · zoom 0.9395 · débord -67.6
+écran 800x600 centre                   fenêtre 546×546 à (127,6) · zone (0, 0, 800, 552) · zoom 0.7184 · débord -51.7
+écran 800x600 coin haut-gauche         fenêtre 546×546 à (0,0) · zone (0, 0, 800, 552) · zoom 0.7184 · débord -51.7
+écran 800x600 coin bas-droit           fenêtre 546×546 à (254,6) · zone (0, 0, 800, 552) · zoom 0.7184 · débord -51.7
+écran 800x600 bord droit               fenêtre 546×546 à (254,6) · zone (0, 0, 800, 552) · zoom 0.7184 · débord -51.7
+écran 800x600 bord bas                 fenêtre 546×546 à (127,6) · zone (0, 0, 800, 552) · zoom 0.7184 · débord -51.7
+écran 1920x1080 centre                 fenêtre 760×760 à (580,160) · zone (0, 0, 1920, 1032) · zoom 1 · débord -72.0
+écran 1920x1080 coin haut-gauche       fenêtre 760×760 à (0,0) · zone (0, 0, 1920, 1032) · zoom 1 · débord -72.0
+écran 1920x1080 coin bas-droit         fenêtre 760×760 à (1160,272) · zone (0, 0, 1920, 1032) · zoom 1 · débord -72.0
+écran 1920x1080 bord droit             fenêtre 760×760 à (1160,160) · zone (0, 0, 1920, 1032) · zoom 1 · débord -72.0
+écran 1920x1080 bord bas               fenêtre 760×760 à (580,272) · zone (0, 0, 1920, 1032) · zoom 1 · débord -72.0
+
+0 échec(s)

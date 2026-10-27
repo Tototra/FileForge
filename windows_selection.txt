@@ -1,0 +1,8 @@
+OK   fenêtre de l'Explorateur ouverte 
+OK   un fichier sélectionné → lu ['C:\\Users\\runneradmin\\Documents\\Sélection test\\Contrat de location.pdf']
+OK   deux fichiers sélectionnés → lus ['C:\\Users\\runneradmin\\Documents\\Sélection test\\Contrat de location.pdf', 'C:\\Users\\runneradmin\\Documents\\Sélection test\\Photo identité.jpg']
+onglets dans la fenêtre : 1
+OK   Ctrl+Alt+F : la roue s'ouvre sur le fichier 1.89 s, 'Contrat de location.pdf'
+OK   aucune sélection → liste vide []
+
+0 échec(s) : []

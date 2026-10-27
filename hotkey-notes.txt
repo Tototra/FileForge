@@ -1,0 +1,2 @@
+ouverture : médiane 0.05 s, max 0.07 s (6/6)
+clavier prêt après l'appui : médiane 145 ms, max 205 ms (13 ouvertures)

@@ -1,0 +1,37 @@
+capture 00-bureau
+OK   roue affichée main
+OK   fond capturé (fausse transparence) True
+capture 01-roue-pdf
+capture 02-categorie-0-convertir
+capture 02-categorie-2-pages
+capture 02-categorie-5-securite
+capture 03-action-survolee
+OK   demande des pages ask
+capture 04-demande-pages
+OK   saisie invalide redemandée ⚠ Pages hors limites : [9] (le document a 4 pages).
+
+Pages à extraire de « Rappo
+capture 05-saisie-invalide
+OK   action terminée done
+capture 06-termine
+OK   fichier créé ['photo vacances.jpg', 'Rapport annuel été.pdf', 'Rapport annuel été_extrait.pdf']
+capture 07-en-cours
+capture 08-erreur
+capture 09-choix
+OK   la roue se ferme 
+OK   roue multi-fichiers 2 éléments
+capture 10-roue-deux-fichiers
+OK   zone de dépôt drop
+capture 11-depot
+OK   panneau de recherche seul ouvert en 1.9 s
+capture 12-recherche-vide
+OK   faute de frappe tolérée (factrue edf) ["Facture EDF été 2026.pdf"]
+capture 13-recherche-faute
+OK   recherche « facture » ["Facture Orange mars.pdf | ~\\Documents\\Factures","Facture EDF été 2026.pdf | ~\\Documents\\Factures","Factures | ~\\Documents","Budget vacances.xlsx | ~\\Documents\\Factures"]
+capture 14-recherche-facture
+OK   Tab → roue sur le fichier Facture Orange mars.pdf
+capture 15-recherche-vers-roue
+OK   index créé 59 éléments
+OK   aucune erreur Python dans le journal 
+
+0 échec(s) : []
