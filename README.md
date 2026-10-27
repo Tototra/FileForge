@@ -24,7 +24,7 @@ Tout se passe sur ton ordinateur : aucun fichier n'est envoyé sur Internet, et 
 
 ## Installer
 
-Télécharge le paquet de ton système depuis [le site](https://filiforme.to-trahant.workers.dev), ou construis-les toi-même (voir plus bas).
+Télécharge le paquet de ton système depuis [le site](https://tototra.github.io/FileForge/), ou construis-les toi-même (voir plus bas).
 
 Une fois installé, FileForge propose lui-même les nouvelles versions (vérification une fois par jour, installation en un clic, empreinte SHA-256 vérifiée).
 
@@ -85,7 +85,8 @@ Le site est un Worker Cloudflare de fichiers statiques (`wrangler.jsonc`, dossie
 
 ```bash
 python3 tools/build.py     # si le code a changé : régénère site/downloads/
-npx wrangler deploy        # publie sur https://filiforme.to-trahant.workers.dev
+tools/publish_pages.sh     # publie sur https://tototra.github.io/FileForge/ (branche gh-pages)
+npx wrangler deploy        # miroir : https://filiforme.to-trahant.workers.dev
 ```
 
 Le site détecte le système du visiteur et met en avant le bon téléchargement ; les tailles et empreintes

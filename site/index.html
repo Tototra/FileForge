@@ -11,18 +11,18 @@
 <meta property="og:description" content="Clic droit, une roue, c'est fait. La boîte à outils de fichiers qui reste sur ton ordinateur.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="/assets/icon-256.png">
-<link rel="icon" type="image/png" href="/assets/favicon.png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-<link rel="preload" href="/assets/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/fonts/atkinson-hyperlegible-next.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preload" href="assets/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/atkinson-hyperlegible-next.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
 <a class="skip" href="#contenu">Aller au contenu</a>
 
 <header class="top">
-  <a class="brand" href="/" aria-label="FileForge, accueil">
-    <img src="/assets/favicon.png" alt="" width="28" height="28">
+  <a class="brand" href="./" aria-label="FileForge, accueil">
+    <img src="assets/favicon.png" alt="" width="28" height="28">
     <span>FileForge</span>
   </a>
   <nav aria-label="Principale">
@@ -168,11 +168,11 @@
           <p class="req">macOS 12 ou plus récent, Apple Silicon ou Intel</p>
           <p class="yours" hidden>Ton système</p>
         </header>
-        <a class="btn" href="/downloads/FileForge-macOS.zip" download data-file="macos">Télécharger pour macOS</a>
+        <a class="btn" href="downloads/FileForge-macOS.zip" download data-file="macos">Télécharger pour macOS</a>
         <p class="file" data-meta="macos">FileForge-macOS.zip</p>
         <ol class="steps">
           <li>Ouvre le zip téléchargé.</li>
-          <li>Clic droit sur <code>install.command</code>, puis Ouvrir. macOS demande une confirmation la première fois.</li>
+          <li>Double-clique sur <code>install.command</code>. Si macOS refuse de l'ouvrir (« développeur non identifié ») : Réglages Système → Confidentialité et sécurité → tout en bas, <strong>Ouvrir quand même</strong>, puis relance-le. (macOS 14 et avant : clic droit sur <code>install.command</code> → Ouvrir.)</li>
           <li>Dans le Finder, sélectionne des fichiers et appuie sur <kbd>⌃</kbd><kbd>⌥</kbd><kbd>F</kbd>.</li>
         </ol>
       </article>
@@ -182,7 +182,7 @@
           <p class="req">Windows 10 ou 11</p>
           <p class="yours" hidden>Ton système</p>
         </header>
-        <a class="btn" href="/downloads/FileForge-Setup.exe" download data-file="windows">Télécharger pour Windows</a>
+        <a class="btn" href="downloads/FileForge-Setup.exe" download data-file="windows">Télécharger pour Windows</a>
         <p class="file" data-meta="windows">FileForge-Setup.exe</p>
         <ol class="steps">
           <li>Double-clique sur <code>FileForge-Setup.exe</code>. Si Windows affiche « Windows a protégé votre ordinateur » : Informations complémentaires, puis Exécuter quand même.</li>
@@ -196,7 +196,7 @@
           <p class="req">Pensé pour Arch et Hyprland, fonctionne avec GNOME, KDE, Thunar ou Nemo</p>
           <p class="yours" hidden>Ton système</p>
         </header>
-        <a class="btn" href="/downloads/FileForge-Linux.tar.gz" download data-file="linux">Télécharger pour Linux</a>
+        <a class="btn" href="downloads/FileForge-Linux.tar.gz" download data-file="linux">Télécharger pour Linux</a>
         <p class="file" data-meta="linux">FileForge-Linux.tar.gz</p>
         <ol class="steps">
           <li>Extrais l'archive : <code>tar xzf FileForge-Linux.tar.gz</code></li>
@@ -217,7 +217,7 @@
   <p><span id="version">FileForge</span>. Code source et suivi des problèmes sur <a href="https://github.com/Tototra/FileForge">GitHub</a>.</p>
 </footer>
 
-<script src="/assets/wheel-data.js"></script>
-<script src="/assets/site.js"></script>
+<script src="assets/wheel-data.js"></script>
+<script src="assets/site.js"></script>
 </body>
 </html>

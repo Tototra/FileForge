@@ -25,7 +25,8 @@ if sys.stdout is None or sys.stderr is None:
     sys.stdout = sys.stdout or _lf
     sys.stderr = sys.stderr or _lf
 
-SITE = "https://filiforme.to-trahant.workers.dev"
+SITE = "https://tototra.github.io/FileForge"
+MIRRORS = [SITE, "https://filiforme.to-trahant.workers.dev"]      # le premier qui répond
 MANIFEST = os.environ.get("FF_UPDATE_URL") or f"{SITE}/downloads/manifest.json"
 STATE = ff.LOG.parent / "update.json"
 EVERY = 20 * 3600            # au plus une vérification automatique par ~jour
@@ -94,7 +95,19 @@ def fetch(url, dest=None, timeout=60):
 
 def check():
     """→ dict : current, latest, newer, required, notes, file (nom, sha256, url)."""
-    m = json.loads(fetch(MANIFEST, timeout=20))
+    global MANIFEST
+    if os.environ.get("FF_UPDATE_URL"):
+        m = json.loads(fetch(MANIFEST, timeout=20))
+    else:
+        err = None
+        for site in MIRRORS:
+            try:
+                MANIFEST = f"{site}/downloads/manifest.json"
+                m = json.loads(fetch(MANIFEST, timeout=20)); break
+            except Exception as e:
+                err = e
+        else:
+            raise err
     f = (m.get("files") or {}).get(OS_KEY) or {}
     if MANIFEST.startswith(("http://", "https://")):
         base = MANIFEST.rsplit("/", 1)[0]

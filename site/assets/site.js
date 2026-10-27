@@ -217,7 +217,7 @@
   }
   document.querySelectorAll(".os .btn").forEach(b => b.insertAdjacentHTML("afterbegin", icon("download", 19)));
 
-  fetch("/downloads/manifest.json", { cache: "no-cache" }).then(r => r.ok ? r.json() : null).then(m => {
+  fetch("downloads/manifest.json", { cache: "no-cache" }).then(r => r.ok ? r.json() : null).then(m => {
     if (!m) return;
     document.getElementById("version").textContent = `FileForge ${m.version}`;
     const sums = document.getElementById("sums");
