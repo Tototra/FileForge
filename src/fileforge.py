@@ -2128,9 +2128,22 @@ def tex_to_pdf(files):
         dst = unique(f.with_suffix(".pdf"))
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)
-            # Copier le .tex et tous les fichiers du même dossier (images, bib, cls…)
+            # Copier le .tex et les fichiers de support (images, bib, cls, sty…)
+            # depuis le dossier du fichier ET le dossier parent (organisation fréquente : template/ + monDoc.tex)
+            support_exts = {".sty", ".cls", ".bib", ".bbx", ".cbx", ".lbx", ".png", ".jpg",
+                             ".jpeg", ".pdf", ".eps", ".svg", ".tikz", ".pgf"}
+            for search_dir in {f.parent, f.parent.parent}:
+                if not search_dir.is_dir():
+                    continue
+                for item in search_dir.iterdir():
+                    if item.is_file() and item.suffix.lower() in support_exts and not (tmp / item.name).exists():
+                        try:
+                            shutil.copy2(item, tmp / item.name)
+                        except Exception:
+                            pass
+            # Tous les fichiers du dossier du .tex (sauf les .pdf déjà compilés)
             for item in f.parent.iterdir():
-                if item.is_file() and item.suffix.lower() not in (".pdf",):
+                if item.is_file() and item.suffix.lower() not in (".pdf",) and not (tmp / item.name).exists():
                     try:
                         shutil.copy2(item, tmp / item.name)
                     except Exception:
