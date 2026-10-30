@@ -104,6 +104,7 @@ META = {
     # Documents / tableurs / général
     "doc_to_pdf": ("convert", "PDF", "file-type"), "office_convert": ("convert", "Autre format", "repeat"),
     "docx_convert": ("convert", "MD / HTML / TXT", "type"), "md_html": ("convert", "HTML", "code"),
+    "tex_to_pdf": ("convert", "PDF", "file-type"),
     "tab_convert": ("convert", "Excel / CSV / JSON", "sheet"), "tab_merge": ("tools", "Fusionner", "combine"),
     "make_zip": ("compress", "ZIP", "archive"), "extract_archive": ("extract", "Décompresser", "package-open"),
     "batch_rename": ("tools", "Renommer", "text-cursor-input"),
@@ -111,7 +112,7 @@ META = {
 }
 
 TYPE_COLORS = [(ff.PDF, "#ef4444"), (ff.IMG, "#22c55e"), (ff.VID, "#a855f7"), (ff.AUD, "#f59e0b"),
-               (ff.OFFICE | ff.TEXT, "#3b82f6"), (ff.TAB, "#10b981"), (ff.ARC, "#94a3b8")]
+               (ff.OFFICE | ff.TEXT, "#3b82f6"), (ff.TEX, "#f97316"), (ff.TAB, "#10b981"), (ff.ARC, "#94a3b8")]
 
 
 class Close(Exception):

@@ -9,7 +9,7 @@ import os, sys, re, io, json, math, shutil, subprocess, traceback, datetime, zip
 from pathlib import Path
 
 APP = "FileForge"
-__version__ = "1.2.3"
+__version__ = "1.3.0"
 HOME_DIR = Path(__file__).resolve().parent
 IS_WIN = sys.platform == "win32"
 IS_MAC = sys.platform == "darwin"
@@ -233,6 +233,7 @@ AUD = {"mp3", "wav", "m4a", "aac", "flac", "ogg", "opus", "aiff", "aif", "wma"}
 WORDS = {"docx", "doc", "rtf", "odt"}
 OFFICE = WORDS | {"pptx", "ppt", "odp", "xlsx", "xls", "ods"}
 TEXT = {"txt", "md", "markdown", "html", "htm"}
+TEX = {"tex"}
 TAB = {"csv", "tsv", "xlsx", "xls", "ods", "json"}
 ARC = {"zip", "tar", "gz", "tgz", "bz2", "xz"}
 
@@ -2089,6 +2090,95 @@ def md_html(files):
                        f"<style>body{{max-width:46em;margin:3em auto;padding:0 1em}}{CSS}</style>{to_html(f)}", encoding="utf-8")
         outs.append(dst)
     return outs
+
+@action("📝 LaTeX · Compiler en PDF", TEX)
+def tex_to_pdf(files):
+    """Compile un ou plusieurs fichiers .tex en PDF.
+
+    Essaie dans l'ordre : latexmk (avec xelatex ou pdflatex), xelatex,
+    pdflatex, puis tectonic (moteur autonome, pas besoin d'installation TeX).
+    Si aucun moteur n'est disponible, explique comment en installer un.
+    """
+    def _latex_engine():
+        """Retourne (nom, est_latexmk, est_tectonic) pour le premier moteur trouvé."""
+        if which("latexmk"):
+            return ("latexmk", True, False)
+        if which("xelatex"):
+            return ("xelatex", False, False)
+        if which("pdflatex"):
+            return ("pdflatex", False, False)
+        if which("tectonic"):
+            return ("tectonic", False, True)
+        return None, False, False
+
+    engine_name, use_latexmk, use_tectonic = _latex_engine()
+    if engine_name is None:
+        raise RuntimeError(
+            "Aucun moteur LaTeX trouvé.\n\n"
+            + ("Installe MiKTeX (miktex.org) ou TeX Live (tug.org/texlive)." if IS_WIN
+               else "Installe MacTeX : brew install --cask mactex\n"
+                    "Ou tectonic (léger) : brew install tectonic" if IS_MAC
+               else "sudo apt install texlive-xetex  # ou texlive-full pour les polices complètes")
+        )
+
+    outs = []
+    notify("Compilation LaTeX en cours…")
+    for f in files:
+        f = Path(f)
+        dst = unique(f.with_suffix(".pdf"))
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            # Copier le .tex et tous les fichiers du même dossier (images, bib, cls…)
+            for item in f.parent.iterdir():
+                if item.is_file() and item.suffix.lower() not in (".pdf",):
+                    try:
+                        shutil.copy2(item, tmp / item.name)
+                    except Exception:
+                        pass
+            tex_in_tmp = tmp / f.name
+
+            if use_tectonic:
+                # tectonic utilise -o pour le dossier de sortie
+                cmd = ["tectonic", "-o", str(tmp), str(tex_in_tmp)]
+                r = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp)
+            elif use_latexmk:
+                xelatex = which("xelatex")
+                cmd = ["latexmk", "-pdf", "-xelatex" if xelatex else "-pdflatex",
+                       "-interaction=nonstopmode", "-halt-on-error",
+                       "-output-directory", str(tmp), str(tex_in_tmp)]
+                r = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp)
+            else:
+                # xelatex / pdflatex : deux passes pour les références croisées
+                cmd = [engine_name, "-interaction=nonstopmode", "-halt-on-error",
+                       "-output-directory", str(tmp), str(tex_in_tmp)]
+                r = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp)
+                if r.returncode == 0:
+                    subprocess.run(cmd, capture_output=True, text=True, cwd=tmp)
+
+            pdf_out = tmp / f.with_suffix(".pdf").name
+            if not pdf_out.exists():
+                log_file = tmp / f.with_suffix(".log").name
+                err_lines = []
+                if log_file.exists():
+                    for line in log_file.read_text(encoding="utf-8", errors="replace").splitlines():
+                        if line.startswith("!") or "Error" in line:
+                            err_lines.append(line)
+                err_msg = "\n".join(err_lines[-8:]) if err_lines else (r.stderr or r.stdout or "")[-600:]
+                raise RuntimeError(
+                    f"La compilation de « {f.name} » a échoué.\n\n"
+                    + (err_msg or "Consulte le journal dans le dossier du fichier .tex.")
+                )
+            shutil.move(str(pdf_out), str(dst))
+            # Copier aussi le .log dans le dossier source (utile pour déboguer)
+            log_src = tmp / f.with_suffix(".log").name
+            if log_src.exists():
+                try:
+                    shutil.copy2(log_src, f.with_suffix(".log"))
+                except Exception:
+                    pass
+        outs.append(dst)
+    return outs
+
 
 # ───────────────────────── TABLEURS ─────────────────────────
 
