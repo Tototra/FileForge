@@ -1,0 +1,13 @@
+OK   LibreOffice disponible /Users/runner/Library/Application Support/FileForge/LibreOffice.app/Contents/MacOS/soffice
+OK   .pptx → PDF PPT Séance 1.pdf
+OK   .xlsx → PDF Budget été.pdf
+OK   recherche tolérante (factrue edf) 103260 éléments indexés en 4.9 s
+2026-11-24 16:25:53.854 python[1914:9594] -[WKWebView _setDrawsTransparentBackground:] is deprecated and should not be used.
+OK   roue : affichée 4.49 s
+2026-11-24 16:25:59.431 python[1979:10062] -[WKWebView _setDrawsTransparentBackground:] is deprecated and should not be used.
+OK   depot : affichée 3.54 s
+2026-11-24 16:26:06.157 python[2037:10399] -[WKWebView _setDrawsTransparentBackground:] is deprecated and should not be used.
+OK   recherche : affichée 2.31 s
+OK   journal sans erreur Python 
+
+0 échec(s) : []

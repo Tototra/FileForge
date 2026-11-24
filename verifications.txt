@@ -1,0 +1,5 @@
+roue : oui
+python : oui
+LibreOffice : oui
+agent ⌃⌥G/⌃⌥F : oui
+action rapide : oui

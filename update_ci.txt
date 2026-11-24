@@ -1,0 +1,43 @@
+OK   version installée lisible {"current": "1.3.1", "latest": "0.0.1", "newer": false, "required": false, "notes": ["Test : nouvelle version factice", "Accents : \u00e9t\u00e9, \u0153uvre"], "file": {"name": "FileForge-macOS.zip", 
+OK   déjà à jour → pas de nouvelle version 
+OK   à jour : rien ne s'affiche, arrêt immédiat 0.1 s
+OK   Plus tard : version reportée {"last_check": 1795537570.4675012, "latest_seen": "9.9.9", "snoozed": {"version": "9.9.9", "at": 1795537572.453214}}
+OK   Plus tard : pas reproposée tout de suite 0.1 s
+OK   empreinte fausse : refusée     path = download(info, lambda p: self._win.evaluate_js(f"UP.progress({p:.3f})"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/runner/Library/Application Support/FileForge/updater.py", line 175, in download
+    raise RuntimeError("le fichier téléchargé ne correspond pas à l'empreinte publiée : installation refusée")
+RuntimeError: le fichier téléchargé ne correspond pas à l'empreinte publiée : installation refusée
+
+OK   empreinte fausse : rien n'a été installé 
+OK   manifeste non signé : refusé     raise RuntimeError("le fichier téléchargé ne correspond pas à l'empreinte publiée : installation refusée")
+RuntimeError: le fichier téléchargé ne correspond pas à l'empreinte publiée : installation refusée
+
+[2026-11-24 16:26:25] mise à jour : vérification impossible : signature du manifeste introuvable ([Errno 2] No such file or directory: '/var/folders/q2/p1t6rgxj5fj32g1dc7dmd49r0000gn/T/ff-site-ba4jw_ay/manifest.sig')
+OK   manifeste non signé : rien n'a été installé 
+OK   manifeste modifié : refusé RuntimeError: le fichier téléchargé ne correspond pas à l'empreinte publiée : installation refusée
+
+[2026-11-24 16:26:25] mise à jour : vérification impossible : signature du manifeste introuvable ([Errno 2] No such file or directory: '/var/folders/q2/p1t6rgxj5fj32g1dc7dmd49r0000gn/T/ff-site-ba4jw_ay/manifest.sig')
+[2026-11-24 16:26:25] mise à jour : vérification impossible : signature du manifeste invalide : mise à jour refusée
+OK   manifeste modifié : rien n'a été installé 
+OK   mise à jour installée 8 s · {"last_check": 1795537585.280416, "latest_seen": "9.9.9", "installed": {"version": "9.9.9", "at": 1795537589.511916}}
+
+  - Dans le Finder : sélectionne des fichiers puis ⌃⌥F (Ctrl + Option + F)
+  - ou clic droit → Actions rapides → FileForge…
+  - ou glisse des fichiers sur FileForge.app (dans ton dossier Applications)
+  - ⌃⌥G n'importe où : chercher un fichier par son nom
+
+  Si le clic droit n'affiche pas FileForge : Réglages Système → Général →
+  Éléments de connexion et extensions → Finder → coche « FileForge… ».
+
+[2026-11-24 16:26:29] mise à jour : 9.9.9 installée
+[2026-11-24 16:26:29] raccourci : ⌃⌥G enregistré
+[2026-11-24 16:26:29] raccourci : ⌃⌥F enregistré
+OK   installée en moins de 10 min 8 s
+OK   agent des raccourcis relancé après la mise à jour 
+OK   FileForge fonctionne après la mise à jour 1.3.1
+OK   après la mise à jour : updater.py présent 
+OK   après la mise à jour : editor.py présent 
+OK   après la mise à jour : wheel.py présent 
+
+0 échec(s) : []
