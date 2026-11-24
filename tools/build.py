@@ -13,7 +13,7 @@ Produit :
 La clé privée de signature n'est jamais dans le dépôt : ~/.config/fileforge/update_signing.key
 (ou le fichier indiqué par FF_SIGNING_KEY), 64 caractères hexadécimaux. Sa clé publique est dans src/updater.py.
 """
-import hashlib, importlib.util, io, json, os, re, tarfile, zipfile
+import hashlib, importlib.util, io, json, os, re, sys, tarfile, zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -148,6 +148,10 @@ def check_public_key(pub):
 
 
 def main():
+    try:                                # console Windows (cp1252) : les flèches et accents ne doivent pas tout arrêter
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
     OUT.mkdir(parents=True, exist_ok=True)
     key, ed = signing_key()             # vérifiée avant de construire quoi que ce soit
     # notes de version et « mise à jour importante » : tools/release.json (lu par updater.py sur chaque ordinateur)
