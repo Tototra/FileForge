@@ -6,6 +6,7 @@
 
 Unicode true
 SetCompressor /SOLID lzma
+SetDateSave off            ; pas de dates de fichiers dans l'installateur : construction reproductible
 RequestExecutionLevel user
 ManifestDPIAware true
 
@@ -158,8 +159,11 @@ Section "Uninstall"
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileForge"
   SetOutPath "$TEMP"
   DetailPrint "Suppression des fichiers..."
-  ; rmdir est bien plus rapide que RMDir /r sur les milliers de fichiers de Python
-  nsExec::Exec '"$SYSDIR\cmd.exe" /c rmdir /s /q "$INSTDIR"'
-  Pop $0
-  RMDir /r "$INSTDIR"
+  ; seulement si c'est bien le dossier de FileForge (Uninstall.exe copié ailleurs ne doit rien effacer)
+  ${If} ${FileExists} "$INSTDIR\wheel.py"
+    ; rmdir est bien plus rapide que RMDir /r sur les milliers de fichiers de Python
+    nsExec::Exec '"$SYSDIR\cmd.exe" /c rmdir /s /q "$INSTDIR"'
+    Pop $0
+    RMDir /r "$INSTDIR"
+  ${EndIf}
 SectionEnd

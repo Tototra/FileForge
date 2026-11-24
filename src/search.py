@@ -236,7 +236,10 @@ class Index:
         home = str(HOME)
         with open(INDEX, encoding="utf-8", errors="replace") as fh:
             for line in fh:
-                m, d, p = line.rstrip("\n").split("\t", 2)
+                parts = line.rstrip("\n").split("\t", 2)
+                if len(parts) != 3 or not parts[0].isdigit():
+                    continue                     # ligne abîmée (écriture interrompue…) : ignorée
+                m, d, p = parts
                 paths.append(p)
                 mtimes.append(int(m))
                 isdir.append(d in ("1", "3"))

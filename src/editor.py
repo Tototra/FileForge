@@ -11,7 +11,7 @@ Chaque modification est appliquée aussitôt à une copie de travail en mémoire
 ce qu'on voit est exactement ce qui sera enregistré. L'original n'est jamais modifié : « Enregistrer »
 crée « document_modifié.pdf » à côté.
 """
-import base64, importlib.util, io, json, os, sys, tempfile, threading, time, traceback
+import base64, importlib.util, io, os, re, sys, tempfile, threading, time, traceback
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -34,6 +34,175 @@ BASE14 = {  # (serif, mono, gras, italique) → police PDF standard
     (False, True, True, False): "cobo", (False, True, False, True): "coit", (False, True, True, True): "cobi",
 }
 LATIN1 = set(range(32, 127)) | set(range(160, 256))     # ce que couvrent les polices PDF standard (pas €, œ, ’…)
+
+
+def _norm_font(n):
+    """« ABCDEF+TimesNewRomanPS-BoldMT » → « timesnewromanbold »"""
+    n = n.split("+", 1)[-1].lower()
+    n = re.sub(r"(ps)?mt$|ps(?=-)|[-_ ,]|regular", "", n)
+    return n.replace("oblique", "italic")
+
+
+_SYSFONTS = None
+
+
+def _font_dirs():
+    if IS_WIN:
+        return [Path(os.environ.get("WINDIR", r"C:\Windows")) / "Fonts",
+                Path(os.environ.get("LOCALAPPDATA", "")) / "Microsoft" / "Windows" / "Fonts",
+                Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "LibreOffice" / "share" / "fonts",
+                *[p / "share" / "fonts" for p in (ff.HOME_DIR / "libreoffice").glob("*")]]
+    # + les polices livrées avec LibreOffice (Carlito, Caladea, Liberation… : celles des PDF exportés depuis Office)
+    if sys.platform == "darwin":
+        return [Path("/System/Library/Fonts"), Path("/System/Library/Fonts/Supplemental"), Path("/Library/Fonts"),
+                Path.home() / "Library" / "Fonts", Path("/Applications/LibreOffice.app/Contents/Resources/fonts"),
+                ff.HOME_DIR / "LibreOffice.app" / "Contents" / "Resources" / "fonts"]
+    return [Path("/usr/share/fonts"), Path("/usr/local/share/fonts"), Path.home() / ".local/share/fonts",
+            Path.home() / ".fonts", Path("/usr/lib/libreoffice/share/fonts"), Path("/opt/libreoffice/share/fonts")]
+
+
+def system_font(name, bold=False, italic=False):
+    """Fichier de police installé correspondant à la police d'un PDF (même famille, graisse la plus proche)."""
+    global _SYSFONTS
+    if _SYSFONTS is None:
+        _SYSFONTS = []
+        for d in _font_dirs():
+            if d.is_dir():
+                _SYSFONTS += [p for p in d.rglob("*") if p.suffix.lower() in (".ttf", ".otf")]
+    want = _norm_font(name)
+    fam = re.split(r"bold|italic|light|medium|semibold|black|condensed", want)[0] or want
+    best, score = None, -1
+    for p in _SYSFONTS:
+        stem = re.sub(r"[-_ ]", "", p.stem.lower())
+        if not stem.startswith(fam[:4]):
+            continue
+        try:
+            full = _norm_font(pymupdf.Font(fontfile=str(p)).name)
+        except Exception:
+            continue
+        if not full.startswith(fam):
+            continue
+        sc = 10 if full == want else 0
+        sc += 3 * (("bold" in full) == bold) + 3 * (("italic" in full) == italic) - abs(len(full) - len(want)) * 0.01
+        if sc > score:
+            best, score = p, sc
+    return best
+
+
+def font_program(doc, xref):
+    """Lit directement le programme d'une police intégrée (FontFile2 / FontFile3 / FontFile), y compris quand
+    extract_font n'y arrive pas (polices TrueType simples des PDF exportés par Word ou LibreOffice)."""
+    def ref(x, k):
+        t, v = doc.xref_get_key(x, k)
+        if t == "xref":
+            return int(v.split()[0])
+        if t == "array" and " 0 R" in v:
+            return int(v.strip("[]").split()[0])
+        return None
+    try:
+        desc = ref(xref, "FontDescriptor")
+        if desc is None:                                   # police composite (Type0) : descripteur de la descendante
+            sub = ref(xref, "DescendantFonts")
+            desc = ref(sub, "FontDescriptor") if sub else None
+        for k in ("FontFile2", "FontFile3", "FontFile"):
+            ff_ = ref(desc, k) if desc else None
+            if ff_:
+                data = doc.xref_stream(ff_)
+                if data:
+                    return data
+    except Exception:
+        pass
+    return None
+
+
+def font_res_name(path):
+    """Nom de ressource unique par fichier de police (« Times New Roman » et « … Bold » ne doivent pas se confondre :
+    insert_font réutilise une police déjà présente sous le même nom)."""
+    import hashlib
+    return "FF" + hashlib.md5(str(path).encode("utf-8")).hexdigest()[:10]
+
+
+def pdf_point(page, pt):
+    """Point en coordonnées PyMuPDF de la page NON pivotée → coordonnées PDF natives (origine en bas à gauche de la
+    MediaBox, qui ne commence pas toujours en 0,0)."""
+    mb = page.mediabox
+    return pymupdf.Point(pt.x + mb.x0, mb.y1 - pt.y)
+
+
+def _obj_array(doc, x, key):
+    t, v = doc.xref_get_key(x, key)
+    if t == "xref":
+        v = doc.xref_object(int(v.split()[0]))
+    return v if t in ("array", "xref") else None
+
+
+def font_codes(doc, xref):
+    """Encodage propre d'une police du PDF : {caractère: code}, octets par code, {code: largeur/1000}.
+    Permet d'écrire avec la police déjà présente dans la page, même un sous-ensemble sans table Unicode."""
+    t, v = doc.xref_get_key(xref, "ToUnicode")
+    if t != "xref":
+        return None
+    cmap = doc.xref_stream(int(v.split()[0])).decode("latin-1")
+    m = re.search(r"begincodespacerange\s*<([0-9A-Fa-f]+)>", cmap)
+    nbytes = len(m.group(1)) // 2 if m else 1
+    if doc.xref_get_key(xref, "Encoding")[1] in ("/Identity-H", "/Identity-V"):
+        nbytes = 2
+    uni = {}
+
+    def put(code, hexdst):
+        try:
+            ch = bytes.fromhex(hexdst).decode("utf-16-be")
+        except ValueError:
+            return
+        if len(ch) == 1:
+            uni.setdefault(ch, code)
+    for blk in re.findall(r"beginbfchar(.*?)endbfchar", cmap, re.S):
+        for a, d in re.findall(r"<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>", blk):
+            put(int(a, 16), d)
+    for blk in re.findall(r"beginbfrange(.*?)endbfrange", cmap, re.S):
+        for a, b, rest in re.findall(r"<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>\s*(\[[^\]]*\]|<[0-9A-Fa-f]+>)", blk):
+            a, b = int(a, 16), int(b, 16)
+            if rest.startswith("["):
+                for i, d in enumerate(re.findall(r"<([0-9A-Fa-f]+)>", rest)):
+                    put(a + i, d)
+            elif b - a < 65536:
+                base = int(rest[1:-1], 16)
+                for i in range(b - a + 1):
+                    put(a + i, "%0*X" % (len(rest) - 2, base + i))
+    widths = {}
+    st, sub = doc.xref_get_key(xref, "Subtype")
+    if sub == "/Type0":
+        t, dv = doc.xref_get_key(xref, "DescendantFonts")
+        if t == "xref":                          # tableau rangé dans un objet à part
+            dv = doc.xref_object(int(dv.split()[0]))
+        m2 = re.search(r"(\d+) 0 R", dv)
+        if not m2:
+            return None
+        d = int(m2.group(1))
+        dw = doc.xref_get_key(d, "DW")[1]
+        default = float(dw) if dw not in ("null", "") else 1000.0
+        w = _obj_array(doc, d, "W") or "[]"
+        toks = re.findall(r"\[[^\]]*\]|-?[\d.]+", w.strip()[1:-1])
+        i = 0
+        while i < len(toks):
+            first = int(float(toks[i]))
+            if i + 1 < len(toks) and toks[i + 1].startswith("["):
+                for k, val in enumerate(toks[i + 1][1:-1].split()):
+                    widths[first + k] = float(val)
+                i += 2
+            else:
+                last, val = int(float(toks[i + 1])), float(toks[i + 2])
+                for c in range(first, last + 1):
+                    widths[c] = val
+                i += 3
+    else:
+        default = 0.0
+        fc = doc.xref_get_key(xref, "FirstChar")[1]
+        arr = _obj_array(doc, xref, "Widths")
+        if fc.isdigit() and arr:
+            for k, val in enumerate(arr.strip()[1:-1].split()):
+                widths[int(fc) + k] = float(val)
+    return {"uni": uni, "nbytes": nbytes, "widths": widths, "default": default}
 
 
 def rgb(hexcol):
@@ -81,6 +250,9 @@ class Editor:
         pix = page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), alpha=False)
         img = "data:image/jpeg;base64," + base64.b64encode(pix.tobytes("jpeg", jpg_quality=90)).decode()
         rot = page.rotation_matrix
+        xrefs = {}                 # nom de police (sans le préfixe de sous-ensemble « ABCDEF+ ») → xref dans le PDF
+        for xref, _e, _t, basefont, *_ in page.get_fonts():
+            xrefs.setdefault(basefont.split("+", 1)[-1], xref)
         lines = []
         for b in page.get_text("dict", flags=pymupdf.TEXTFLAGS_TEXT)["blocks"]:
             for ln in b.get("lines", []):
@@ -100,6 +272,7 @@ class Editor:
                     "serif": bool(flags & 4) or any(k in fontname for k in ("times", "serif", "georgia", "garamond", "roman")),
                     "mono": bool(flags & 8) or any(k in fontname for k in ("courier", "mono", "consol")),
                     "dir": tuple(ln.get("dir", (1, 0))),
+                    "font": s0["font"], "font_xref": xrefs.get(s0["font"]),
                 })
         self.lines[i] = lines
         return {"img": img, "w": page.rect.width, "h": page.rect.height, "rot": page.rotation, "lines": lines}
@@ -111,7 +284,8 @@ class Editor:
         if op["type"] == "text_edit":   # on fige le style de la ligne visée (rejouable après « Annuler »)
             ln = self.lines[op["page"]][op["line"]]
             op.update(raw_bbox=ln["raw_bbox"], origin=ln["origin"], size=ln["size"], color=op.get("color") or ln["color"],
-                      bold=ln["bold"], italic=ln["italic"], serif=ln["serif"], mono=ln["mono"], old=ln["text"], dir=ln["dir"])
+                      bold=ln["bold"], italic=ln["italic"], serif=ln["serif"], mono=ln["mono"], old=ln["text"], dir=ln["dir"],
+                      font=ln.get("font"), font_xref=ln.get("font_xref"))
         elif op["type"] == "image" and "file" in op:
             op["data"] = base64.b64encode(Path(op.pop("file")).read_bytes()).decode()
         self._apply(op)
@@ -131,9 +305,21 @@ class Editor:
         a, b = self._derot(page, r[0], r[1]), self._derot(page, r[2], r[3])
         return pymupdf.Rect(min(a.x, b.x), min(a.y, b.y), max(a.x, b.x), max(a.y, b.y))
 
-    def _font(self, page, text, bold=False, italic=False, serif=False, mono=False):
-        """Police standard PDF si possible (accents français compris), sinon une police du système qui a
-        tous les caractères du texte (€, œ, ✓…), la plus proche possible du style d'origine."""
+    def _font(self, page, text, bold=False, italic=False, serif=False, mono=False, font=None, font_xref=None):
+        """Police pour du texte modifié, la plus fidèle possible :
+        1. la police d'origine intégrée au PDF, si elle a tous les caractères du nouveau texte ;
+        2. la même police installée sur l'ordinateur (même famille, même graisse) ;
+        3. une police standard PDF (accents français compris), sinon une police du système qui a tous les
+           caractères du texte (€, œ, ✓…), proche du style d'origine."""
+        need = {ord(c) for c in text if not c.isspace()}
+        if font_xref:
+            buf = self._embedded(page.parent, font_xref)
+            if buf and self._covers(("xref", font_xref), need, buf):
+                return {"fontname": f"FFo{font_xref}", "fontbuffer": buf, "_key": ("xref", font_xref)}
+        if font:
+            f = system_font(font, bold, italic)
+            if f and self._covers(f, need):
+                return {"fontname": font_res_name(f), "fontfile": str(f), "_family": True}
         if all(ord(c) in LATIN1 for c in text):
             return {"fontname": BASE14[(serif and not mono, mono, bold, italic)]}
         k = (1 if bold else 0) + (2 if italic else 0)
@@ -149,36 +335,162 @@ class Editor:
                       (("Courier New.ttf",) if mono else ("Times New Roman.ttf",) if serif else ("Arial.ttf",))]
             cands += [Path("/System/Library/Fonts/Supplemental/Arial Unicode.ttf")]
         cands.append(Path(ff.font_file()))
-        need = {ord(c) for c in text if not c.isspace()}
         for f in cands:
             if f.exists() and self._covers(f, need):
-                return {"fontname": "FF" + f.stem.replace(" ", "")[:12], "fontfile": str(f)}
+                return {"fontname": font_res_name(f), "fontfile": str(f)}
         f = next((c for c in cands if c.exists()), Path(ff.font_file()))
-        return {"fontname": "FF" + f.stem.replace(" ", "")[:12], "fontfile": str(f)}
+        return {"fontname": font_res_name(f), "fontfile": str(f)}
 
     _cov = {}
+    _buf = {}
 
-    def _covers(self, f, need):
+    def _embedded(self, doc, xref):
+        """Programme de la police intégrée au PDF (None si elle n'est pas intégrée ou pas réutilisable)."""
+        key = (id(doc), xref)
+        if key not in self._buf:
+            buf = None
+            try:
+                _name, ext, _typ, buf = doc.extract_font(xref)
+                buf = buf if buf and ext not in ("n/a", "") else None
+            except Exception:
+                buf = None
+            self._buf[key] = buf or font_program(doc, xref)
+        return self._buf[key]
+
+    _enc = {}
+
+    def _codes(self, page, xref):
+        """Encodage de la police `xref` si elle est une ressource directe de la page (sinon None)."""
+        key = (id(page.parent), page.xref, xref)       # les noms de ressources (/F1…) sont propres à chaque page
+        if key not in self._enc:
+            enc = None
+            try:
+                # (xref, ext, type, basefont, nom de ressource, encodage, référent) — référent 0 : la page elle-même
+                res = next((f[4] for f in page.get_fonts(full=True) if f[0] == xref and f[6] == 0), None)
+                if res:
+                    enc = font_codes(page.parent, xref)
+                    if enc and enc["uni"]:
+                        enc["res"] = res
+                    else:
+                        enc = None
+            except Exception:
+                enc = None
+            self._enc[key] = enc
+        return self._enc[key]
+
+    def _put_codes(self, page, origin, text, size, color, rotate, enc):
+        """Écrit `text` avec la police de la page (ressource enc["res"]) ; renvoie la largeur écrite."""
+        import math
+        codes = [enc["uni"][c] for c in text]
+        hexs = "".join("%0*X" % (2 * enc["nbytes"], c) for c in codes)
+        width = sum(enc["widths"].get(c, enc["default"]) for c in codes) / 1000 * size
+        p = pdf_point(page, pymupdf.Point(origin))
+        a = math.radians(rotate)
+        ca, sa = round(math.cos(a), 6), round(math.sin(a), 6)
+        r, g, b = rgb(color)
+        ops = (f"q {r:.4f} {g:.4f} {b:.4f} rg BT /{enc['res']} {size:.3f} Tf "
+               f"{ca} {sa} {-sa} {ca} {p.x:.3f} {p.y:.3f} Tm <{hexs}> Tj ET Q\n").encode("ascii")
+        doc = page.parent
+        page.wrap_contents()
+        last = page.get_contents()[-1]
+        doc.update_stream(last, doc.xref_stream(last) + b"\n" + ops)
+        return width
+
+    def _fontobj(self, kw):
+        key = kw.get("_key") or kw.get("fontfile")
+        if key not in self._cov:
+            self._covers(key, set(), kw.get("fontbuffer"))
+        return self._cov.get(key)
+
+    def _width(self, s, kw, size):
+        if "fontbuffer" in kw or "fontfile" in kw:
+            return self._fontobj(kw).text_length(s, fontsize=size)
+        return pymupdf.get_text_length(s, kw["fontname"], size)
+
+    def _runs(self, page, text, style):
+        """Morceaux (texte, police). La police d'origine n'est qu'un sous-ensemble (cas courant des PDF exportés par
+        Word / LibreOffice) et la même famille n'est pas installée : chaque lettre présente dans la police d'origine
+        y reste, seules les lettres absentes passent dans une police proche."""
+        kw = self._font(page, text, **style)
+        xref = style.get("font_xref")
+        if "fontbuffer" in kw or kw.get("_family") or not xref:
+            return [(text, kw)]
+        buf = self._embedded(page.parent, xref)
+        if not buf or not self._covers(("xref", xref), set(), buf):
+            return [(text, kw)]
+        orig = self._cov[("xref", xref)]
+        okw = {"fontname": f"FFo{xref}", "fontbuffer": buf, "_key": ("xref", xref)}
+        has = lambda c: orig.has_glyph(32 if c.isspace() else ord(c))
+        if not any(has(c) for c in text):
+            # sous-ensemble sans table Unicode : on écrit avec la police de la page elle-même, par ses propres codes
+            enc = self._codes(page, xref)
+            if enc:
+                okw = {"_codes": enc}
+                has = lambda c: c in enc["uni"]
+        missing = "".join(sorted({c for c in text if not has(c)}))
+        if len(missing) == len(set(text)):
+            return [(text, kw)]
+        rest = {k: v for k, v in style.items() if k not in ("font", "font_xref")}
+        fkw = self._font(page, missing, **rest)
+        runs = []
+        for c in text:
+            k = okw if has(c) else fkw
+            if runs and runs[-1][1] is k:
+                runs[-1][0] += c
+            else:
+                runs.append([c, k])
+        return [(t, k) for t, k in runs]
+
+    def _covers(self, f, need, buf=None):
         font = self._cov.get(f)
         if font is None:
             try:
-                font = self._cov[f] = pymupdf.Font(fontfile=str(f))
+                font = pymupdf.Font(fontbuffer=buf) if buf else pymupdf.Font(fontfile=str(f))
+                if buf and not getattr(font, "is_writable", True):
+                    return False
+                self._cov[f] = font
             except Exception:
                 return False
         return all(font.has_glyph(c) for c in need)
 
     def _insert_text(self, page, origin, text, size, color, rotate=0, **style):
-        kw = self._font(page, text, **style)
-        page.insert_text(origin, text, fontsize=size, color=rgb(color), rotate=rotate, **kw)
-        if "fontfile" in kw:
-            self._fix_spaces(page, kw["fontname"])
+        o = pymupdf.Point(origin)
+        dx, dy = {0: (1, 0), 90: (0, -1), 180: (-1, 0), 270: (0, 1)}.get(rotate % 360, (1, 0))   # sens d'écriture
+        for chunk, kw in self._runs(page, text, style):
+            if "_codes" in kw:
+                w = self._put_codes(page, o, chunk, size, color, rotate, kw["_codes"])
+                o = o + (dx * w, dy * w)
+                continue
+            kw = {k: v for k, v in kw.items() if not k.startswith("_")} | {"_key": kw.get("_key")}
+            ins = {k: v for k, v in kw.items() if k != "_key"}
+            try:
+                page.insert_text(o, chunk, fontsize=size, color=rgb(color), rotate=rotate, **ins)
+            except Exception as e:
+                if "fontbuffer" not in ins and "fontfile" not in ins:
+                    raise
+                ff.log(f"éditeur : police {ins['fontname']} inutilisable ({e}), police de secours")
+                rest = {k: v for k, v in style.items() if k not in ("font", "font_xref")}
+                kw = self._font(page, chunk, **rest)
+                ins = {k: v for k, v in kw.items() if not k.startswith("_")}
+                page.insert_text(o, chunk, fontsize=size, color=rgb(color), rotate=rotate, **ins)
+            if "fontfile" in ins or "fontbuffer" in ins:
+                self._fix_spaces(page, ins["fontname"], self._fontobj(kw) if kw.get("_key") or "fontfile" in kw else None)
+            w = self._width(chunk, kw, size)
+            o = o + (dx * w, dy * w)
 
-    def _fix_spaces(self, page, fontname):
+    def _fix_spaces(self, page, fontname, font=None):
         """Arial & co. ont un seul dessin pour l'espace et l'espace insécable : la table de correspondance
         générée dit « insécable », et un copier-coller ou une recherche dans le PDF donnerait des espaces
-        spéciales. On la corrige pour nos polices."""
-        import re
+        spéciales. On corrige la seule entrée du dessin de l'espace (jamais une plage : décaler une plage qui
+        commence à U+00A0 transformerait é en i, ç en g…)."""
+        gid = font.has_glyph(32) if font is not None else 0
+        if not gid:
+            return
         doc = page.parent
+        one = re.compile(rb"(<0*%X>\s*)<00[aA]0>" % gid, re.I)
+
+        def block(m):
+            return one.sub(rb"\g<1><0020>", m.group(0))
         for xref, _e, _t, _b, name, _enc in page.get_fonts():
             if name != fontname:
                 continue
@@ -186,7 +498,7 @@ class Editor:
             if t[0] == "xref":
                 tx = int(t[1].split()[0])
                 st = doc.xref_stream(tx)
-                fixed = re.sub(rb"<00[aA]0>", b"<0020>", st)
+                fixed = re.sub(rb"beginbfchar.*?endbfchar", block, st, flags=re.S)
                 if fixed != st:
                     doc.update_stream(tx, fixed)
 
@@ -206,7 +518,8 @@ class Editor:
                 d = op.get("dir") or (1, 0)
                 rotate = {(1, 0): 0, (0, -1): 90, (-1, 0): 180, (0, 1): 270}.get((round(d[0]), round(d[1])), 0)
                 self._insert_text(page, op["origin"], op["text"], op["size"], op["color"], rotate=rotate,
-                                  bold=op["bold"], italic=op["italic"], serif=op["serif"], mono=op["mono"])
+                                  bold=op["bold"], italic=op["italic"], serif=op["serif"], mono=op["mono"],
+                                  font=op.get("font"), font_xref=op.get("font_xref"))
         elif t == "text_add":
             # (x, y) = ligne de base de la 1re ligne, en coordonnées affichées ; sur une page pivotée, le texte
             # reçoit la même rotation que la page pour apparaître droit
@@ -258,7 +571,10 @@ class Editor:
 
     def save(self, dest=None):
         dest = Path(dest) if dest else ff.unique(self.path.with_name(f"{self.path.stem}_modifié.pdf"))
-        self.doc.save(dest, garbage=3, deflate=True)
+        kw = {}
+        if self.password:          # document protégé : la copie modifiée garde le même mot de passe
+            kw = dict(encryption=pymupdf.PDF_ENCRYPT_AES_256, owner_pw=self.password, user_pw=self.password)
+        self.doc.save(dest, garbage=3, deflate=True, **kw)
         ff.log(f"éditeur : {len(self.ops)} modification(s) → {dest}")
         return str(dest)
 

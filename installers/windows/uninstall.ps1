@@ -9,7 +9,7 @@ if (-not $Quiet) { Write-Host "Désinstallation de FileForge..." -ForegroundColo
 # tout ce qui tourne depuis le dossier de FileForge (roue, agent Ctrl+Alt+G, LibreOffice privé…)
 $all = Get-CimInstance Win32_Process
 $ours = @($all | Where-Object { ($_.ExecutablePath -and $_.ExecutablePath -like "$Dest\*") -or
-                 (($_.Name -eq "pythonw.exe" -or $_.Name -eq "python.exe") -and $_.CommandLine -like "*FileForge*") })
+                 (($_.Name -eq "pythonw.exe" -or $_.Name -eq "python.exe") -and $_.CommandLine -like "*$Dest\*") })
 $ids = @($ours | ForEach-Object { $_.ProcessId })
 # et le moteur d'affichage (Edge WebView2) lancé par la roue
 $web = @($all | Where-Object { $_.Name -eq "msedgewebview2.exe" -and $ids -contains $_.ParentProcessId })

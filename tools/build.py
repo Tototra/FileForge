@@ -7,16 +7,21 @@ Produit :
   site/downloads/FileForge-macOS.zip
   site/downloads/FileForge-Setup.exe  (nécessite makensis)
   site/downloads/FileForge-Linux.tar.gz
-  site/downloads/manifest.json   (version, tailles, empreintes SHA-256 — lu par le site)
+  site/downloads/manifest.json   (version, tailles, empreintes SHA-256 — lu par le site et par les mises à jour)
+  site/downloads/manifest.sig    (signature Ed25519 du manifeste : sans elle, aucune mise à jour n'est acceptée)
+
+La clé privée de signature n'est jamais dans le dépôt : ~/.config/fileforge/update_signing.key
+(ou le fichier indiqué par FF_SIGNING_KEY), 64 caractères hexadécimaux. Sa clé publique est dans src/updater.py.
 """
-import hashlib, io, json, re, tarfile, time, zipfile
+import hashlib, importlib.util, io, json, os, re, tarfile, zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC, ASSETS, INST = ROOT / "src", ROOT / "assets", ROOT / "installers"
 OUT = ROOT / "site" / "downloads"
 VERSION = re.search(r'__version__ = "([^"]+)"', (SRC / "fileforge.py").read_text(encoding="utf-8")).group(1)
-CORE = ["fileforge.py", "wheel.py", "wheel.html", "search.py", "editor.py", "editor.html", "updater.py", "lucide.min.js"]
+CORE = ["fileforge.py", "wheel.py", "wheel.html", "search.py", "editor.py", "editor.html", "updater.py", "ed25519.py",
+        "lucide.min.js"]
 # horodatage fixe : archives reproductibles (même contenu → même empreinte)
 EPOCH = (2026, 1, 1, 0, 0, 0)
 
@@ -74,11 +79,8 @@ def build_windows():
     p = OUT / "FileForge-Setup.exe"
     w = INST / "windows"
     if not shutil.which("makensis"):
-        # ex. serveurs de build Cloudflare : on garde l'installateur déjà compilé (et testé) du dépôt
-        if p.exists():
-            print("makensis absent : FileForge-Setup.exe existant conservé")
-            return p
-        raise SystemExit("makensis introuvable : sudo apt install nsis  (ou brew install makensis)")
+        # jamais l'ancien Setup.exe sous le nouveau numéro de version : chaque PC Windows le réinstallerait en boucle
+        raise SystemExit("makensis introuvable : brew install makensis  (ou sudo apt install nsis)")
     st = Path(tempfile.mkdtemp())
     (st / "app").mkdir()
     for f in CORE + ["hotkey_win.py"]:
@@ -87,8 +89,10 @@ def build_windows():
     (st / "install.ps1").write_bytes(windows_text((w / "install.ps1").read_bytes(), True))
     (st / "uninstall.ps1").write_bytes(windows_text((w / "uninstall.ps1").read_bytes(), True))
     wizard_bitmap(st / "wizard.bmp")
+    import calendar
+    env = dict(os.environ, SOURCE_DATE_EPOCH=str(calendar.timegm(EPOCH + (0, 0, 0))))   # horodatage fixe de l'exe
     r = subprocess.run(["makensis", "-V2", "-INPUTCHARSET", "UTF8", f"-DSTAGE={st}", f"-DVERSION={VERSION}",
-                        f"-DOUTFILE={p}", str(w / "FileForge.nsi")], capture_output=True, text=True)
+                        f"-DOUTFILE={p}", str(w / "FileForge.nsi")], capture_output=True, text=True, env=env)
     shutil.rmtree(st, ignore_errors=True)
     if r.returncode != 0:
         raise SystemExit("makensis :\n" + r.stdout + r.stderr)
@@ -105,7 +109,8 @@ def build_linux():
               ("install.sh", INST / "linux/install.sh", True),
               ("uninstall.sh", INST / "linux/uninstall.sh", True),
               ("LISEZ-MOI.md", INST / "linux/LISEZ-MOI.md", False)]
-    mtime = time.mktime(EPOCH + (0, 0, -1))
+    import calendar
+    mtime = calendar.timegm(EPOCH + (0, 0, 0))     # indépendant du fuseau horaire : archive reproductible partout
     buf = io.BytesIO()
     with tarfile.open(fileobj=buf, mode="w", format=tarfile.PAX_FORMAT) as tf:
         for d in ("fileforge-linux", "fileforge-linux/app"):
@@ -122,8 +127,29 @@ def build_linux():
     return p
 
 
+def signing_key():
+    path = Path(os.environ.get("FF_SIGNING_KEY") or Path.home() / ".config" / "fileforge" / "update_signing.key")
+    try:
+        key = bytes.fromhex(path.read_text(encoding="ascii").strip())
+    except (OSError, ValueError):
+        raise SystemExit(f"clé de signature introuvable ou illisible : {path}\n"
+                         "(sans signature, aucun ordinateur n'accepterait cette version)") from None
+    if len(key) != 32:
+        raise SystemExit(f"clé de signature invalide : {path}")
+    spec = importlib.util.spec_from_file_location("ed25519", SRC / "ed25519.py")
+    ed = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ed)
+    return key, ed
+
+
+def check_public_key(pub):
+    if pub.hex() not in (SRC / "updater.py").read_text(encoding="utf-8"):
+        raise SystemExit("cette clé ne correspond pas à PUBLIC_KEY dans src/updater.py : les mises à jour seraient refusées")
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
+    key, ed = signing_key()             # vérifiée avant de construire quoi que ce soit
     # notes de version et « mise à jour importante » : tools/release.json (lu par updater.py sur chaque ordinateur)
     rel = json.loads((ROOT / "tools" / "release.json").read_text(encoding="utf-8")) if (ROOT / "tools" / "release.json").exists() else {}
     if rel.get("version") not in (None, VERSION):
@@ -135,8 +161,13 @@ def main():
         manifest["files"][os_name] = {"name": p.name, "bytes": len(data),
                                       "sha256": hashlib.sha256(data).hexdigest()}
         print(f"{p.name:28s} {len(data) / 1024:7.1f} Ko")
-    (OUT / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-    print(f"version {VERSION} → {OUT.relative_to(ROOT)}/manifest.json")
+    raw = (json.dumps(manifest, indent=2) + "\n").encode("utf-8")
+    sig = ed.sign(key, raw)
+    if not os.environ.get("FF_TEST_BUILD"):     # CI : clé de test, paquets jamais publiés
+        check_public_key(ed.public_key(key))
+    (OUT / "manifest.json").write_bytes(raw)
+    (OUT / "manifest.sig").write_text(sig.hex() + "\n", encoding="ascii")
+    print(f"version {VERSION} → {OUT.relative_to(ROOT) if OUT.is_relative_to(ROOT) else OUT}/manifest.json (signé)")
 
 
 if __name__ == "__main__":

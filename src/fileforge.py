@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # FileForge — Copyright © 2026 Thomas Trahant — SPDX-License-Identifier: GPL-3.0-or-later
-"""FileForge — boîte à outils fichiers pour macOS.
-PDF, images, vidéo, audio, documents, tableurs, archives.
-Usage : fileforge.py fichier1 [fichier2 ...]  (affiche un menu natif)
+"""FileForge — moteur : toutes les actions (PDF, images, vidéo, audio, documents, tableurs, archives).
+
+Chargé par la roue (wheel.py), qui fournit les dialogues. Lancé seul, il ne sert qu'aux fenêtres Tk de la roue :
+    fileforge.py --tk '{"fn": "regions", …}'
 """
 import os, sys, re, io, json, math, shutil, subprocess, traceback, datetime, zipfile, tarfile, gzip, tempfile
 from pathlib import Path
@@ -35,9 +36,6 @@ if IS_LINUX and "TESSDATA_PREFIX" not in os.environ:
 NOTES = []
 
 if IS_WIN:
-    # langues OCR fournies avec FileForge
-    if (HOME_DIR / "tessdata").is_dir():
-        os.environ.setdefault("TESSDATA_PREFIX", str(HOME_DIR / "tessdata"))
     # aucune fenêtre de console quand on lance ffmpeg, LibreOffice…
     _Popen = subprocess.Popen
 
@@ -152,7 +150,7 @@ def font_file():
             return c
     return "DejaVuSans.ttf"
 
-# ───────────────────────── utilitaires UI (AppleScript) ─────────────────────────
+# ───────────────────────── journal, dialogues ─────────────────────────
 
 class Cancel(Exception):
     pass
@@ -166,63 +164,20 @@ def log(msg):
         pass
 
 
-def _q(s):
-    return '"' + str(s).replace("\\", "\\\\").replace('"', '\\"') + '"'
+# Dialogues : fournis par l'interface qui charge ce module (wheel.py les remplace au démarrage, les tests aussi).
+def _no_ui(*a, **k):
+    raise RuntimeError("Interface non chargée : lance FileForge par la roue (wheel.py).")
 
 
-def osa(script):
-    r = subprocess.run(["osascript", "-e", script], capture_output=True, text=True)
-    if r.returncode != 0:
-        if "-128" in r.stderr:
-            raise Cancel()
-        raise RuntimeError(r.stderr.strip())
-    return r.stdout.rstrip("\n")
-
-
-def choose(items, prompt, default=None, multiple=False, ok="OK"):
-    lst = "{" + ",".join(_q(i) for i in items) + "}"
-    d = f" default items {{{_q(default if default in items else items[0])}}}" if not multiple else ""
-    m = " with multiple selections allowed" if multiple else ""
-    res = osa(
-        f"activate\nset r to choose from list {lst} with title {_q(APP)} with prompt {_q(prompt)}{d}{m} "
-        f'OK button name {_q(ok)} cancel button name "Annuler"\n'
-        "if r is false then error number -128\n"
-        "set AppleScript's text item delimiters to linefeed\nreturn r as text")
-    return res.split("\n") if multiple else res
-
-
-def ask(prompt, default="", hidden=False):
-    h = " with hidden answer" if hidden else ""
-    return osa(
-        f"activate\nreturn text returned of (display dialog {_q(prompt)} default answer {_q(default)} "
-        f'with title {_q(APP)}{h} buttons {{"Annuler","OK"}} default button "OK" cancel button "Annuler")').strip()
-
-
-def buttons(prompt, btns, default=None):
-    b = "{" + ",".join(_q(x) for x in btns) + "}"
-    c = ' cancel button "Annuler"' if "Annuler" in btns else ""
-    return osa(
-        f"activate\nreturn button returned of (display dialog {_q(prompt)} with title {_q(APP)} "
-        f"buttons {b} default button {_q(default or btns[-1])}{c})")
+choose = ask = buttons = choose_file = _no_ui
 
 
 def alert(title, msg=""):
-    try:
-        osa(f"activate\ndisplay alert {_q(title)} message {_q(msg)} as warning")
-    except Exception:
-        pass
+    log(f"{title} {msg}")
 
 
 def notify(msg):
-    try:
-        osa(f"display notification {_q(msg)} with title {_q(APP)}")
-    except Exception:
-        pass
-
-
-def choose_file(prompt, types=None):
-    t = (" of type {" + ",".join(_q(x) for x in types) + "}") if types else ""
-    return osa(f"activate\nreturn POSIX path of (choose file with prompt {_q(prompt)}{t})")
+    pass
 
 # ───────────────────────── utilitaires fichiers ─────────────────────────
 
@@ -296,23 +251,28 @@ def parse_ranges(s, n):
     s = s.replace(" ", "").lower()
     if s in ("", "tout", "toutes", "all", "*"):
         return list(range(n))
+    def num(x):
+        if x in ("fin", "end"):
+            return n
+        if not x.isdigit():
+            raise ValueError(f"« {part} » n'est pas compris (exemple : 1-3, 5, 8-fin).")
+        v = int(x)
+        if not 1 <= v <= n:
+            raise ValueError(f"Page {v} hors limites (le document a {n} page{'s' if n > 1 else ''}).")
+        return v
+
     res = []
     for part in s.split(","):
         if not part:
             continue
         if "-" in part:
             a, b = part.split("-", 1)
-            a = 1 if a == "" else (n if a in ("fin", "end") else int(a))
-            b = n if b in ("", "fin", "end") else int(b)
+            a = 1 if a == "" else num(a)
+            b = n if b == "" else num(b)
             step = 1 if b >= a else -1
             res += list(range(a, b + step, step))
-        elif part in ("fin", "end"):
-            res.append(n)
         else:
-            res.append(int(part))
-    bad = [p for p in res if p < 1 or p > n]
-    if bad:
-        raise ValueError(f"Pages hors limites : {bad} (le document a {n} pages).")
+            res.append(num(part))
     return [p - 1 for p in res]
 
 
@@ -329,10 +289,7 @@ def ask_pages(prompt, default, n, allow_empty=False):
                 return r
             raise ValueError("Aucune page indiquée.")
         except ValueError as e:
-            err = str(e)
-            if err.startswith("invalid literal"):
-                err = f"« {s} » n'est pas compris."
-            msg = f"⚠ {err}\n\n{prompt}"
+            msg = f"⚠ {e}\n\n{prompt}"
             default = s
 
 
@@ -346,9 +303,12 @@ def ask_int(prompt, default, lo=1):
 
 
 def parse_time(s):
+    """« 83 », « 1:23 » ou « 0:01:23 » → secondes ; vide → None."""
     s = s.strip().replace(",", ".")
     if not s:
         return None
+    if not re.fullmatch(r"\d+(\.\d+)?(:\d+(\.\d+)?){0,2}", s):
+        raise ValueError(f"« {s} » n'est pas un moment compris (exemples : 83, 1:23, 0:01:23).")
     parts = [float(x) for x in s.split(":")]
     t = 0.0
     for x in parts:
@@ -393,7 +353,35 @@ def ff(*args):
     r = subprocess.run([FFMPEG, "-y", "-hide_banner", "-loglevel", "error", *map(str, args)],
                        capture_output=True, text=True)
     if r.returncode != 0:
+        Path(str(args[-1])).unlink(missing_ok=True)        # la sortie (toujours en dernier) : pas de fichier cassé
         raise RuntimeError("ffmpeg : " + (r.stderr.strip().splitlines() or ["erreur"])[-1])
+
+
+_ENC = {}
+
+
+def has_encoder(name):
+    """Le ffmpeg trouvé sait-il encoder avec `name` ? (celui de Homebrew n'a pas libvorbis, par exemple)"""
+    if name not in _ENC:
+        try:
+            r = subprocess.run([FFMPEG, "-hide_banner", "-encoders"], capture_output=True, text=True, timeout=20)
+            _ENC.update({ln.split()[1]: True for ln in r.stdout.splitlines() if len(ln.split()) > 1 and ln.startswith(" ")})
+        except Exception:
+            pass
+        _ENC.setdefault(name, False)
+    return _ENC[name]
+
+
+def has_audio(f):
+    if not FFMPEG:
+        return True
+    r = subprocess.run([FFMPEG, "-hide_banner", "-i", str(f)], capture_output=True, text=True)
+    return "Audio:" in r.stderr
+
+
+def need_audio(f):
+    if not has_audio(f):
+        raise ValueError(f"« {Path(f).name} » n'a pas de son.")
 
 # ───────────────────────── registre des actions ─────────────────────────
 
@@ -617,6 +605,7 @@ def open_pdf(path):
         pw = ask(f"« {Path(path).name} » est protégé par un mot de passe.\nMot de passe :", hidden=True)
         if not d.authenticate(pw):
             raise RuntimeError("Mot de passe incorrect.")
+        d._ff_password = pw
     return d
 
 
@@ -676,6 +665,14 @@ def crop_page(page, l, t, r, b):
     page.set_cropbox(new & page.mediabox)
 
 
+def to_page(page, r):
+    """Rectangle vu à l'écran (page éventuellement pivotée) → coordonnées PDF de la page non pivotée."""
+    import pymupdf
+    u = pymupdf.Rect(r) * page.derotation_matrix
+    u.normalize()
+    return u
+
+
 def content_bbox(page):
     import pymupdf
     R = page.rect
@@ -689,21 +686,26 @@ def content_bbox(page):
     return bb
 
 
-def launch_editor(f):
-    """Ouvre l'éditeur PDF dans son propre processus (la roue se ferme aussitôt)."""
+def spawn(script, *args):
+    """Lance un autre programme de FileForge dans son propre processus, détaché de la roue (qui se ferme aussitôt) ;
+    ses erreurs de démarrage vont dans le journal."""
     exe = Path(sys.executable)
     if IS_WIN and exe.name.lower() == "python.exe" and (exe.parent / "pythonw.exe").exists():
         exe = exe.parent / "pythonw.exe"
-    lf = open(LOG, "a", encoding="utf-8")      # les erreurs de démarrage de l'éditeur vont dans le journal
+    lf = open(LOG, "a", encoding="utf-8")
     kw = {"cwd": tempfile.gettempdir(), "stdout": lf, "stderr": lf, "stdin": subprocess.DEVNULL}
     if IS_WIN:
         kw["creationflags"] = 0x08000000 | 0x00000200   # sans console, nouveau groupe
     else:
         kw["start_new_session"] = True
     try:
-        return subprocess.Popen([str(exe), str(Path(__file__).with_name("editor.py")), str(f)], **kw)
+        return subprocess.Popen([str(exe), str(Path(__file__).with_name(script)), *map(str, args)], **kw)
     finally:
         lf.close()
+
+
+def launch_editor(f):
+    return spawn("editor.py", f)
 
 
 @action("📄 PDF · Modifier (éditeur)", PDF)
@@ -877,8 +879,18 @@ def pdf_crop(files):
                 else:   # page d'un autre format : même zone, proportionnellement
                     crop_page(doc[p], fr[0] * Q.width, fr[1] * Q.height, (1 - fr[2]) * Q.width, (1 - fr[3]) * Q.height)
         elif mode.startswith("Retirer"):
-            v = [float(x) * mm for x in re.split(r"[,; ]+", ask(
-                "Marges à retirer en mm : haut, droite, bas, gauche\n(une seule valeur = partout)", "10")) if x]
+            raw = ask("Marges à retirer en mm : haut, droite, bas, gauche\n(une seule valeur = partout)", "10")
+            try:
+                r = raw.strip()
+                if ";" not in r and " " not in r and r.count(",") >= 2:   # « 10,5,10,5 » : virgules = séparateurs
+                    parts = r.split(",")
+                else:                                                    # « 10; 5 », « 10, 5 », « 2,5 » (décimale)
+                    parts = re.split(r"[; ]+|,(?=\s)", r)
+                v = [float(x.replace(",", ".")) * mm for x in parts if x]
+            except ValueError:
+                raise ValueError(f"« {raw} » : indique des nombres en mm, par exemple « 10 » ou « 10; 5; 10; 5 ».") from None
+            if not v or any(x < 0 for x in v):
+                raise ValueError("Indique des marges positives en mm.")
             t, rr, b, l = (v * 4)[:4] if len(v) == 1 else (v + [0, 0, 0, 0])[:4]
             for pg in doc:
                 crop_page(pg, l, t, rr, b)
@@ -920,15 +932,16 @@ def pdf_to_word(files):
     outs = []
     notify("Conversion en Word en cours…")
     for f in files:
-        pw = None
-        import pymupdf
-        if pymupdf.open(str(f)).needs_pass:
-            pw = ask(f"Mot de passe de « {Path(f).name} » :", hidden=True)
-        dst = out(f, "word", "docx").with_name(Path(f).stem + ".docx")
-        dst = unique(dst)
+        doc = open_pdf(f)                     # vérifie le fichier et le mot de passe avec un message clair
+        pw = getattr(doc, "_ff_password", None)
+        doc.close()
+        dst = unique(Path(f).with_suffix(".docx"))
         cv = Converter(str(f), password=pw)
         try:
             cv.convert(str(dst))
+        except BaseException:
+            dst.unlink(missing_ok=True)
+            raise
         finally:
             cv.close()
         outs.append(dst)
@@ -944,11 +957,14 @@ def pdf_to_pptx(files):
         doc = open_pdf(f)
         prs = Presentation()
         R = doc[0].rect
-        prs.slide_width, prs.slide_height = Emu(int(R.width * 12700)), Emu(int(R.height * 12700))
+        W, H = int(R.width * 12700), int(R.height * 12700)
+        prs.slide_width, prs.slide_height = Emu(W), Emu(H)
         for pg in doc:
             pix = pg.get_pixmap(dpi=170, alpha=False)
             s = prs.slides.add_slide(prs.slide_layouts[6])
-            s.shapes.add_picture(io.BytesIO(pix.tobytes("png")), 0, 0, prs.slide_width, prs.slide_height)
+            k = min(W / pg.rect.width, H / pg.rect.height)       # page d'un autre format : centrée, sans déformation
+            w, h = int(pg.rect.width * k), int(pg.rect.height * k)
+            s.shapes.add_picture(io.BytesIO(pix.tobytes("png")), Emu((W - w) // 2), Emu((H - h) // 2), Emu(w), Emu(h))
         dst = unique(Path(f).with_suffix(".pptx"))
         prs.save(str(dst))
         outs.append(dst)
@@ -1002,7 +1018,7 @@ def pdf_to_text(files):
             if not langs:
                 raise ValueError(f"« {Path(f).name} » ne contient aucun texte (document scanné). "
                                  "Utilise d'abord « OCR ». " + install_hint("tesseract"))
-            lang = "+".join(l for l in ("fra", "eng") if l in langs) or "eng"
+            lang = ocr_lang(langs)
             notify("Document scanné : reconnaissance du texte (OCR)…")
             txt = "\n\n".join(p.get_textpage_ocr(language=lang, dpi=300, full=True).extractText() for p in doc)
             NOTES.append("Document scanné : texte obtenu par OCR.")
@@ -1061,7 +1077,8 @@ def pdf_unlock(files):
     outs = []
     for f in files:
         doc = open_pdf(f)
-        if not doc.is_encrypted and not doc.needs_pass:
+        # ne pas relire doc.needs_pass après authenticate : PyMuPDF enregistrerait alors des pages vides
+        if not (doc.metadata or {}).get("encryption"):
             NOTES.append(f"{Path(f).name} n'était pas protégé.")
         outs.append(save_pdf(doc, out(f, "déverrouillé"), encryption=pymupdf.PDF_ENCRYPT_NONE))
     return outs
@@ -1070,7 +1087,9 @@ def pdf_unlock(files):
 @action("💧 PDF · Ajouter un filigrane", PDF)
 def pdf_watermark(files):
     import pymupdf
-    text = ask("Texte du filigrane :", "CONFIDENTIEL")
+    text = ask("Texte du filigrane :", "CONFIDENTIEL").strip()
+    if not text:
+        raise ValueError("Texte du filigrane vide.")
     op = {"Discret": 0.12, "Normal": 0.22, "Marqué": 0.4}[choose(["Discret", "Normal", "Marqué"], "Intensité :", default="Normal")]
     outs = []
     for f in files:
@@ -1082,8 +1101,10 @@ def pdf_watermark(files):
             tl = pymupdf.get_text_length(text, "helv", fs)
             ctr = pymupdf.Point(R.width / 2, R.height / 2)
             ang = math.degrees(math.atan2(R.height, R.width))
-            pg.insert_text(pymupdf.Point(ctr.x - tl / 2, ctr.y + fs * 0.35), text, fontsize=fs, fontname="helv",
-                           color=(0.55, 0.55, 0.55), fill_opacity=op, morph=(ctr, pymupdf.Matrix(ang)), overlay=True)
+            dr = pg.derotation_matrix          # géométrie calculée sur la page vue, posée sur la page PDF
+            pg.insert_text(pymupdf.Point(ctr.x - tl / 2, ctr.y + fs * 0.35) * dr, text, fontsize=fs, fontname="helv",
+                           color=(0.55, 0.55, 0.55), fill_opacity=op, rotate=pg.rotation,
+                           morph=(ctr * dr, pymupdf.Matrix(ang)), overlay=True)
         outs.append(save_pdf(doc, out(f, "filigrane")))
     return outs
 
@@ -1107,7 +1128,8 @@ def pdf_numbers(files):
             tl = pymupdf.get_text_length(s, "helv", fs)
             x = {"centre": (R.width - tl) / 2, "droite": R.width - tl - 36, "gauche": 36}[pos.split()[-1]]
             y = 28 if pos.startswith("Haut") else R.height - 22
-            pg.insert_text((x, y), s, fontsize=fs, fontname="helv", color=(0.25, 0.25, 0.25))
+            pg.insert_text(pymupdf.Point(x, y) * pg.derotation_matrix, s, fontsize=fs, fontname="helv",
+                           color=(0.25, 0.25, 0.25), rotate=pg.rotation)
         outs.append(save_pdf(doc, out(f, "numéroté")))
     return outs
 
@@ -1123,12 +1145,14 @@ def pdf_sign(files):
         sig = draw_signature()
     else:
         sig = Path(choose_file("Choisis l'image de ta signature", ["public.image"]))
-        if ext(sig) in ("heic", "heif", "webp"):
-            from PIL import Image
-            _heif()
-            tmp = Path(tempfile.mkdtemp()) / "sig.png"
-            Image.open(sig).save(tmp)
-            sig = tmp
+    # image lue en mémoire (HEIC / WebP convertis en PNG) : aucune copie de la signature dans le dossier temporaire
+    data = sig.read_bytes()
+    if ext(sig) in ("heic", "heif", "webp", "avif"):
+        from PIL import Image
+        _heif()
+        b = io.BytesIO()
+        Image.open(sig).save(b, "PNG")
+        data = b.getvalue()
     outs = []
     for f in files:
         doc = open_pdf(f)
@@ -1137,37 +1161,71 @@ def pdf_sign(files):
                            "Tu peux en placer plusieurs (sur différentes pages : ◀ ▶).",
                            multi=True, start_page=doc.page_count - 1)
         for pi, rects in sel.items():
+            pg = doc[pi]
             for r in rects:
-                doc[pi].insert_image(r, filename=str(sig), keep_proportion=True, overlay=True)
+                pg.insert_image(to_page(pg, r), stream=data, keep_proportion=True, overlay=True, rotate=pg.rotation)
         outs.append(save_pdf(doc, out(f, "signé")))
     return outs
 
 
 @action("⬛ PDF · Caviarder (masquer définitivement)", PDF)
 def pdf_redact(files):
+    import pymupdf
     m = choose(["Dessiner les zones à masquer", "Rechercher un mot / une expression"], "Caviarder :")
-    words = ask("Mots ou expressions à masquer (séparés par ; ) :", "") if m.startswith("Rechercher") else None
+    words = None
+    if m.startswith("Rechercher"):
+        words = [w.strip() for w in ask("Mots ou expressions à masquer (séparés par ; ) :", "").split(";") if w.strip()]
+        if not words:
+            raise ValueError("Aucun mot à masquer.")
     outs = []
     for f in files:
         doc = open_pdf(f)
         hits = 0
+        zones = {}                                    # page → rectangles (coordonnées PDF) à vider
         if words is None:
             sel = pick_regions(doc, "pdf", "Caviarder",
                                "Dessine un rectangle sur chaque zone à masquer (plusieurs possibles, sur toutes les pages).",
                                multi=True)
             for pi, rects in sel.items():
-                for r in rects:
-                    doc[pi].add_redact_annot(r, fill=(0, 0, 0))
-                    hits += 1
+                zones[pi] = [to_page(doc[pi], r) for r in rects]   # zone dessinée sur la page vue (éventuellement pivotée)
         else:
             for pg in doc:
-                for w in [w.strip() for w in words.split(";") if w.strip()]:
-                    for r in pg.search_for(w):
-                        pg.add_redact_annot(r, fill=(0, 0, 0))
-                        hits += 1
+                zones[pg.number] = [r for w in words for r in pg.search_for(w)]
+        for pi, rects in zones.items():
+            pg = doc[pi]
+            for r in rects:
+                pg.add_redact_annot(r, fill=(0, 0, 0))
+                hits += 1
+            for w in pg.widgets():                    # champs texte sous une zone ou contenant un mot : vidés
+                if w.field_type not in (pymupdf.PDF_WIDGET_TYPE_TEXT, pymupdf.PDF_WIDGET_TYPE_COMBOBOX):
+                    continue
+                val = str(w.field_value or "")
+                if val.strip() and (any(w.rect.intersects(r) for r in rects)
+                                    or (words and any(x.lower() in val.lower() for x in words))):
+                    w.field_value = " "               # (une valeur vide laisserait l'ancien texte dans le fichier)
+                    w.update()
+                    hits += 1
+        if not hits:
+            raise ValueError(f"« {Path(f).name} » : rien à masquer (aucune occurrence trouvée)."
+                             + (" Le mot est peut-être coupé en fin de ligne, ou le document est un scan (fais d'abord l'OCR)."
+                                if words else ""))
         for pg in doc:
             pg.apply_redactions()
-        NOTES.append(f"{Path(f).name} : {hits} zone(s) masquée(s) — le contenu dessous est réellement supprimé.")
+        # ce qui pourrait encore trahir le contenu : métadonnées, pièces jointes, scripts (pas le « texte caché » :
+        # ce serait toute la couche de texte d'un scan passé à l'OCR)
+        doc.scrub(metadata=True, xml_metadata=True, attached_files=True, embedded_files=True, javascript=True,
+                  hidden_text=False, thumbnails=True, reset_fields=False, reset_responses=True, redactions=True,
+                  remove_links=False)
+        if words:
+            def clean(t):
+                for w in words:
+                    t = re.sub(re.escape(w), "■■■", t, flags=re.I)
+                return t
+            doc.set_toc([[lv, clean(t), pg_] for lv, t, pg_ in doc.get_toc()])
+        else:
+            doc.set_toc([])
+        NOTES.append(f"{Path(f).name} : {hits} zone(s) masquée(s) — le contenu dessous est réellement supprimé "
+                     "(métadonnées et pièces jointes retirées aussi).")
         outs.append(save_pdf(doc, out(f, "caviardé"), garbage=4))
     return outs
 
@@ -1188,13 +1246,17 @@ def tess_langs():
         return None
 
 
+def ocr_lang(langs):
+    return "+".join(x for x in ("fra", "eng") if x in langs) or "eng"
+
+
 @action("🔍 PDF · OCR — rendre un scan cherchable", PDF)
 def pdf_ocr(files):
     import pymupdf
     langs = tess_langs()
     if langs is None:
         raise RuntimeError("L'OCR nécessite les langues Tesseract. " + install_hint("tesseract"))
-    lang = "+".join(l for l in ("fra", "eng") if l in langs) or "eng"
+    lang = ocr_lang(langs)
     outs = []
     notify("OCR en cours… (quelques secondes par page)")
     for f in files:
@@ -1258,7 +1320,14 @@ def pdf_repair(files):
     outs = []
     for f in files:
         doc = open_pdf(f)
-        outs.append(save_pdf(doc, out(f, "réparé"), garbage=4, clean=True))
+        dst = out(f, "réparé")
+        try:
+            save_pdf(doc, dst, garbage=4, clean=True)
+        except Exception as e:          # certains fichiers abîmés refusent le nettoyage des flux : on garde la structure
+            log(f"réparation sans nettoyage : {e}")
+            dst.unlink(missing_ok=True)
+            save_pdf(doc, dst, garbage=4)
+        outs.append(dst)
     return outs
 
 
@@ -1288,8 +1357,30 @@ def load_img(f):
     _heif()
     im = Image.open(f)
     im.load()
-    im = ImageOps.exif_transpose(im) or im
-    return im
+    if animated(im) or not im.getexif().get(0x0112, 1) > 1:
+        return im              # animation (garde toutes ses images) ou déjà droite
+    return ImageOps.exif_transpose(im)
+
+
+def animated(im):
+    """Vraie animation (GIF, WebP, PNG animés) — pas une photo JPEG « MPO » ni un TIFF multipage."""
+    return bool(getattr(im, "is_animated", False)) and im.format in ("GIF", "WEBP", "PNG")
+
+
+def frames_map(im, fn):
+    """Applique fn à chaque image d'une animation (GIF, WebP, PNG animés) ; image fixe → fn(im)."""
+    if not animated(im):
+        r = fn(im)
+        r.info = im.info
+        return r
+    from PIL import ImageSequence
+    res = []
+    for fr in ImageSequence.Iterator(im):
+        g = fn(fr.convert("RGBA"))
+        g.info = {"duration": fr.info.get("duration", im.info.get("duration", 100))}
+        res.append(g)
+    res[0].info.update(loop=im.info.get("loop", 0))
+    return res
 
 
 def flatten(im, bg=(255, 255, 255)):
@@ -1306,10 +1397,20 @@ PIL_FMT = {"jpg": "JPEG", "jpeg": "JPEG", "png": "PNG", "webp": "WEBP", "heic": 
            "avif": "AVIF", "tif": "TIFF", "tiff": "TIFF", "gif": "GIF", "bmp": "BMP", "ico": "ICO"}
 
 
+ANIM_FMT = {"GIF", "WEBP", "PNG"}
+
+
 def save_img(im, dst, quality=90, keep_exif=True):
-    from PIL import Image
+    """Enregistre une image (ou une liste d'images = animation) dans le format de l'extension de dst."""
     e = ext(dst)
     fmt = PIL_FMT.get(e, "PNG")
+    if isinstance(im, list):
+        if len(im) > 1 and fmt in ANIM_FMT:
+            frames = [f.convert("RGBA") for f in im]
+            frames[0].save(str(dst), fmt, save_all=True, append_images=frames[1:], loop=im[0].info.get("loop", 0),
+                           duration=[f.info.get("duration", 100) for f in im], **({"quality": quality} if fmt == "WEBP" else {}))
+            return Path(dst)
+        im = im[0]
     kw = {}
     exif = im.info.get("exif") if keep_exif else None
     if im.mode not in ("RGB", "RGBA", "L", "LA", "P", "1"):
@@ -1334,8 +1435,17 @@ def save_img(im, dst, quality=90, keep_exif=True):
         kw["exif"] = exif
     if not keep_exif:
         icc = im.info.get("icc_profile")
+        im = im.copy()          # nouvelle image : plus aucune balise d'origine (TIFF recopie sinon les siennes)
         im.info = {"icc_profile": icc} if icc else {}
-    im.save(str(dst), fmt, **kw)
+    try:
+        im.save(str(dst), fmt, **kw)
+    except (RuntimeError, ValueError, OSError) as e:
+        if "exif" not in kw:
+            raise
+        log(f"EXIF non transférable vers {fmt} ({e}) : image enregistrée sans")
+        Path(dst).unlink(missing_ok=True)
+        kw.pop("exif")
+        im.save(str(dst), fmt, **kw)
     return Path(dst)
 
 
@@ -1352,10 +1462,11 @@ def img_convert(files):
     fmt = choose(writable_formats(), "Convertir en :").lower()
     outs = []
     for f in files:
-        im = load_img(f)
-        if ext(f) == "gif" and fmt == "gif":
+        if ext(f) == fmt or (ext(f), fmt) in (("jpeg", "jpg"), ("tif", "tiff"), ("heif", "heic")):
+            NOTES.append(f"{Path(f).name} est déjà au format {fmt.upper()}.")
             continue
-        outs.append(save_img(im, unique(Path(f).with_suffix("." + fmt)), quality=92))
+        im = load_img(f)
+        outs.append(save_img(frames_map(im, lambda x: x), unique(Path(f).with_suffix("." + fmt)), quality=92))
     return outs
 
 
@@ -1363,22 +1474,22 @@ def img_convert(files):
 def img_resize(files):
     from PIL import Image
     s = ask("Nouvelle taille :\n• 50%  → pourcentage\n• 1920 → plus grand côté en pixels\n• 1080x1080 → tenir dans un cadre", "50%")
+    s = s.strip().lower().replace(" ", "").replace("×", "x").replace(",", ".")
+    m = (re.fullmatch(r"(\d+(?:\.\d+)?)%", s) or re.fullmatch(r"(\d+)x(\d+)", s) or re.fullmatch(r"(\d+)", s))
+    if not m or any(float(g) <= 0 for g in m.groups()):
+        raise ValueError(f"« {s} » n'est pas compris : écris par exemple 50%, 1920 ou 1080x1080.")
     outs = []
     for f in files:
         im = load_img(f)
         w, h = im.size
         if s.endswith("%"):
-            k = float(s[:-1]) / 100
-            nw, nh = round(w * k), round(h * k)
-        elif "x" in s.lower():
-            bw, bh = [int(x) for x in s.lower().split("x")]
-            k = min(bw / w, bh / h)
-            nw, nh = round(w * k), round(h * k)
+            k = float(m.group(1)) / 100
+        elif "x" in s:
+            k = min(int(m.group(1)) / w, int(m.group(2)) / h)
         else:
-            k = int(s) / max(w, h)
-            nw, nh = round(w * k), round(h * k)
-        r = im.resize((max(1, nw), max(1, nh)), Image.LANCZOS)
-        r.info = im.info
+            k = int(m.group(1)) / max(w, h)
+        nw, nh = max(1, round(w * k)), max(1, round(h * k))
+        r = frames_map(im, lambda x: x.resize((nw, nh), Image.LANCZOS))
         outs.append(save_img(r, out(f, f"{nw}x{nh}"), quality=92))
     return outs
 
@@ -1391,11 +1502,22 @@ def img_compress(files):
     outs = []
     for f in files:
         im = load_img(f)
+        e = ext(f)
+        if animated(im):                                 # animation : on réduit chaque image, sans changer de format
+            def shrink(x):
+                x = x.copy()
+                if maxs and max(x.size) > maxs:
+                    x.thumbnail((maxs, maxs), Image.LANCZOS)
+                return x
+            dst = out(f, "compressé")
+            save_img(frames_map(im, shrink), dst, quality=q)
+            size_note(f, dst)
+            outs.append(dst)
+            continue
         if maxs and max(im.size) > maxs:
             info = im.info
             im.thumbnail((maxs, maxs), Image.LANCZOS)
             im.info = info
-        e = ext(f)
         if e in ("png", "gif", "bmp", "tif", "tiff") and lvl[0] == "F" and e != "gif":
             if "A" in im.getbands():
                 im = im.quantize(256, method=Image.Quantize.FASTOCTREE)
@@ -1444,9 +1566,7 @@ def img_crop(files):
             if not box:
                 NOTES.append(f"{Path(f).name} : aucun bord détecté.")
                 continue
-        c = im.crop(box)
-        c.info = im.info
-        outs.append(save_img(c, out(f, "rogné"), quality=93))
+        outs.append(save_img(frames_map(im, lambda x: x.crop(box)), out(f, "rogné"), quality=93))
     return outs
 
 
@@ -1460,9 +1580,7 @@ def img_rotate(files):
     outs = []
     for f in files:
         im = load_img(f)
-        r = im.transpose(op)
-        r.info = im.info
-        outs.append(save_img(r, out(f, "pivoté"), quality=93))
+        outs.append(save_img(frames_map(im, lambda x: x.transpose(op)), out(f, "pivoté"), quality=93))
     return outs
 
 
@@ -1498,7 +1616,9 @@ def img_to_pdf(files):
 @action("💧 Image · Ajouter un filigrane / copyright", IMG)
 def img_watermark(files):
     from PIL import Image, ImageDraw, ImageFont
-    text = ask("Texte du filigrane :", f"© {datetime.date.today().year}")
+    text = ask("Texte du filigrane :", f"© {datetime.date.today().year}").strip()
+    if not text:
+        raise ValueError("Texte du filigrane vide.")
     pos = choose(["Bas droite", "Bas gauche", "Centre (grand)", "Mosaïque (répété en diagonale)"], "Position :")
     outs = []
     for f in files:
@@ -1558,6 +1678,11 @@ def img_gif(files):
 
 # ───────────────────────── VIDÉO ─────────────────────────
 
+def check_span(a, b):
+    if b is not None and b <= (a or 0):
+        raise ValueError("La fin de l'extrait doit être après son début.")
+
+
 def _vlabel(files):
     notify(f"Traitement vidéo en cours ({len(files)} fichier(s))… je te préviens à la fin.")
 
@@ -1595,6 +1720,7 @@ def vid_compress(files):
 def vid_trim(files):
     a = parse_time(ask("Début de l'extrait (ex : 1:23 ou 83 ou 0:01:23) :", "0:00"))
     b = parse_time(ask("Fin de l'extrait (vide = jusqu'à la fin) :", ""))
+    check_span(a, b)
     _vlabel(files)
     outs = []
     for f in files:
@@ -1629,6 +1755,7 @@ def vid_audio(files):
     _vlabel(files)
     outs = []
     for f in files:
+        need_audio(f)
         dst = unique(Path(f).with_suffix(".mp3"))
         ff("-i", f, "-vn", "-c:a", "libmp3lame", "-q:a", "2", dst)
         outs.append(dst)
@@ -1670,7 +1797,7 @@ def vid_rotate(files):
     for f in files:
         dst = out(f, "pivoté", "mp4")
         ff("-i", f, "-vf", vf, "-c:v", "libx264", "-crf", "20", "-preset", "medium", "-pix_fmt", "yuv420p",
-           "-c:a", "copy", "-movflags", "+faststart", dst)
+           "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", dst)
         outs.append(dst)
     return outs
 
@@ -1682,14 +1809,26 @@ def vid_frame(files):
     for f in files:
         dst = out(f, f"image_{int(t)}s", "jpg")
         ff("-ss", t, "-i", f, "-frames:v", "1", "-q:v", "2", dst)
+        if not dst.exists() or dst.stat().st_size == 0:
+            dst.unlink(missing_ok=True)
+            raise ValueError(f"Le moment choisi ({t:g} s) est après la fin de « {Path(f).name} ».")
         outs.append(dst)
     return outs
 
 # ───────────────────────── AUDIO ─────────────────────────
 
-ACODEC = {"mp3": ["-c:a", "libmp3lame", "-q:a", "2"], "m4a": ["-c:a", "aac", "-b:a", "192k"],
-          "wav": ["-c:a", "pcm_s16le"], "flac": ["-c:a", "flac"], "ogg": ["-c:a", "libvorbis", "-q:a", "5"],
-          "aiff": ["-c:a", "pcm_s16be"]}
+def acodec(e):
+    """Options d'encodage audio pour un fichier de sortie d'extension `e` (son seul ou piste d'une vidéo)."""
+    aac = ["-c:a", "aac", "-b:a", "192k"]
+    table = {"mp3": ["-c:a", "libmp3lame", "-q:a", "2"], "m4a": aac, "aac": aac, "mp4": aac, "m4v": aac, "mov": aac,
+             "mkv": aac, "3gp": aac, "wav": ["-c:a", "pcm_s16le"], "flac": ["-c:a", "flac"],
+             "aiff": ["-c:a", "pcm_s16be"], "aif": ["-c:a", "pcm_s16be"], "wma": ["-c:a", "wmav2", "-b:a", "192k"],
+             "wmv": ["-c:a", "wmav2", "-b:a", "192k"], "opus": ["-c:a", "libopus", "-b:a", "128k"],
+             "webm": ["-c:a", "libopus", "-b:a", "128k"], "avi": ["-c:a", "libmp3lame", "-q:a", "2"],
+             "flv": aac, "mpg": ["-c:a", "mp2"], "mpeg": ["-c:a", "mp2"]}
+    if e == "ogg":     # le ffmpeg de Homebrew n'a pas libvorbis : encodeur Vorbis intégré (stéréo) à la place
+        return ["-c:a", "libvorbis", "-q:a", "5"] if has_encoder("libvorbis") else ["-c:a", "vorbis", "-strict", "-2", "-ac", "2"]
+    return table.get(e, table["mp3"])
 
 
 @action("🎵 Audio · Convertir le format", AUD | VID)
@@ -1697,8 +1836,9 @@ def aud_convert(files):
     e = choose(["MP3", "M4A (AAC)", "WAV", "FLAC", "OGG", "AIFF"], "Convertir en :").split()[0].lower()
     outs = []
     for f in files:
+        need_audio(f)
         dst = unique(Path(f).with_suffix("." + e))
-        ff("-i", f, "-vn", *ACODEC[e], dst)
+        ff("-i", f, "-vn", *acodec(e), dst)
         outs.append(dst)
     return outs
 
@@ -1709,6 +1849,7 @@ def aud_compress(files):
                 "Débit :", default="128k (standard)")
     outs = []
     for f in files:
+        need_audio(f)
         dst = out(f, "compressé", "mp3")
         mono = ["-ac", "1"] if "mono" in br else []
         ff("-i", f, "-vn", *mono, "-c:a", "libmp3lame", "-b:a", br.split()[0], dst)
@@ -1721,6 +1862,7 @@ def aud_compress(files):
 def aud_trim(files):
     a = parse_time(ask("Début (ex : 1:23) :", "0:00")) or 0
     b = parse_time(ask("Fin (vide = jusqu'à la fin) :", ""))
+    check_span(a, b)
     fade = choose(["Sans fondu", "Fondu entrée + sortie (2 s)"], "Fondu :").startswith("Fondu")
     outs = []
     for f in files:
@@ -1733,7 +1875,7 @@ def aud_trim(files):
             if dur:
                 fl += f",afade=t=out:st={max(0, dur - 2)}:d=2"
             af = ["-af", fl]
-        ff("-ss", a, *to, "-i", f, "-vn", *af, *ACODEC.get(ext(f), ["-c:a", "libmp3lame", "-q:a", "2"]), dst)
+        ff("-ss", a, *to, "-i", f, "-vn", *af, *acodec(ext(f)), dst)
         outs.append(dst)
     return outs
 
@@ -1742,12 +1884,12 @@ def aud_trim(files):
 def aud_norm(files):
     outs = []
     for f in files:
-        if ext(f) in VID:
-            dst = out(f, "volume-normalisé")
-            ff("-i", f, "-c:v", "copy", "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-c:a", "aac", "-b:a", "192k", dst)
-        else:
-            dst = out(f, "volume-normalisé")
-            ff("-i", f, "-vn", "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", *ACODEC.get(ext(f), ACODEC["mp3"]), dst)
+        need_audio(f)
+        dst = out(f, "volume-normalisé")
+        keep = ["-c:v", "copy"] if ext(f) in VID else ["-vn"]
+        # loudnorm travaille à 192 kHz : on revient à une fréquence standard
+        ff("-i", f, *keep, "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-ar", "48000" if ext(f) in ("opus", "webm") else "44100",
+           *acodec(ext(f)), dst)
         outs.append(dst)
     return outs
 
@@ -1759,7 +1901,9 @@ def aud_merge(files):
     for f in files:
         args += ["-i", f]
     n = len(files)
-    ff(*args, "-filter_complex", "".join(f"[{i}:a]" for i in range(n)) + f"concat=n={n}:v=0:a=1[a]",
+    # même fréquence et mêmes canaux pour tous (sinon concat refuse des fichiers mono 22 kHz + stéréo 44 kHz)
+    norm = "".join(f"[{i}:a]aresample=44100,aformat=sample_fmts=fltp:channel_layouts=stereo[a{i}];" for i in range(n))
+    ff(*args, "-filter_complex", norm + "".join(f"[a{i}]" for i in range(n)) + f"concat=n={n}:v=0:a=1[a]",
        "-map", "[a]", "-c:a", "libmp3lame", "-q:a", "2", dst)
     return [dst]
 
@@ -1840,14 +1984,6 @@ def read_any_text(f):
     return b.decode("latin-1")
 
 
-def text_encoding(f):
-    try:
-        Path(f).read_bytes().decode("utf-8-sig")
-        return "utf-8-sig"
-    except UnicodeDecodeError:
-        return "cp1252"
-
-
 def to_html(f):
     import html as H
     e = ext(f)
@@ -1897,10 +2033,6 @@ def soffice():
                  str(HOME_DIR / "LibreOffice.app" / "Contents" / "MacOS" / "soffice"))
 
 
-def word_app():
-    return os.path.exists("/Applications/Microsoft Word.app")
-
-
 def lo_convert(src, fmt, dst):
     """Conversion via LibreOffice (headless). Retourne True si réussi."""
     so = soffice()
@@ -1918,9 +2050,10 @@ def lo_convert(src, fmt, dst):
         # profil séparé : fonctionne même si LibreOffice est déjà ouvert
         r = subprocess.run([so, f"-env:UserInstallation={prof.as_uri()}", "--headless", "--norestore",
                             "--nologo", "--nodefault", "--convert-to", fmt, "--outdir", str(tmp), str(simple)],
-                           capture_output=True, timeout=600)
+                           capture_output=True, timeout=300)
         res = None
-        for _ in range(40):  # au cas où soffice rendrait la main avant d'avoir écrit le fichier
+        # Windows : soffice.exe rend parfois la main avant d'avoir écrit le fichier ; ailleurs, inutile d'attendre
+        for _ in range(40 if IS_WIN and r.returncode == 0 else 2):
             res = next(tmp.glob("document." + fmt.split(":")[0]), None)
             if res and res.stat().st_size > 0:
                 break
@@ -2054,8 +2187,18 @@ def office_convert(files):
     notify("Conversion en cours…")
     for f in files:
         dst = unique(Path(f).with_suffix("." + tgt))
-        fmt = "txt:Text (encoded):UTF8" if tgt == "txt" else tgt
-        if not lo_convert(f, fmt, dst):
+        if tgt == "txt":
+            # l'export texte de LibreOffice reste bloqué indéfiniment sur certaines versions : passage par .docx
+            import mammoth
+            src = Path(f)
+            with tempfile.TemporaryDirectory() as td:
+                if ext(f) != "docx":
+                    src = Path(td) / "document.docx"
+                    if not lo_convert(f, "docx", src):
+                        raise RuntimeError(f"Conversion impossible pour {Path(f).name}.")
+                with open(src, "rb") as fh:
+                    dst.write_text(mammoth.extract_raw_text(fh).value, encoding="utf-8")
+        elif not lo_convert(f, tgt, dst):
             raise RuntimeError(f"Conversion impossible pour {Path(f).name}.")
         outs.append(dst)
     return outs
@@ -2086,7 +2229,8 @@ def md_html(files):
     outs = []
     for f in files:
         dst = unique(Path(f).with_suffix(".html"))
-        dst.write_text(f"<!doctype html><meta charset='utf-8'><title>{Path(f).stem}</title>"
+        import html as H
+        dst.write_text(f"<!doctype html><meta charset='utf-8'><title>{H.escape(Path(f).stem)}</title>"
                        f"<style>body{{max-width:46em;margin:3em auto;padding:0 1em}}{CSS}</style>{to_html(f)}", encoding="utf-8")
         outs.append(dst)
     return outs
@@ -2128,37 +2272,15 @@ def tex_to_pdf(files):
         dst = unique(f.with_suffix(".pdf"))
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)
-            # Copier le .tex et les fichiers de support (images, bib, cls, sty…)
-            # depuis le dossier du fichier ET le dossier parent (organisation fréquente : template/ + monDoc.tex)
-            support_exts = {".sty", ".cls", ".bib", ".bbx", ".cbx", ".lbx", ".png", ".jpg",
-                             ".jpeg", ".pdf", ".eps", ".svg", ".tikz", ".pgf"}
-            for search_dir in {f.parent, f.parent.parent}:
-                if not search_dir.is_dir():
-                    continue
-                for item in search_dir.iterdir():
-                    if item.is_file() and item.suffix.lower() in support_exts and not (tmp / item.name).exists():
-                        try:
-                            shutil.copy2(item, tmp / item.name)
-                        except Exception:
-                            pass
-            # Tous les fichiers du dossier du .tex (sauf les .pdf déjà compilés)
-            for item in f.parent.iterdir():
-                if item.is_file() and item.suffix.lower() not in (".pdf",) and not (tmp / item.name).exists():
-                    try:
-                        shutil.copy2(item, tmp / item.name)
-                    except Exception:
-                        pass
+            copy_tex_tree(f, tmp)
             tex_in_tmp = tmp / f.name
-
             if use_tectonic:
-                # tectonic utilise -o pour le dossier de sortie
-                cmd = ["tectonic", "-o", str(tmp), str(tex_in_tmp)]
+                cmd = [which("tectonic"), "-o", str(tmp), str(tex_in_tmp)]
                 r = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp)
             elif use_latexmk:
-                xelatex = which("xelatex")
-                cmd = ["latexmk", "-pdf", "-xelatex" if xelatex else "-pdflatex",
-                       "-interaction=nonstopmode", "-halt-on-error",
-                       "-output-directory", str(tmp), str(tex_in_tmp)]
+                # -norc : un fichier latexmkrc (du code Perl) posé à côté du .tex n'est jamais exécuté
+                cmd = ["latexmk", "-norc", "-pdf", "-xelatex" if which("xelatex") else "-pdflatex",
+                       "-interaction=nonstopmode", "-halt-on-error", "-output-directory=" + str(tmp), str(tex_in_tmp)]
                 r = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp)
             else:
                 # xelatex / pdflatex : deux passes pour les références croisées
@@ -2166,31 +2288,72 @@ def tex_to_pdf(files):
                        "-output-directory", str(tmp), str(tex_in_tmp)]
                 r = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp)
                 if r.returncode == 0:
-                    subprocess.run(cmd, capture_output=True, text=True, cwd=tmp)
+                    r = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp)
 
             pdf_out = tmp / f.with_suffix(".pdf").name
-            if not pdf_out.exists():
-                log_file = tmp / f.with_suffix(".log").name
+            log_src = tmp / f.with_suffix(".log").name
+            if log_src.exists():            # journal à côté du .tex (utile pour corriger une erreur)
+                try:
+                    shutil.copy2(log_src, f.with_suffix(".log"))
+                except OSError:
+                    pass
+            if not pdf_out.exists():          # (l'ancien PDF n'est jamais recopié : celui-ci vient de cette compilation)
                 err_lines = []
-                if log_file.exists():
-                    for line in log_file.read_text(encoding="utf-8", errors="replace").splitlines():
+                if log_src.exists():
+                    for line in log_src.read_text(encoding="utf-8", errors="replace").splitlines():
                         if line.startswith("!") or "Error" in line:
                             err_lines.append(line)
                 err_msg = "\n".join(err_lines[-8:]) if err_lines else (r.stderr or r.stdout or "")[-600:]
                 raise RuntimeError(
                     f"La compilation de « {f.name} » a échoué.\n\n"
-                    + (err_msg or "Consulte le journal dans le dossier du fichier .tex.")
+                    + (err_msg or f"Consulte le journal {f.with_suffix('.log').name} à côté du fichier .tex.")
                 )
             shutil.move(str(pdf_out), str(dst))
-            # Copier aussi le .log dans le dossier source (utile pour déboguer)
-            log_src = tmp / f.with_suffix(".log").name
-            if log_src.exists():
-                try:
-                    shutil.copy2(log_src, f.with_suffix(".log"))
-                except Exception:
-                    pass
         outs.append(dst)
     return outs
+
+
+TEX_EXTS = {".tex", ".sty", ".cls", ".bib", ".bst", ".bbx", ".cbx", ".lbx", ".dbx", ".def", ".cfg", ".clo", ".fd", ".ltx",
+            ".ist", ".png", ".jpg", ".jpeg", ".pdf", ".eps", ".svg", ".tikz", ".pgf", ".csv", ".dat", ".txt", ".ttf",
+            ".otf", ".bbl", ".gls", ".nlo", ".lua", ".mp", ".pdf_tex", ".table", ".gnuplot"}
+TEX_STYLE = {".sty", ".cls", ".bib", ".bst", ".bbx", ".cbx", ".lbx", ".dbx", ".def", ".cfg", ".clo", ".fd"}
+TEX_SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "venv", "build", "_minted"}
+
+
+def copy_tex_tree(f, tmp, max_files=3000, max_bytes=150 * 1024 * 1024, big=40 * 1024 * 1024):
+    """Copie dans tmp ce dont LaTeX a besoin, sans jamais exécuter ni recopier n'importe quoi :
+    - dossier du .tex : tous les fichiers (sources de \\lstinputlisting, données…), sauf latexmkrc, l'ancien PDF
+      compilé (une compilation ratée renverrait l'ancienne version), vidéos, sons, archives et très gros fichiers ;
+    - sous-dossiers (chapitres/, figures/…) : seulement les types utiles à TeX, dans la limite d'une taille raisonnable ;
+    - dossier parent : fichiers de style (modèle commun)."""
+    root = f.parent
+    skip_top = {f.with_suffix(".pdf").name, f.with_suffix(".log").name, "latexmkrc", ".latexmkrc"}
+    heavy = {"." + e for e in VID | AUD | ARC} | {".dmg", ".iso", ".exe", ".pkg", ".app"}
+    n = size = 0
+    for d, dirs, names in os.walk(root):
+        dirs[:] = [x for x in dirs if x not in TEX_SKIP_DIRS and not x.startswith(".")]
+        rel = Path(d).relative_to(root)
+        top = rel == Path(".")
+        for name in names:
+            src = Path(d) / name
+            e = Path(name).suffix.lower()
+            if top and (name in skip_top or e in heavy) or not top and e not in TEX_EXTS:
+                continue
+            try:
+                sz = src.stat().st_size
+            except OSError:
+                continue
+            if sz > big or n >= max_files or size + sz > max_bytes:
+                continue                                  # trop gros pour être utile à LaTeX : ignoré
+            n += 1
+            size += sz
+            (tmp / rel).mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, tmp / rel / name)
+    parent = root.parent
+    if parent != root:
+        for src in parent.iterdir():
+            if src.is_file() and src.suffix.lower() in TEX_STYLE and not (tmp / src.name).exists():
+                shutil.copy2(src, tmp / src.name)
 
 
 # ───────────────────────── TABLEURS ─────────────────────────
@@ -2199,10 +2362,12 @@ def read_tables(f):
     import pandas as pd
     e = ext(f)
     if e in ("csv", "tsv"):
-        return {Path(f).stem: pd.read_csv(f, sep="\t" if e == "tsv" else None, engine="python", encoding=text_encoding(f),
-                                            encoding_errors="replace")}
+        return {Path(f).stem: pd.read_csv(io.StringIO(read_any_text(f)), sep="\t" if e == "tsv" else None, engine="python")}
     if e == "json":
-        data = json.loads(Path(f).read_text(encoding="utf-8"))
+        try:
+            data = json.loads(read_any_text(f))
+        except ValueError as err:
+            raise ValueError(f"« {Path(f).name} » n'est pas un fichier JSON valide ({err}).") from None
         if isinstance(data, dict) and all(isinstance(v, list) for v in data.values()):
             return {k: pd.json_normalize(v) for k, v in data.items()}
         return {Path(f).stem: pd.json_normalize(data if isinstance(data, list) else [data])}
@@ -2221,9 +2386,10 @@ def tab_convert(files):
         sheets = read_tables(f)
         if tgt.startswith("Excel"):
             dst = unique(Path(f).with_suffix(".xlsx"))
-            with pd.ExcelWriter(dst) as xw:
+            names = set()
+            with written(dst), pd.ExcelWriter(dst) as xw:
                 for name, df in sheets.items():
-                    df.to_excel(xw, sheet_name=str(name)[:31] or "Feuille1", index=False)
+                    df.to_excel(xw, sheet_name=sheet_name(name, names), index=False)
             outs.append(dst)
         else:
             for name, df in sheets.items():
@@ -2241,19 +2407,47 @@ def tab_convert(files):
 def tab_merge(files):
     import pandas as pd
     mode = choose(["Une feuille par fichier", "Tout empiler dans une seule feuille"], "Fusion :")
+    tables = [(f, name, df) for f in files for name, df in read_tables(f).items()]   # tout lire avant d'écrire
     dst = unique(Path(files[0]).with_name("Fusion.xlsx"))
-    frames = []
-    with pd.ExcelWriter(dst) as xw:
-        for f in files:
-            for name, df in read_tables(f).items():
-                if mode.startswith("Une"):
-                    df.to_excel(xw, sheet_name=f"{Path(f).stem}"[:31], index=False)
-                else:
-                    df.insert(0, "Source", Path(f).name)
-                    frames.append(df)
-        if frames:
+    names = set()
+    with written(dst), pd.ExcelWriter(dst) as xw:
+        if mode.startswith("Une"):
+            for f, name, df in tables:
+                stem = Path(f).stem
+                label = stem if name == stem else f"{stem} - {name}"     # classeur à plusieurs feuilles
+                df.to_excel(xw, sheet_name=sheet_name(label, names), index=False)
+        else:
+            frames = []
+            for f, name, df in tables:
+                df.insert(0, "Source", Path(f).name)
+                frames.append(df)
             pd.concat(frames, ignore_index=True).to_excel(xw, sheet_name="Fusion", index=False)
     return [dst]
+
+
+def sheet_name(name, used):
+    """Nom de feuille Excel valide (31 caractères, sans []:*?/\\) et unique dans le classeur."""
+    base = re.sub(r"[\[\]:*?/\\]", "_", str(name)).strip("'") or "Feuille"
+    cand, i = base[:31], 2
+    while cand.lower() in used:
+        suf = f" ({i})"
+        cand, i = base[:31 - len(suf)] + suf, i + 1
+    used.add(cand.lower())
+    return cand
+
+
+class written:
+    """with written(dst): … — si l'écriture échoue, le fichier à moitié écrit est supprimé."""
+    def __init__(self, dst):
+        self.dst = Path(dst)
+
+    def __enter__(self):
+        return self.dst
+
+    def __exit__(self, et, ev, tb):
+        if et is not None:
+            self.dst.unlink(missing_ok=True)
+        return False
 
 # ───────────────────────── GÉNÉRAL ─────────────────────────
 
@@ -2292,69 +2486,65 @@ def extract_archive(files):
             d.mkdir()
             with tarfile.open(f) as t:
                 t.extractall(d, filter="data")
-        elif ext(f) == "gz":
-            d = unique(Path(f).with_name(name))
-            with gzip.open(f, "rb") as src, open(d, "wb") as o:
-                shutil.copyfileobj(src, o)
+        elif ext(f) in ("gz", "bz2", "xz"):
+            import bz2, lzma
+            opener = {"gz": gzip.open, "bz2": bz2.open, "xz": lzma.open}[ext(f)]
+            try:
+                with written(d), opener(f, "rb") as src, open(d, "wb") as o:
+                    shutil.copyfileobj(src, o)
+            except (OSError, EOFError, lzma.LZMAError) as err:
+                raise RuntimeError(f"« {Path(f).name} » est abîmé ou n'est pas une archive lisible ({err}).") from None
         else:
-            raise RuntimeError(f"Format d'archive non pris en charge : {Path(f).name}")
+            raise RuntimeError(f"Format d'archive non pris en charge (ou fichier abîmé) : {Path(f).name}")
         outs.append(d)
     return outs
 
 
 @action("🔄 FileForge · Vérifier les mises à jour", None)
 def app_update(files):
-    exe = Path(sys.executable)
-    if IS_WIN and exe.name.lower() == "python.exe" and (exe.parent / "pythonw.exe").exists():
-        exe = exe.parent / "pythonw.exe"
-    kw = {"cwd": tempfile.gettempdir()}
-    kw.update(creationflags=0x08000000 | 0x00000200) if IS_WIN else kw.update(start_new_session=True)
-    subprocess.Popen([str(exe), str(Path(__file__).with_name("updater.py")), "--manual"], **kw)
+    spawn("updater.py", "--manual")
     return []
 
 
 @action("🏷️ Renommer en lot (numérotation)", None, minf=2)
 def batch_rename(files):
-    base = ask(f"Renommer {len(files)} éléments.\nNom de base (ils deviendront « Nom_01 », « Nom_02 »…) :", "Fichier")
+    base = ask(f"Renommer {len(files)} éléments.\nNom de base (ils deviendront « Nom_01 », « Nom_02 »…) :", "Fichier").strip()
     if not base:
         raise Cancel()
+    if re.search(r'[/\\:*?"<>|]', base) or base.startswith("."):
+        raise ValueError("Le nom ne peut pas contenir / \\ : * ? \" < > | ni commencer par un point.")
     w = max(2, len(str(len(files))))
     preview = "\n".join(f"{Path(f).name}  →  {base}_{i:0{w}d}{Path(f).suffix}" for i, f in enumerate(files[:6], 1))
     if buttons(f"Aperçu :\n\n{preview}{chr(10) + '…' if len(files) > 6 else ''}", ["Annuler", "Renommer"]) != "Renommer":
         raise Cancel()
-    outs = []
-    tmp = []
-    for i, f in enumerate(files, 1):  # passage par des noms temporaires pour éviter les collisions
-        t = Path(f).with_name(f".ff_tmp_{i}_{os.getpid()}{Path(f).suffix}")
-        os.rename(f, t)
-        tmp.append(t)
-    for i, t in enumerate(tmp, 1):
-        dst = unique(t.with_name(f"{base}_{i:0{w}d}{t.suffix}"))
-        os.rename(t, dst)
-        outs.append(dst)
-    return outs
+    done = []      # [nom d'origine, nom temporaire, nom actuel] : de quoi tout remettre en place si un fichier résiste
+    try:
+        for i, f in enumerate(files, 1):  # passage par des noms temporaires pour éviter les collisions
+            t = Path(f).with_name(f".ff_tmp_{i}_{os.getpid()}{Path(f).suffix}")
+            os.rename(f, t)
+            done.append([Path(f), t, t])
+        for i, item in enumerate(done, 1):
+            dst = unique(item[1].with_name(f"{base}_{i:0{w}d}{item[1].suffix}"))
+            os.rename(item[1], dst)
+            item[2] = dst
+    except OSError as e:
+        # en deux temps (nouveaux noms → temporaires → noms d'origine) : un nouveau nom peut être l'ancien nom
+        # d'un autre fichier, et rename écraserait ce dernier
+        for step in (lambda it: (it[2], it[1]), lambda it: (it[1], it[0])):
+            for it in done:
+                a, b = step(it)
+                if a == b or not a.exists():
+                    continue
+                try:
+                    if b.exists():
+                        raise OSError("destination occupée")
+                    os.rename(a, b)
+                except OSError as err:
+                    log(f"renommage : impossible de remettre {a} → {b} ({err})")
+        raise RuntimeError(f"Renommage annulé, rien n'a changé : {e}") from None
+    return [cur for _, _, cur in done]
 
-# ───────────────────────── MENU PRINCIPAL ─────────────────────────
-
-def finish(outs):
-    outs = [Path(o) for o in outs if o]
-    if not outs and not NOTES:
-        return
-    msg = f"Terminé ✓  {len(outs)} élément(s) créé(s)." if outs else "Terminé."
-    if outs:
-        msg += "\n\n" + "\n".join("• " + o.name for o in outs[:8]) + (f"\n… et {len(outs) - 8} autres" if len(outs) > 8 else "")
-    if NOTES:
-        msg += "\n\n" + "\n".join(NOTES)
-    if not outs:
-        buttons(msg, ["OK"])
-        return
-    btns = ["OK", "Afficher dans le Finder"] + (["Ouvrir"] if len(outs) == 1 else [])
-    b = buttons(msg, btns, default=btns[-1])
-    if b == "Ouvrir":
-        open_path(outs[0])
-    elif b.startswith("Afficher"):
-        reveal(outs[0])
-
+# ───────────────────────── sélection des actions, fenêtres Tk ─────────────────────────
 
 def available(files):
     res = []
@@ -2365,21 +2555,6 @@ def available(files):
             continue
         res.append(a)
     return res
-
-
-def main(argv):
-    files = sorted({os.path.abspath(a) for a in argv if os.path.exists(a)}, key=natural)
-    if not files:
-        alert("Aucun fichier", "Sélectionne un ou plusieurs fichiers dans le Finder, puis clic droit → Actions rapides → FileForge.")
-        return
-    acts = available(files)
-    names = ", ".join(Path(f).name for f in files[:3]) + (f" (+{len(files) - 3})" if len(files) > 3 else "")
-    label = choose([a["label"] for a in acts], f"{len(files)} élément(s) : {names}\n\nQue veux-tu faire ?", ok="Continuer")
-    act = next(a for a in acts if a["label"] == label)
-    log(f"{act['label']} ← {files}")
-    outs = act["fn"](files) or []
-    log(f"  → {[str(o) for o in outs]}")
-    finish(outs)
 
 
 def tk_entry(a):
@@ -2416,13 +2591,3 @@ def tk_entry(a):
 
 if __name__ == "__main__" and len(sys.argv) > 2 and sys.argv[1] == "--tk":
     tk_entry(json.loads(sys.argv[2]))
-    sys.exit(0)
-
-if __name__ == "__main__":
-    try:
-        main(sys.argv[1:])
-    except Cancel:
-        pass
-    except Exception as e:
-        log(traceback.format_exc())
-        alert("Oups, l'action a échoué", f"{e}\n\nDétails : ~/Library/Logs/FileForge.log")

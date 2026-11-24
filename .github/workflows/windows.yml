@@ -5,7 +5,7 @@ name: Test Windows et Mac
 on:
   push:
     branches: [windows]
-    paths: ["src/**", "installers/windows/**", "site/downloads/FileForge-Setup.exe", "tests/**", ".github/workflows/windows.yml"]
+    paths: ["src/**", "installers/**", "tools/build.py", "tests/**", ".github/workflows/windows.yml"]
   workflow_dispatch:
 
 permissions:
@@ -24,6 +24,16 @@ jobs:
         shell: pwsh
     steps:
       - uses: actions/checkout@v4
+
+      - name: Construction des paquets depuis les sources du commit (clé de signature de test)
+        run: |
+          choco install nsis -y --no-progress
+          $env:Path += ";${env:ProgramFiles(x86)}\NSIS"
+          python -m pip install --quiet pillow
+          python -c "import secrets; print(secrets.token_hex(32))" | Out-File -Encoding ascii "$env:RUNNER_TEMP\test.key"
+          $env:FF_SIGNING_KEY = "$env:RUNNER_TEMP\test.key"; $env:FF_TEST_BUILD = "1"
+          python tools/build.py
+          if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: Installation par FileForge-Setup.exe (fenêtre visible, comme un utilisateur)
         run: |
@@ -189,7 +199,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Installation à partir du zip publié (comme un utilisateur)
+      - name: Construction des paquets depuis les sources du commit (clé de signature de test)
+        run: |
+          brew install makensis
+          python3 -m pip install --quiet --break-system-packages pillow
+          python3 -c "import secrets; print(secrets.token_hex(32))" > "$RUNNER_TEMP/test.key"
+          FF_SIGNING_KEY="$RUNNER_TEMP/test.key" FF_TEST_BUILD=1 python3 tools/build.py
+
+      - name: Installation à partir du zip construit (comme un utilisateur)
         run: |
           mkdir -p ci-out "$RUNNER_TEMP/pkg"
           ditto -x -k site/downloads/FileForge-macOS.zip "$RUNNER_TEMP/pkg"

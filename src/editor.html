@@ -176,7 +176,7 @@ async function renderPage(P){
   P.z = S.zoom; busy(1);
   try{
     const r = await api().render(P.i, S.zoom * (window.devicePixelRatio || 1));
-    if(r.error){ toast('Erreur : ' + r.error); return }
+    if(r.error){ toast('Erreur : ' + esc(r.error)); return }
     P.img.src = r.img; P.lines = r.lines; P.w = r.w; P.h = r.h; sizePage(P); drawLines(P);
   }finally{ busy(-1) }
 }
@@ -246,7 +246,13 @@ function bindPage(P){
 function moveRect(el, a, b){ Object.assign(el.style, {left:Math.min(a[0], b[0]) * S.zoom + 'px', top:Math.min(a[1], b[1]) * S.zoom + 'px',
   width:Math.abs(b[0] - a[0]) * S.zoom + 'px', height:Math.abs(b[1] - a[1]) * S.zoom + 'px'}) }
 
-function family(l){ return l.mono ? 'Consolas,Courier New,monospace' : l.serif ? '"Times New Roman",Georgia,serif' : 'Helvetica,Arial,"Segoe UI",sans-serif' }
+function family(l){
+  // la police de la ligne d'abord (« ABCDEF+Georgia-Bold » → Georgia), si elle est installée ; sinon une famille proche
+  const real = (l.font || '').split('+').pop().split(/[-,]/)[0].replace(/(PS)?MT$/, '')
+    .replace(/(\s+(Regular|Bold|Italic|Oblique|Light|Medium|Semibold|Black))+$/i, '').replace(/[^\w ]/g, '');
+  const base = l.mono ? 'Consolas,Courier New,monospace' : l.serif ? '"Times New Roman",Georgia,serif' : 'Helvetica,Arial,"Segoe UI",sans-serif';
+  return (real ? `"${real}",` : '') + base;
+}
 function startEdit(P, l){
   const b = document.createElement('div'); b.className = 'box'; b.contentEditable = 'plaintext-only'; b.textContent = l.text;
   const [x0, y0, x1, y1] = l.bbox;
@@ -283,7 +289,7 @@ async function doOp(op, pages){
   busy(1);
   try{
     const r = await api().do(op);
-    if(!r || r.error){ toast('Modification impossible : ' + (r && r.error)); return false }
+    if(!r || r.error){ toast('Modification impossible : ' + esc(r && r.error)); return false }
     S.ops++; S.info = r.info; $('#b-undo').disabled = false;
     if(op.type === 'delete_page' || op.type === 'rotate'){ build(); rerender() } else rerender(pages);
     return true;
@@ -302,7 +308,7 @@ async function save(){
   await commitEdit(); busy(1);
   try{
     const r = await api().save();
-    if(r.error){ toast('Enregistrement impossible : ' + r.error); return }
+    if(r.error){ toast('Enregistrement impossible : ' + esc(r.error)); return }
     S.saved = r.path;
     toast(`${icon('circle-check', 16).replace('<svg', '<svg style="color:#22c55e"')} Enregistré : <b>${esc(r.path.split(/[\\/]/).pop())}</b>
       <button id="t-open">Ouvrir</button><button id="t-show">Afficher</button>`, 9000);

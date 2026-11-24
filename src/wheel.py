@@ -202,7 +202,8 @@ def choose(items, prompt, default=None, multiple=False, ok="OK"):
 
 
 def ask(prompt, default="", hidden=False):
-    return str(ui._wait({"mode": "ask", "prompt": prompt, "default": default, "hidden": hidden})).strip()
+    v = str(ui._wait({"mode": "ask", "prompt": prompt, "default": default, "hidden": hidden}))
+    return v if hidden else v.strip()        # un mot de passe peut commencer ou finir par une espace
 
 
 def buttons(prompt, btns, default=None):
@@ -332,16 +333,21 @@ def tk_call(payload):
 
 
 def pick_regions(src, kind, title, hint, multi=False, start_page=0):
-    tmp = Path(tempfile.mkdtemp())
-    if kind == "pdf":
-        import pymupdf
-        p = tmp / "src.pdf"
-        p.write_bytes(src.tobytes(encryption=pymupdf.PDF_ENCRYPT_NONE))
-    else:
-        p = tmp / "src.png"
-        src.save(p)
-    res = tk_call({"fn": "regions", "path": str(p), "kind": kind, "title": title, "hint": hint,
-                   "multi": multi, "start_page": start_page})
+    # copie (déchiffrée) le temps de la fenêtre de sélection seulement : jamais laissée dans le dossier temporaire
+    import shutil
+    tmp = Path(tempfile.mkdtemp(prefix="fileforge-"))
+    try:
+        if kind == "pdf":
+            import pymupdf
+            p = tmp / "src.pdf"
+            p.write_bytes(src.tobytes(encryption=pymupdf.PDF_ENCRYPT_NONE))
+        else:
+            p = tmp / "src.png"
+            src.save(p)
+        res = tk_call({"fn": "regions", "path": str(p), "kind": kind, "title": title, "hint": hint,
+                       "multi": multi, "start_page": start_page})
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
     return {int(k): [tuple(r) for r in v] for k, v in res.items()}
 
 
@@ -402,22 +408,65 @@ def explorer_selection():
 
 
 def gather(args):
-    """Windows lance un processus par fichier sélectionné : on les regroupe en une seule roue."""
-    import time
+    """Windows lance un processus par fichier sélectionné (clic droit) : on les regroupe en une seule roue.
+    Chacun ajoute ses fichiers à une file commune. Le premier à créer le verrou attend que la file ne bouge plus,
+    la prend, ramasse les retardataires, puis libère le verrou ; les autres s'arrêtent dès que leur ligne est prise."""
     tmp = Path(tempfile.gettempdir())
     q, lock = tmp / "fileforge_queue.txt", tmp / "fileforge_queue.lock"
     with open(q, "a", encoding="utf-8") as fh:
         fh.write("\n".join(args) + "\n")
+    me = args[0]
+    deadline = time.time() + 30
+    while True:
+        try:
+            if lock.exists() and time.time() - lock.stat().st_mtime > 15:
+                lock.unlink()                                   # verrou abandonné (processus tué)
+            os.close(os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY))
+            break                                               # c'est ce processus qui ouvre la roue
+        except FileExistsError:
+            pass
+        except OSError:
+            pass
+        try:
+            mine_waiting = me in [x.strip() for x in q.read_text(encoding="utf-8").splitlines()]
+        except FileNotFoundError:
+            mine_waiting = False
+        except OSError:
+            mine_waiting = True
+        if not mine_waiting or time.time() > deadline:
+            os._exit(0)                                         # nos fichiers sont dans la roue d'un autre processus
+        time.sleep(0.05)
+    paths = []
     try:
-        if lock.exists() and time.time() - lock.stat().st_mtime > 10:
-            lock.unlink()
-        os.close(os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY))
-    except FileExistsError:
-        os._exit(0)
-    time.sleep(0.7)
-    try:
-        paths = [l.strip() for l in q.read_text(encoding="utf-8").splitlines() if l.strip()]
-        q.unlink()
+        # Explorateur : on sait exactement quels fichiers sont sélectionnés → on attend qu'ils soient tous arrivés
+        expected = set(explorer_selection()) if IS_WIN else set()
+        if me not in expected:
+            expected = set()
+        last, still, t0 = -1, 0, time.time()
+        while time.time() - t0 < 10:                            # attend que tous les processus aient écrit
+            time.sleep(0.15)
+            try:
+                txt = q.read_text(encoding="utf-8")
+            except OSError:
+                txt = ""
+            if expected and expected <= {x.strip() for x in txt.splitlines()}:
+                break
+            still = still + 1 if len(txt) == last else 0
+            last = len(txt)
+            if not expected and still >= 8 and time.time() - t0 >= 1.2:   # sinon : la file ne bouge plus depuis 1,2 s
+                break
+        taken, quiet, stop = q.with_name(f"fileforge_queue.{os.getpid()}.txt"), 0, time.time() + 8
+        while quiet < 3 and time.time() < stop:                 # prend la file, puis les éventuels retardataires
+            try:
+                os.replace(q, taken)
+                paths += [x.strip() for x in taken.read_text(encoding="utf-8").splitlines() if x.strip()]
+                taken.unlink(missing_ok=True)
+                quiet = 0
+            except FileNotFoundError:
+                quiet += 1
+            except PermissionError:                             # Windows : un autre processus écrit à l'instant
+                pass
+            time.sleep(0.1)
     finally:
         lock.unlink(missing_ok=True)
     return list(dict.fromkeys(paths))
@@ -502,11 +551,11 @@ def wait_for_show(name="Local\\FileForgeSearchShow"):
 
 def prewarm():
     """Roue en réserve : charge d'avance les bibliothèques des actions (PDF, images) pour qu'elles démarrent aussitôt."""
-    try:
-        import pymupdf  # noqa: F401
-        from PIL import Image  # noqa: F401
-    except Exception:
-        pass
+    for m in ("pymupdf", "PIL.Image"):
+        try:
+            importlib.import_module(m)
+        except Exception:
+            pass
 
 
 def take_request():

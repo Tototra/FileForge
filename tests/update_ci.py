@@ -6,9 +6,11 @@ Un faux site local annonce la version 9.9.9 avec les installateurs fraîchement 
   • « Plus tard » : rien n'est installé, et la même version n'est pas reproposée tout de suite ;
   • « Mettre à jour » : téléchargement, empreinte vérifiée, installation silencieuse par-dessus,
     l'agent des raccourcis redémarre, FileForge marche toujours ;
-  • une empreinte fausse est refusée ; déjà à jour → rien ne s'affiche.
+  • une empreinte fausse est refusée ; un manifeste non signé ou modifié est refusé ; déjà à jour → rien ne s'affiche.
+
+Les manifestes du faux site sont signés avec une clé de test (FF_UPDATE_PUBKEY, accepté seulement avec FF_UPDATE_URL).
 """
-import hashlib, json, os, shutil, subprocess, sys, tempfile, time
+import hashlib, importlib.util, json, os, secrets, shutil, subprocess, sys, tempfile, time
 from pathlib import Path
 from PIL import ImageGrab
 
@@ -20,6 +22,11 @@ PY = D / ("venv/Scripts/pythonw.exe" if IS_WIN else "venv/bin/python")
 LOG = D / "FileForge.log" if IS_WIN else Path.home() / "Library/Logs/FileForge.log"
 STATE = LOG.parent / "update.json"
 fails = []
+_ed = Path(__file__).resolve().parent.parent / "src" / "ed25519.py"
+_spec = importlib.util.spec_from_file_location("ed25519", _ed if _ed.exists() else D / "ed25519.py")
+ED = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(ED)
+KEY = secrets.token_bytes(32)
+PUB = ED.public_key(KEY).hex()
 
 
 def expect(name, cond, info=""):
@@ -35,7 +42,7 @@ def shot(name):
         print("capture impossible", e)
 
 
-def site(version, bad_sha=False, required=False):
+def site(version, bad_sha=False, required=False, signed=True, tamper=False):
     d = Path(tempfile.mkdtemp(prefix="ff-site-"))
     m = json.loads((BUILT / "manifest.json").read_text(encoding="utf-8"))
     m["version"], m["required"] = version, required
@@ -44,12 +51,18 @@ def site(version, bad_sha=False, required=False):
         shutil.copy(BUILT / f["name"], d / f["name"])
         if bad_sha:
             f["sha256"] = "0" * 64
-    (d / "manifest.json").write_text(json.dumps(m), encoding="utf-8")
+    raw = json.dumps(m).encode("utf-8")
+    if signed:
+        (d / "manifest.sig").write_text(ED.sign(KEY, raw).hex())
+    if tamper:                      # modifié après signature (ex. empreinte remplacée par un attaquant)
+        m["notes"] = ["modifié"]
+        raw = json.dumps(m).encode("utf-8")
+    (d / "manifest.json").write_bytes(raw)
     return d / "manifest.json"
 
 
 def run(manifest, choice=None, wait=True, timeout=1500):
-    env = dict(os.environ, FF_UPDATE_URL=str(manifest), PYTHONIOENCODING="utf-8")
+    env = dict(os.environ, FF_UPDATE_URL=str(manifest), FF_UPDATE_PUBKEY=PUB, PYTHONIOENCODING="utf-8")
     env.pop("FF_UPDATE_CHOICE", None)
     if choice:
         env["FF_UPDATE_CHOICE"] = choice
@@ -92,7 +105,7 @@ if IS_WIN:      # l'installateur de l'étape d'installation peut être resté su
     subprocess.run(["taskkill", "/F", "/IM", "FileForge-Setup.exe"], capture_output=True)
 STATE.unlink(missing_ok=True)
 cur = subprocess.run([str(D / ("venv/Scripts/python.exe" if IS_WIN else "venv/bin/python")), str(D / "updater.py"), "--check"],
-                     env=dict(os.environ, FF_UPDATE_URL=str(site("0.0.1"))), capture_output=True, text=True)
+                     env=dict(os.environ, FF_UPDATE_URL=str(site("0.0.1")), FF_UPDATE_PUBKEY=PUB), capture_output=True, text=True)
 info = json.loads(cur.stdout or "{}")
 expect("version installée lisible", bool(info.get("current")), cur.stdout[:200] + cur.stderr[-300:])
 expect("déjà à jour → pas de nouvelle version", info.get("newer") is False)
@@ -119,6 +132,13 @@ time.sleep(12); shot("2-empreinte-fausse")
 p.kill() if p.poll() is None else None
 expect("empreinte fausse : refusée", "ne correspond pas" in tail_log(15), tail_log(6))
 expect("empreinte fausse : rien n'a été installé", (D / "fileforge.py").stat().st_mtime == before)
+
+# 3 bis. manifeste non signé, puis modifié après signature : refusés avant tout téléchargement
+for label, kw in (("non signé", dict(signed=False)), ("modifié", dict(tamper=True))):
+    STATE.unlink(missing_ok=True)
+    p = run(site("9.9.9", **kw), choice="install", timeout=90)
+    expect(f"manifeste {label} : refusé", "signature" in tail_log(6), tail_log(4))
+    expect(f"manifeste {label} : rien n'a été installé", (D / "fileforge.py").stat().st_mtime == before)
 
 # 4. « Mettre à jour » : installation silencieuse complète
 STATE.unlink(missing_ok=True)

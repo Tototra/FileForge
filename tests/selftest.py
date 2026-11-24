@@ -103,3 +103,4 @@ try:
 except Exception as e:
     print("FAIL Markdown → PDF : blocs de code :", e); fail += 1
 print(f"\n{ok} OK / {fail} échecs")
+sys.exit(1 if fail else 0)

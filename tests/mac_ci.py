@@ -22,6 +22,8 @@ spec = u.spec_from_file_location("ff", D / "fileforge.py")
 ff = u.module_from_spec(spec); spec.loader.exec_module(ff)
 ff.notify = lambda m: None
 ff.choose = lambda items, prompt, default=None, **k: items[0]
+LOGF = Path.home() / "Library" / "Logs" / "FileForge.log"
+LOG0 = LOGF.stat().st_size if LOGF.exists() else 0          # seules les lignes écrites pendant ce test comptent
 T = Path.home() / "Documents" / "Essais FileForge"
 shutil.rmtree(T, ignore_errors=True); T.mkdir(parents=True)
 
@@ -85,8 +87,7 @@ for args, want, name in (([str(pptx)], "main", "roue"), (["--no-selection"], "dr
     except subprocess.TimeoutExpired:
         p.kill(); expect(f"{name} : se ferme", False)
 
-log = Path.home() / "Library" / "Logs" / "FileForge.log"
-txt = log.read_text(encoding="utf-8", errors="replace") if log.exists() else ""
+txt = LOGF.read_bytes()[LOG0:].decode("utf-8", "replace") if LOGF.exists() else ""
 (OUT / "FileForge-mac.log").write_text(txt, encoding="utf-8")
 expect("journal sans erreur Python", "Traceback" not in txt)
 print(f"\n{len(fails)} échec(s) : {fails}")

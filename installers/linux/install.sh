@@ -96,7 +96,7 @@ Type=Application
 Name=FileForge
 GenericName=Boîte à outils fichiers
 Comment=Convertir, compresser, éditer PDF, images, vidéos, audio, documents
-Exec=$LAUNCHER %F
+Exec="$LAUNCHER" %F
 Icon=fileforge
 Terminal=false
 Categories=Utility;Office;
@@ -124,7 +124,7 @@ X-KDE-Priority=TopLevel
 [Desktop Action fileforge]
 Name=FileForge…
 Icon=fileforge
-Exec=$LAUNCHER %F
+Exec="$LAUNCHER" %F
 EOF
 chmod +x "$DATA/kio/servicemenus/fileforge.desktop"
 # Nemo
@@ -133,7 +133,7 @@ cat > "$DATA/nemo/actions/fileforge.nemo_action" <<EOF
 [Nemo Action]
 Name=FileForge…
 Comment=Convertir, compresser, éditer
-Exec=$LAUNCHER %F
+Exec="$LAUNCHER" %F
 Icon-Name=fileforge
 Selection=notnone
 Extensions=any;
@@ -149,7 +149,7 @@ Profiles=all;
 
 [X-Action-Profile all]
 MimeTypes=all/all;
-Exec=$LAUNCHER %F
+Exec="$LAUNCHER" %F
 EOF
 # Thunar
 if command -v thunar >/dev/null || [[ -d "${XDG_CONFIG_HOME:-$HOME/.config}/Thunar" ]]; then

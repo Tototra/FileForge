@@ -2,6 +2,7 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'
 
 /assets/*
   Cache-Control: public, max-age=86400
@@ -11,4 +12,7 @@
   X-Robots-Tag: noindex
 
 /downloads/manifest.json
+  Cache-Control: no-cache
+
+/downloads/manifest.sig
   Cache-Control: no-cache

@@ -9,17 +9,27 @@
     updater.py --check     affiche l'état en JSON (tests)
 
 Le site publie downloads/manifest.json : version, notes, « required » (mise à jour importante, installée sans
-demander), et pour chaque système le fichier d'installation et son empreinte SHA-256. Le fichier téléchargé est
-refusé si son empreinte ne correspond pas. L'installation se fait en silence, par-dessus l'actuelle (réglages,
+demander), et pour chaque système le fichier d'installation et son empreinte SHA-256. Le manifeste est signé
+(downloads/manifest.sig, Ed25519) avec une clé privée qui ne quitte jamais l'ordinateur de publication : un manifeste
+non signé ou modifié est refusé, même s'il vient du bon site. Le fichier téléchargé est refusé si son empreinte ne
+correspond pas. L'installation se fait en silence, par-dessus l'actuelle (réglages,
 Python et LibreOffice conservés).
 """
 import hashlib, importlib.util, json, os, subprocess, sys, tempfile, threading, time, traceback
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-_spec = importlib.util.spec_from_file_location("fileforge", HERE / "fileforge.py")
-ff = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(ff)
+
+
+def _load(name):
+    spec = importlib.util.spec_from_file_location(name, HERE / f"{name}.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+ff = _load("fileforge")
+ed25519 = _load("ed25519")
 IS_WIN, IS_MAC = sys.platform == "win32", sys.platform == "darwin"
 if sys.stdout is None or sys.stderr is None:
     _lf = open(ff.LOG, "a", encoding="utf-8", buffering=1)
@@ -33,6 +43,27 @@ STATE = ff.LOG.parent / "update.json"
 EVERY = 20 * 3600            # au plus une vérification automatique par ~jour
 SNOOZE = 3 * 86400           # « Plus tard » : on reproposera la même version dans 3 jours
 OS_KEY = "windows" if IS_WIN else "macos" if IS_MAC else "linux"
+# clé publique de l'auteur (la clé privée correspondante signe chaque manifeste publié, voir tools/build.py)
+PUBLIC_KEY = "9d2ad63a068ebc82e077dcff1f92cd6b7f59071b2cc426c8852513043920f343"
+
+
+def public_key():
+    """Clé de vérification. FF_UPDATE_PUBKEY ne compte qu'avec FF_UPDATE_URL (site de test local)."""
+    if os.environ.get("FF_UPDATE_URL") and os.environ.get("FF_UPDATE_PUBKEY"):
+        return bytes.fromhex(os.environ["FF_UPDATE_PUBKEY"])
+    return bytes.fromhex(PUBLIC_KEY)
+
+
+def signed_manifest(url):
+    """Télécharge le manifeste et sa signature ; refuse tout manifeste qui n'a pas été signé par l'auteur."""
+    raw = fetch(url, timeout=20)
+    try:
+        sig = bytes.fromhex(fetch(url.rsplit(".", 1)[0] + ".sig", timeout=20).decode("ascii").strip())
+    except Exception as e:
+        raise RuntimeError(f"signature du manifeste introuvable ({e})") from None
+    if not ed25519.verify(public_key(), raw, sig):
+        raise RuntimeError("signature du manifeste invalide : mise à jour refusée")
+    return json.loads(raw)
 
 
 def log(m):
@@ -98,13 +129,14 @@ def check():
     """→ dict : current, latest, newer, required, notes, file (nom, sha256, url)."""
     global MANIFEST
     if os.environ.get("FF_UPDATE_URL"):
-        m = json.loads(fetch(MANIFEST, timeout=20))
+        m = signed_manifest(MANIFEST)
     else:
         err = None
-        for site in MIRRORS:
+        for site in MIRRORS:            # un miroir injoignable ou qui sert un manifeste non signé : le suivant
             try:
                 MANIFEST = f"{site}/downloads/manifest.json"
-                m = json.loads(fetch(MANIFEST, timeout=20)); break
+                m = signed_manifest(MANIFEST)
+                break
             except Exception as e:
                 err = e
         else:
@@ -157,14 +189,21 @@ def install(path):
             raise RuntimeError("l'installation ne s'est pas terminée (une autre installation de FileForge est peut-être "
                                "ouverte : ferme-la puis réessaie)")
     if IS_MAC:
+        import shutil
         d = Path(tempfile.mkdtemp(prefix="FileForge-maj-"))
-        subprocess.run(["ditto", "-x", "-k", str(path), str(d)], check=True)
-        script = next(d.rglob("install.command"))
-        env = dict(os.environ, FILEFORGE_UPDATE="1")
-        with open(ff.LOG, "a", encoding="utf-8") as out:
-            p = subprocess.Popen(["/bin/bash", str(script)], cwd=str(script.parent), env=env, stdout=out, stderr=out,
-                                 stdin=subprocess.DEVNULL, start_new_session=True)   # survit à l'arrêt de l'agent
-        return p.wait(timeout=3600)
+        try:
+            subprocess.run(["ditto", "-x", "-k", str(path), str(d)], check=True)
+            script = next(d.rglob("install.command"), None)
+            if script is None:
+                raise RuntimeError("paquet de mise à jour incomplet (install.command absent)")
+            env = dict(os.environ, FILEFORGE_UPDATE="1")
+            with open(ff.LOG, "a", encoding="utf-8") as out:
+                p = subprocess.Popen(["/bin/bash", str(script)], cwd=str(script.parent), env=env, stdout=out, stderr=out,
+                                     stdin=subprocess.DEVNULL, start_new_session=True)   # survit à l'arrêt de l'agent
+            return p.wait(timeout=3600)
+        finally:
+            shutil.rmtree(d, ignore_errors=True)
+            Path(path).unlink(missing_ok=True)
     ff.open_path(f"{SITE}/#download")         # Linux : page de téléchargement
     return 0
 
@@ -298,13 +337,16 @@ def main():
     if mode == "--check":            # simple consultation (tests, diagnostic) : ne décale pas la vérification du jour
         print(json.dumps(info)); return 0
     st["last_check"] = time.time(); st["latest_seen"] = info["latest"]; save_state(st)
-    if mode == "--check":
-        print(json.dumps(info)); return 0
     if mode == "--auto":
         if not info["newer"] or not info["file"]:
             return 0
         sn = st.get("snoozed") or {}
         if not info["required"] and sn.get("version") == info["latest"] and time.time() - sn.get("at", 0) < SNOOZE:
+            return 0
+        if (st.get("installed") or {}).get("version") == info["latest"]:
+            # déjà installée, et pourtant toujours « plus récente » : le paquet publié est incohérent ; on ne
+            # repropose pas la même mise à jour toutes les 30 minutes
+            log(f"{info['latest']} déjà installée mais version locale {info['current']} : paquet publié incohérent ?")
             return 0
         log(f"{info['latest']} disponible (installée : {info['current']})")
     window(info, manual=(mode == "--manual"))

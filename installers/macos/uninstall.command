@@ -6,7 +6,8 @@ pkill -f "$DEST/wheel.py" 2>/dev/null
 launchctl bootout "gui/$(id -u)/fr.fileforge.hotkey" 2>/dev/null
 rm -f "$HOME/Library/LaunchAgents/fr.fileforge.hotkey.plist" "$HOME/Library/Caches/FileForge/index-fichiers.tsv"
 rm -rf "$HOME/Library/Services/FileForge.workflow" "$HOME/Applications/FileForge.app"
-python3 - <<'PY' 2>/dev/null || true
+# Python privé de FileForge (le python3 du système ouvrirait la fenêtre « installer les outils de développement »)
+"$DEST/venv/bin/python" - <<'PY' 2>/dev/null || true
 import plistlib, subprocess
 raw = subprocess.run(["defaults", "export", "pbs", "-"], capture_output=True).stdout
 if raw:

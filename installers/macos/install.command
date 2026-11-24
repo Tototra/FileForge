@@ -144,7 +144,7 @@ else
   # FileForge récupère LibreOffice lui-même (image officielle) et le garde dans son dossier : rien à faire
   echo "      Téléchargement de LibreOffice (~350 Mo) pour convertir Word / PowerPoint / Excel en PDF…"
   BASE="https://download.documentfoundation.org/libreoffice/stable/"
-  V=$(curl -fsSL "$BASE" | grep -oE 'href="[0-9]+(\.[0-9]+)+/"' | grep -oE '[0-9]+(\.[0-9]+)+' | sort -t. -k1,1n -k2,2n -k3,3n | tail -1)
+  V=$(curl -fsSL "$BASE" | grep -oE 'href="[0-9]+(\.[0-9]+)+/"' | grep -oE '[0-9]+(\.[0-9]+)+' | sort -t. -k1,1n -k2,2n -k3,3n | tail -1) || true   # facultatif : ne doit jamais arrêter l'installation
   if [[ "$(uname -m)" == "arm64" ]]; then A="aarch64"; F="aarch64"; else A="x86_64"; F="x86-64"; fi
   DMG="$TMPDIR/fileforge-libreoffice.dmg"; MNT="$TMPDIR/fileforge-lo-mnt"
   if [[ -n "$V" ]] && curl -fsSL -o "$DMG" "$BASE$V/mac/$A/LibreOffice_${V}_MacOS_${F}.dmg"; then

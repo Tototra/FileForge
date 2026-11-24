@@ -28,7 +28,7 @@ Tout se passe sur ton ordinateur : aucun fichier n'est envoyé sur Internet, et 
 
 Télécharge le paquet de ton système depuis [le site](https://tototra.github.io/FileForge/), ou construis-les toi-même (voir plus bas).
 
-Une fois installé, FileForge propose lui-même les nouvelles versions (vérification une fois par jour, installation en un clic, empreinte SHA-256 vérifiée).
+Une fois installé, FileForge propose lui-même les nouvelles versions (vérification une fois par jour, installation en un clic). Chaque manifeste de version est signé (Ed25519) et chaque paquet vérifié par son empreinte SHA-256 : une version qui ne vient pas de l'auteur est refusée.
 
 | Système | Installation | Ouvrir la roue |
 | --- | --- | --- |
@@ -48,6 +48,8 @@ src/            le programme (commun aux trois systèmes)
   wheel.py        la roue (pywebview) et l'intégration à chaque système
   wheel.html      interface de la roue
   search.py       recherche de fichiers par nom (index local)
+  updater.py      mises à jour (manifeste signé, empreinte vérifiée)
+  ed25519.py      vérification des signatures (Python pur)
   hotkey_mac.py   agent macOS du raccourci global ⌃⌥G
   linux_setup.py  intégration Hyprland / Thunar
 installers/     scripts d'installation macOS, Windows, Linux
@@ -55,7 +57,8 @@ assets/         icônes
 site/           site de présentation (statique, prêt pour Cloudflare Pages)
   downloads/      paquets générés par tools/build.py
 tools/          build.py (paquets), site_data.py (données de la démo), make_icon.py
-tests/          selftest.py : toutes les actions ; windows_ci.py / windows_ui.py : tests sur un vrai Windows
+tests/          suite pytest (toutes les actions, éditeur, mises à jour, recherche, roue, paquets) ;
+                windows_ci.py / mac_ci.py / update_ci.py : tests sur une vraie installation (CI)
 .github/        workflow « Test Windows » : installe le .exe, teste et photographie la roue (branche windows)
 ```
 
@@ -63,8 +66,9 @@ tests/          selftest.py : toutes les actions ; windows_ci.py / windows_ui.py
 
 ```bash
 python3 -m venv .venv && . .venv/bin/activate
-pip install pymupdf pymupdf4llm pdf2docx pillow pillow-heif openpyxl pandas xlrd odfpy mammoth markdown python-pptx pywebview imageio-ffmpeg rapidfuzz
-python tests/selftest.py              # toutes les actions, sans interface
+pip install pymupdf pymupdf4llm pdf2docx pillow pillow-heif openpyxl pandas xlrd odfpy mammoth markdown markdown-it-py pygments python-pptx python-docx pywebview imageio-ffmpeg rapidfuzz pytest pyflakes
+python -m pytest tests -m "not slow"  # tests rapides (une vingtaine de secondes)
+python -m pytest tests                # tout : vidéo, audio, OCR, LibreOffice, LaTeX, paquets (~10 min)
 python src/wheel.py un_fichier.pdf    # ouvre la roue
 ```
 
@@ -79,7 +83,11 @@ python3 tools/site_data.py  # si les actions ou catégories ont changé (démo d
 
 1. Changer `__version__` dans `src/fileforge.py`.
 2. Écrire les nouveautés dans `tools/release.json` (`"required": true` pour une mise à jour importante, installée sans demander).
-3. `python3 tools/build.py` puis `npx wrangler deploy` : chaque ordinateur se voit proposer la mise à jour dans la journée.
+3. `python3 tools/build.py` : construit les paquets et **signe** le manifeste avec la clé privée
+   `~/.config/fileforge/update_signing.key` (jamais dans le dépôt ; à sauvegarder hors de l'ordinateur).
+   Sans elle, aucun ordinateur n'accepterait la mise à jour. `makensis` est obligatoire (`brew install makensis`).
+4. Commiter `site/`, puis `tools/publish_pages.sh` (GitHub Pages) et `npx wrangler deploy` (miroir) :
+   chaque ordinateur se voit proposer la mise à jour dans la journée.
 
 ## Publier le site
 
