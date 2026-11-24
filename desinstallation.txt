@@ -1,0 +1,2 @@
+durée : 240 s
+dossier restant : True / clic droit restant : False / entrée Applications : False

@@ -1,0 +1,2 @@
+agent au démarrage de session : False
+agent lancé par l'installateur : False
