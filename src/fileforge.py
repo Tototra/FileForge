@@ -10,7 +10,7 @@ import os, sys, re, io, json, math, shutil, subprocess, traceback, datetime, zip
 from pathlib import Path
 
 APP = "FileForge"
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 HOME_DIR = Path(__file__).resolve().parent
 IS_WIN = sys.platform == "win32"
 IS_MAC = sys.platform == "darwin"
